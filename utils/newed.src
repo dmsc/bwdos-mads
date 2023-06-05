@@ -1,0 +1,268 @@
+	ORG	$6000,$A800
+	JMP	START
+
+*************************************
+*				*
+*     " N E W E D "  PRO BW-DOS	*
+*				*
+*************************************
+
+* VOLNO: 128
+
+NAME	EQU	$6800
+
+***
+
+COMNAM	DFB 155
+	ASC "MOC."
+***
+
+START	LDA	$700
+	CMP	#'S'
+	BNE	ST0ER
+
+	LDA	$703
+	CMP	#'B'
+	BNE	ST0ER
+	LDA	$704
+	CMP	#'W'
+	BNE	ST0ER
+
+	LDA	$705
+	CMP	#$12
+	BCS	START2
+
+ST0ER	JSR	PRINT
+	DFB 155
+	ASC "Error: Not BW-DOS "
+	ASC "ver.1.20 or later !"
+	DFB 155,0
+
+	JMP	(10)
+***
+
+START2	LDA	10
+	CLC
+	ADC	#3
+	STA	GETNAME+1
+	LDA	11
+	ADC	#0
+	STA	GETNAME+2
+
+GETNAME	JSR	XDOS
+
+***
+
+	LDY	#33
+
+ST3	LDA	(10),Y
+	STA	NAME-33,Y
+
+	CMP	#$9B
+	BEQ	ST4
+
+	INY
+	CPY	#61
+	BCC	ST3
+*
+
+ST4	LDX	#4
+
+ST5	LDA	COMNAM,X
+	STA	NAME-33,Y
+
+	INY
+	DEX
+	BPL	ST5
+
+**TEST
+	JSR	CLOSE
+
+	LDA	#3
+	JSR	DOIT
+	BPL	ST6
+
+	JMP	ERROR
+*
+
+ST6	JSR	TESTFF
+	JSR	TESTFF
+
+	JSR	CLOSE
+
+*ROMkove E:
+
+	LDY	#0
+
+RED1	LDA	$31A,Y
+	CMP	#'E'
+	BEQ	RED2
+
+	INY
+	INY
+	INY
+	CPY	#33
+	BCC	RED1
+*
+	JSR	PRINT
+	DFB 155
+	ASC "Error: Handler 'E:'"
+	ASC " not present !"
+	DFB 155,0
+
+	JMP	ERR5
+**
+
+RED2	LDA	#0
+	STA	$31B,Y
+	LDA	#$E4
+	STA	$31C,Y
+
+*LOAD
+	LDA	#40
+*DO IT!
+
+DOIT	LDX	#$10
+	STA	$342,X
+
+	LDA	#NAME:L
+	STA	$344,X
+	LDA	#NAME:H
+	STA	$345,X
+
+	LDA	#4
+	STA	$34A,X
+	LDA	#0
+	STA	$34B,X
+
+	JMP	$E456
+
+**CLOSE
+
+CLOSE	LDX	#$10
+	LDA	#12
+	STA	$342,X
+	JMP	$E456
+***
+
+TESTFF	LDX	#$10
+	LDA	#0
+	STA	$348,X
+	STA	$349,X
+	LDA	#7
+	STA	$342,X
+
+	JSR	$E456
+	BMI	TFFER
+
+	CMP	#$FF
+	BNE	TFFER
+
+	RTS
+
+****
+
+TFFER	LDY	#152
+
+**
+
+ERROR	TYA
+	PHA
+
+	JSR	PRINT
+	DFB 155
+	ASC "Error "
+	DFB 0
+
+	LDX	#2
+	PLA
+
+ERR2	LDY	#0
+
+ERR3	CMP	ERRTAB,X
+	BCC	ERR4
+
+	SBC	ERRTAB,X
+	INY
+	BNE	ERR3
+**
+
+ERR4	PHA
+	TXA
+	PHA
+
+	TYA
+	ORA	#$30
+	JSR	PRT1
+
+	PLA
+	TAX
+	PLA
+
+	DEX
+	BPL	ERR2
+**
+	LDA	#$9B
+	JSR	PRT1
+
+ERR5	JSR	CLOSE
+
+*XDIV
+
+	LDY	#8
+	LDA	(10),Y
+	STA	ERR5J+1
+	INY
+	LDA	(10),Y
+	STA	ERR5J+2
+
+	LDY	#1
+ERR5J	JSR	XDOS
+
+**
+
+XDOS	JMP	(10)
+**
+
+ERRTAB	DFB 1,10,100
+
+***
+
+PRINT	PLA
+	STA	PRINT3+1
+	PLA
+	STA	PRINT3+2
+
+PRINT2	INC	PRINT3+1
+	BNE	PRINT3
+	INC	PRINT3+2
+
+PRINT3	LDA	$FFFF
+	BEQ	PRINT4
+
+	JSR	PRT1
+	JMP	PRINT2
+**
+
+PRINT4	LDA	PRINT3+2
+	PHA
+	LDA	PRINT3+1
+	PHA
+
+PRTEX	RTS
+
+***
+
+PRT1	TAY
+
+	LDA	#0
+	TAX
+	STA	$348,X
+	STA	$349,X
+
+	LDA	#11
+	STA	$342,X
+
+	TYA
+	JMP	$E456
+***
