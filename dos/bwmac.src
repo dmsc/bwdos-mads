@@ -1,0 +1,50 @@
+*************************************
+*				*
+*	B W  D O S  V 1.30  	*
+*				*
+*	     MACROS		*
+*				*
+*************************************
+
+EOL	.MACRO
+	DTA	155
+	.MEND
+*
+
+UC	.MACRO	A1,A2,A3
+	DTA	>(:A1)+64
+	DTA	<(:A1)
+	DTA	>(:A2)+32*(:A3)
+	DTA	<(:A2)
+	.MEND
+
+UCE	.MACRO	A1,A2,A3
+	DTA	>(:A1)+192
+	DTA	<(:A1)
+	DTA	>(:A2)+32*(:A3)
+	DTA	<(:A2)
+	.MEND
+
+UCS	.MACRO	A1,A2,A3
+	DTA	<((:A3)+32)
+	DTA	<((:A1)-DLVOL)
+	DTA	<((:A2)-DLVOL)
+	.MEND
+
+UCSE	.MACRO	A1,A2,A3
+	DTA	<((:A3)+32+128)
+	DTA	<((:A1)-DLVOL)
+	DTA	<((:A2)-DLVOL)
+	.MEND
+
+UCALL	.MACRO	A1
+	DTA	>(:A1)
+	DTA	<(:A1)
+	.MEND
+
+UCALLE	.MACRO	A1
+	DTA	>(:A1)+128
+	DTA	<(:A1)
+	.MEND
+
+
