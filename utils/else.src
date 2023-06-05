@@ -1,0 +1,148 @@
+	ORG	$6000,$A800
+	JMP	START
+
+*************************************
+*				*
+*     " E L S E "   PRO BW-DOS	*
+*				*
+*************************************
+
+* VOLNO: 128
+
+BUFFER	EQU	$6800
+
+***
+
+PRINT	PLA
+	STA	PRINT3+1
+	PLA
+	STA	PRINT3+2
+
+PRINT2	INC	PRINT3+1
+	BNE	PRINT3
+	INC	PRINT3+2
+
+PRINT3	LDA	$FFFF
+	BEQ	PRINT4
+
+	JSR	PRT1
+	JMP	PRINT2
+**
+
+PRINT4	LDA	PRINT3+2
+	PHA
+	LDA	PRINT3+1
+	PHA
+
+PRTEX	RTS
+
+***
+
+PRT1	TAY
+
+	LDA	#0
+	TAX
+	STA	$348,X
+	STA	$349,X
+
+	LDA	#11
+	STA	$342,X
+
+	TYA
+	JMP	$E456
+***
+
+XDIVIO	JMP	($FFFF)
+
+BATFLG	LDA	$FFFF
+	RTS
+
+***
+
+START	LDA	$700
+	CMP	#'S'
+	BEQ	START2
+
+	JSR	PRINT
+	DFB 155,253
+	ASC "Incorrect DOS version"
+	DFB 155,0
+
+	JMP	(10)
+***
+
+START2	LDA	10
+	CLC
+	ADC	#8
+	STA	XDIVIO+1
+	LDA	11
+	ADC	#0
+	STA	XDIVIO+2
+
+	LDA	10
+	SEC
+	SBC	#7
+	STA	BATFLG+1
+	LDA	11
+	SBC	#0
+	STA	BATFLG+2
+***
+
+NO2	JSR	GETLINE
+
+	LDX	#0
+
+NO3	LDA	BUFFER,X
+	CMP	VZOR,X
+	BNE	NO2
+
+	INX
+
+	CMP	#155
+	BNE	NO3
+***
+
+	JMP	(10)
+
+***
+
+VZOR	ASC "ENDIF"
+	DFB 155
+
+****
+
+GETLNX	LDY	#1
+	JSR	XDIVIO
+
+	JSR	PRINT
+	DFB 155
+	ASC "Error: End of batch "
+	ASC "file!"
+	DFB 155,0
+
+	JMP	(10)
+**
+
+GETLINE	JSR	BATFLG
+	BMI	GETLNX
+
+	LDX	#0
+	LDA	#5
+	STA	$342,X
+
+	LDA	#BUFFER:L
+	STA	$344,X
+	LDA	#BUFFER:H
+	STA	$345,X
+
+	LDA	#64
+	STA	$348,X
+	LDA	#0
+	STA	$349,X
+
+	JSR	$E456
+	BMI	GETLNX
+
+	RTS
+***
+

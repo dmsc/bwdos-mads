@@ -1,0 +1,253 @@
+	ORG	$6000,$A800
+	JMP	START
+
+*************************************
+*				*
+*	" I F "   PRO BW-DOS	*
+*				*
+*************************************
+
+* VOLNO: 128
+
+BUFFER	EQU	$6800
+
+***
+
+PRINT	PLA
+	STA	PRINT3+1
+	PLA
+	STA	PRINT3+2
+
+PRINT2	INC	PRINT3+1
+	BNE	PRINT3
+	INC	PRINT3+2
+
+PRINT3	LDA	$FFFF
+	BEQ	PRINT4
+
+	JSR	PRT1
+	JMP	PRINT2
+**
+
+PRINT4	LDA	PRINT3+2
+	PHA
+	LDA	PRINT3+1
+	PHA
+
+PRTEX	RTS
+
+***
+
+EOL	LDA	#$9B
+
+PRT1	TAY
+
+	LDA	#0
+	TAX
+	STA	$348,X
+	STA	$349,X
+
+	LDA	#11
+	STA	$342,X
+
+	TYA
+	JMP	$E456
+***
+
+XDIVIO	JMP	($FFFF)
+
+BATFLG	LDA	$FFFF
+	RTS
+
+***
+
+START	LDA	$700
+	CMP	#'S'
+	BEQ	START2
+
+	JSR	PRINT
+	DFB 155,253
+	ASC "Incorrect DOS version"
+	DFB 155,0
+
+	JMP	(10)
+***
+
+START2	LDA	10
+	CLC
+	ADC	#8
+	STA	XDIVIO+1
+	LDA	11
+	ADC	#0
+	STA	XDIVIO+2
+
+	LDA	10
+	SEC
+	SBC	#7
+	STA	BATFLG+1
+	LDA	11
+	SBC	#0
+	STA	BATFLG+2
+***
+	JSR	EOL
+
+	JSR	GETLINE
+
+	JSR	PRINT
+	ASC "<Y>...Yes  <N>...No  "
+	DFB 0
+***
+
+START3	JSR	CLOSE
+
+	LDX	#$10
+	LDA	#3
+	STA	$342,X
+
+	LDA	#KNAM:L
+	STA	$344,X
+	LDA	#KNAM:H
+	STA	$345,X
+
+	LDA	#4
+	STA	$34A,X
+	LDA	#0
+	STA	$34B,X
+
+	JSR	$E456
+	BMI	START3
+
+	LDX	#$10
+	LDA	#7
+	STA	$342,X
+	LDA	#0
+	STA	$348,X
+	STA	$349,X
+
+	JSR	$E456
+	BMI	START3
+
+	PHA
+	JSR	CLOSE
+	PLA
+
+	CMP	#27
+	BEQ	ESCAPE
+
+	AND	#$5F
+	CMP	#'Y'
+	BNE	NONO
+*
+
+YES0	JSR	PRINT
+	ASC "Yes!"
+	DFB 155,0
+
+	JMP	(10)
+***
+
+NONO	CMP	#'N'
+	BEQ	NO
+	BNE	START3
+
+* ESC
+
+ESCAPE	LDY	#1
+	JSR	XDIVIO
+
+	JSR	PRINT
+	DFB 155
+	ASC "(Batch file aborted)"
+	DFB 155,0
+
+NO3	JMP	(10)
+
+***
+
+NO	JSR	PRINT
+	ASC "No!"
+	DFB 155,155,0
+
+NO2	JSR	GETLINE
+
+	LDX	#0
+	JSR	TEST
+	BEQ	NO3
+
+	LDX	#VZ2-VZOR
+	JSR	TEST
+	BNE	NO2
+	BEQ	NO3
+
+***
+
+VZOR	ASC "ENDIF"
+	DFB 155
+VZ2	ASC "ELSE"
+	DFB 155
+
+***
+
+TEST	LDY	#0
+
+TEST2	LDA	BUFFER,Y
+	CMP	VZOR,X
+	BNE	TESTX
+
+	INY
+	INX
+
+	CMP	#$9B
+	BNE	TEST2
+
+	LDA	#0
+TESTX	RTS
+
+***
+
+CLOSE	LDX	#$10
+	LDA	#12
+	STA	$342,X
+
+	JMP	$E456
+***
+
+KNAM	ASC "K:"
+	DFB 155
+****
+
+GETLNX	LDY	#1
+	JSR	XDIVIO
+
+	JSR	PRINT
+	DFB 155
+	ASC "Error: End of batch "
+	ASC "file!"
+	DFB 155,0
+
+	JMP	(10)
+**
+
+GETLINE	JSR	BATFLG
+	BMI	GETLNX
+
+	LDX	#0
+	LDA	#5
+	STA	$342,X
+
+	LDA	#BUFFER:L
+	STA	$344,X
+	LDA	#BUFFER:H
+	STA	$345,X
+
+	LDA	#64
+	STA	$348,X
+	LDA	#0
+	STA	$349,X
+
+	JSR	$E456
+	BMI	GETLNX
+
+	RTS
+***
+

@@ -1,0 +1,145 @@
+	ORG	$6000,$A800
+	JMP	START
+
+*************************************
+*				*
+*    " V E R I F Y "  PRO BW-DOS	*
+*				*
+*************************************
+
+WRTADR	EPZ	128
+
+* VOLNO: 130
+
+***
+
+PRINT	PLA
+	STA	PRINT3+1
+	PLA
+	STA	PRINT3+2
+
+PRINT2	INC	PRINT3+1
+	BNE	PRINT3
+	INC	PRINT3+2
+
+PRINT3	LDA	$FFFF
+	BEQ	PRINT4
+
+	JSR	PRT1
+	JMP	PRINT2
+**
+
+PRINT4	LDA	PRINT3+2
+	PHA
+	LDA	PRINT3+1
+	PHA
+
+PRTEX	RTS
+
+***
+
+PRT1	TAY
+
+	LDA	#0
+	TAX
+	STA	$348,X
+	STA	$349,X
+
+	LDA	#11
+	STA	$342,X
+
+	TYA
+	JMP	$E456
+***
+
+GETNAME	JMP	PRTEX
+
+***
+
+START	LDA	$700
+	CMP	#'S'
+	BEQ	START2
+
+	JSR	PRINT
+	DFB 155,253
+	ASC "Incorrect DOS version"
+	DFB 155,0
+
+	JMP	(10)
+***
+
+START2	LDA	10
+	CLC
+	ADC	#3
+	STA	GETNAME+1
+	LDA	11
+	ADC	#0
+	STA	GETNAME+2
+
+	LDA	10
+	SEC
+	SBC	#2
+	STA	WRTADR
+	LDA	11
+	SBC	#0
+	STA	WRTADR+1
+**
+
+	JSR	GETNAME
+
+	LDY	#36
+	LDA	(10),Y
+	CMP	#'O'
+	BNE	BADPAR
+
+	INY
+	LDA	(10),Y
+	INY
+
+	CMP	#'N'
+	BEQ	ON1
+	CMP	#'F'
+	BNE	BADPAR
+* OFF?
+	CMP	(10),Y
+	BNE	BADPAR
+
+	INY
+	LDA	(10),Y
+	CMP	#$9B
+	BNE	BADPAR
+* OFF!
+	LDA	#'P'
+	BNE	ONOF2
+* ON?
+
+ON1	LDA	(10),Y
+	CMP	#$9B
+	BNE	BADPAR
+* ON!
+	LDA	#'W'
+
+ONOF2	LDY	#0
+	STA	(WRTADR),Y
+
+	JMP	(10)
+**
+
+BADPAR	JSR	PRINT
+	DFB 155
+	ASC "Bad parameter!"
+	DFB 155,0
+
+ERR5X	LDY	#8
+	LDA	(10),Y
+	STA	ERR5Y+1
+	INY
+	LDA	(10),Y
+	STA	ERR5Y+2
+	LDY	#1
+ERR5Y	JSR	$E474
+
+	JMP	(10)
+
+***
+

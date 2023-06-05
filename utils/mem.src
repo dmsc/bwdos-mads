@@ -1,0 +1,259 @@
+	ORG	$6000,$A800
+	JMP	START
+
+*************************************
+*				*
+*     " M E M "	PRO BW-DOS	*
+*				*
+*************************************
+
+* VOLNO: 128
+
+***
+
+PRINT	PLA
+	STA	PRINT3+1
+	PLA
+	STA	PRINT3+2
+
+PRINT2	INC	PRINT3+1
+	BNE	PRINT3
+	INC	PRINT3+2
+
+PRINT3	LDA	$FFFF
+	BEQ	PRINT4
+
+	JSR	PRT1
+	JMP	PRINT2
+**
+
+PRINT4	LDA	PRINT3+2
+	PHA
+	LDA	PRINT3+1
+	PHA
+
+PRTEX	RTS
+
+***
+
+POML	LDA	#'-'
+
+PRT1	TAY
+
+	LDA	#0
+	TAX
+	STA	$348,X
+	STA	$349,X
+
+	LDA	#11
+	STA	$342,X
+
+	TYA
+	JMP	$E456
+***
+
+GETNAME	JMP	PRTEX
+
+***
+
+START	LDA	$700
+	CMP	#'S'
+	BNE	START3
+
+START2	LDA	10
+	CLC
+	ADC	#3
+	STA	GETNAME+1
+	LDA	11
+	ADC	#0
+	STA	GETNAME+2
+
+	JSR	GETNAME
+
+	LDY	#36
+	LDA	(10),Y
+	CMP	#'/'
+	BNE	START3
+
+	INY
+	LDA	(10),Y
+	CMP	#'M'
+	BNE	START3
+
+	JMP	LONG
+***
+
+START3	JSR	PRINT
+	DFB 155
+	ASC "MEMLO = "
+	DFB 0
+
+	LDY	743
+	LDX	744
+	JSR	PRTHEX
+
+	JSR	PRINT
+	DFB 155
+	ASC "MEMHI = "
+	DFB 0
+
+	LDY	741
+	LDX	742
+	JSR	PRTHEX
+
+	LDA	#155
+	JSR	PRT1
+
+	JMP	(10)
+***
+
+LONG	JSR	PRINT
+	DFB 155
+	ASC "Current Memory-map :"
+	DFB 155,155
+
+	ASC "$0000-$007F "
+	ASC "System area"
+	DFB 155
+	ASC "$0080-$00FF "
+	ASC "User area"
+	DFB 155
+	ASC "$0100-$047F "
+	ASC "System area"
+	DFB 155
+	ASC "$0480-$06FF "
+	ASC "User area"
+	DFB 155
+	ASC "$0700-"
+	DFB 0
+
+	LDY	#31
+	LDA	(10),Y
+	PHA
+	TAX
+	DEY
+	LDA	(10),Y
+	PHA
+	TAY
+
+	JSR	PRTHEXM
+
+	JSR	PRINT
+	ASC " DOS"
+	DFB 155,0
+
+	PLA
+	TAY
+	PLA
+	TAX
+
+	CPY	743
+	BNE	LONG2
+	CPX	744
+	BEQ	LONG3
+
+LONG2	JSR	PRTHEX
+	JSR	POML
+
+	LDY	743
+	LDX	744
+	JSR	PRTHEXM
+
+	JSR	PRINT
+	ASC " Resident handlers"
+	DFB 155,0
+
+LONG3	LDY	743
+	LDX	744
+	JSR	PRTHEX
+	JSR	POML
+
+	LDY	741
+	LDX	742
+	JSR	PRTHEXM
+
+	JSR	PRINT
+	ASC " User area"
+	DFB 155,0
+
+	LDY	741
+	LDX	742
+	JSR	PRTHEX
+	JSR	POML
+
+	LDY	#0
+	LDX	106
+	JSR	PRTHEXM
+
+	JSR	PRINT
+	ASC " Screen memory"
+	DFB 155,0
+
+	LDY	#0
+	LDX	106
+
+	CPX	#$C0
+	BCS	LONG4
+**
+	JSR	PRTHEX
+
+	JSR	PRINT
+	ASC "-$BFFF Cartridge or "
+	ASC "Reserved"
+	DFB 155,0
+
+LONG4	JSR	PRINT
+	ASC "$C000-$CFFF Operating"
+	ASC " System"
+	DFB 155
+	ASC "$D000-$D7FF Input"
+	ASC "/Output area"
+	DFB 155
+	ASC "$D800-$FFFF Operating"
+	ASC " System"
+	DFB 155,0
+
+	JMP	(10)
+****
+
+PRTHEXM	TYA
+	BNE	PHXM2
+	DEX
+PHXM2	DEY
+
+PRTHEX	TYA
+	PHA
+	TXA
+	PHA
+
+	LDA	#'$'
+	JSR	PRT1
+
+	PLA
+	JSR	PRTHX2
+
+	PLA
+**
+
+PRTHX2	PHA
+	LSR
+	LSR
+	LSR
+	LSR
+	JSR	PRTHX3
+	PLA
+**
+
+PRTHX3	AND	#15
+	CLC
+	ADC	#$30
+	CMP	#$3A
+	BCC	PRTHX4
+
+	CLC
+	ADC	#7
+
+PRTHX4	JMP	PRT1
+
+****
+

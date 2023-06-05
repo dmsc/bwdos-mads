@@ -1,0 +1,146 @@
+	ORG	$6000,$A800
+	JMP	START
+
+*************************************
+*				*
+*     " P A U S E "   PRO BW-DOS	*
+*				*
+*************************************
+
+* VOLNO: 128
+
+***
+
+PRINT	PLA
+	STA	PRINT3+1
+	PLA
+	STA	PRINT3+2
+
+PRINT2	INC	PRINT3+1
+	BNE	PRINT3
+	INC	PRINT3+2
+
+PRINT3	LDA	$FFFF
+	BEQ	PRINT4
+
+	JSR	PRT1
+	JMP	PRINT2
+**
+
+PRINT4	LDA	PRINT3+2
+	PHA
+	LDA	PRINT3+1
+	PHA
+
+PRTEX	RTS
+
+***
+
+PRT1	TAY
+
+	LDA	#0
+	TAX
+	STA	$348,X
+	STA	$349,X
+
+	LDA	#11
+	STA	$342,X
+
+	TYA
+	JMP	$E456
+***
+
+XDIVIO	JMP	($FFFF)
+
+***
+
+START	LDA	$700
+	CMP	#'S'
+	BEQ	START2
+
+	JSR	PRINT
+	DFB 155,253
+	ASC "Incorrect DOS version"
+	DFB 155,0
+
+	JMP	(10)
+***
+
+START2	LDA	10
+	CLC
+	ADC	#8
+	STA	XDIVIO+1
+	LDA	11
+	ADC	#0
+	STA	XDIVIO+2
+***
+	JSR	PRINT
+	DFB 155
+	ASC "Press <RETURN> "
+	ASC "to continue..."
+	DFB 0
+***
+
+START3	JSR	CLOSE
+
+	LDX	#$10
+	LDA	#3
+	STA	$342,X
+
+	LDA	#KNAM:L
+	STA	$344,X
+	LDA	#KNAM:H
+	STA	$345,X
+
+	LDA	#4
+	STA	$34A,X
+	LDA	#0
+	STA	$34B,X
+
+	JSR	$E456
+	BMI	START3
+
+	LDX	#$10
+	LDA	#7
+	STA	$342,X
+	LDA	#0
+	STA	$348,X
+	STA	$349,X
+
+	JSR	$E456
+	BMI	START3
+
+	PHA
+	JSR	CLOSE
+	PLA
+
+	CMP	#155
+	BEQ	STRET
+	CMP	#27
+	BNE	START3
+* ESC
+	LDY	#1
+	JSR	XDIVIO
+
+	JSR	PRINT
+	DFB 155
+	ASC "(Batch file aborted)"
+	DFB 0
+* RETURN
+
+STRET	JSR	PRINT
+	DFB 155,0
+
+	JMP	(10)
+***
+
+CLOSE	LDX	#$10
+	LDA	#12
+	STA	$342,X
+
+	JMP	$E456
+***
+
+KNAM	ASC "K:"
+	DFB 155
+****
