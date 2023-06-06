@@ -1,4 +1,4 @@
-	ORG	$6000,$A800
+	ORG	$6000
 	JMP	START
 
 *************************************
@@ -59,9 +59,9 @@ START	LDA	$700
 	BEQ	START2
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Incorrect DOS version"
-	DFB 155,0
+	DTA 155,253
+	DTA C"Incorrect DOS version"
+	DTA 155,0
 
 	JMP	(10)
 ***
@@ -75,10 +75,10 @@ START2	LDA	10
 	STA	XDIVIO+2
 ***
 	JSR	PRINT
-	DFB 155
-	ASC "Press <RETURN> "
-	ASC "to continue..."
-	DFB 0
+	DTA 155
+	DTA C"Press <RETURN> "
+	DTA C"to continue..."
+	DTA 0
 ***
 
 START3	JSR	CLOSE
@@ -87,9 +87,9 @@ START3	JSR	CLOSE
 	LDA	#3
 	STA	$342,X
 
-	LDA	#KNAM:L
+	LDA	#<KNAM
 	STA	$344,X
-	LDA	#KNAM:H
+	LDA	#>KNAM
 	STA	$345,X
 
 	LDA	#4
@@ -123,13 +123,13 @@ START3	JSR	CLOSE
 	JSR	XDIVIO
 
 	JSR	PRINT
-	DFB 155
-	ASC "(Batch file aborted)"
-	DFB 0
+	DTA 155
+	DTA C"(Batch file aborted)"
+	DTA 0
 * RETURN
 
 STRET	JSR	PRINT
-	DFB 155,0
+	DTA 155,0
 
 	JMP	(10)
 ***
@@ -141,6 +141,6 @@ CLOSE	LDX	#$10
 	JMP	$E456
 ***
 
-KNAM	ASC "K:"
-	DFB 155
+KNAM	DTA C"K:"
+	DTA 155
 ****

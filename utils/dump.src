@@ -1,4 +1,4 @@
-	ORG	$6000,$A800
+	ORG	$6000
 	JMP	START
 
 *************************************
@@ -7,20 +7,20 @@
 *				*
 *************************************
 
-HEX	EPZ	128
+HEX	EQU	128
 
-POS	EPZ	131
-LEN	EPZ	134
+POS	EQU	131
+LEN	EQU	134
 
-ASCII	EPZ	137
+ASCII	EQU	137
 
-LLEN	EPZ	138
-LPOS	EPZ	139
+LLEN	EQU	138
+LPOS	EQU	139
 
-SAVE82	EPZ	140
+SAVE82	EQU	140
 
-STATUS	EPZ	141
-LIX	EPZ	142
+STATUS	EQU	141
+LIX	EQU	142
 
 * VOLNO: 143
 
@@ -136,8 +136,8 @@ GETHX4	ASL	HEX
 
 GHXERR	JSR	VRAT82
 	JSR	PRINT
-	ASC "Bad parameter !"
-	DFB 0
+	DTA C"Bad parameter !"
+	DTA 0
 
 ERR2X	LDY	#8
 	LDA	(10),Y
@@ -161,9 +161,9 @@ CLOSE	LDX	#$10
 	JMP	$E456
 ***
 
-CIONAME	LDA	#NAME:L
+CIONAME	LDA	#<NAME
 	STA	$344,X
-	LDA	#NAME:H
+	LDA	#>NAME
 	STA	$345,X
 
 	JMP	$E456
@@ -174,9 +174,9 @@ START	LDA	$700
 	BEQ	START2
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Incorrect DOS !"
-	DFB 155,0
+	DTA 155,253
+	DTA C"Incorrect DOS !"
+	DTA 155,0
 
 	JMP	(10)
 ***
@@ -279,8 +279,8 @@ ST8	JSR	CLOSE
 **
 	JSR	VRAT82
 	JSR	PRINT
-	ASC "Can't open file !"
-	DFB 0
+	DTA C"Can't open file !"
+	DTA 0
 	JMP	ERR2X
 
 *** POINT
@@ -306,9 +306,9 @@ ST9	LDA	POS
 ***
 	JSR	VRAT82
 	JSR	PRINT
-	ASC "Can't set "
-	ASC "file-position !"
-	DFB 0
+	DTA C"Can't set "
+	DTA C"file-position !"
+	DTA 0
 	JMP	ERR2X
 
 *** DUMP IT !
@@ -457,8 +457,8 @@ DUMPX2	CMP	#136
 
 	JSR	VRAT82
 	JSR	PRINT
-	ASC "Error while reading !"
-	DFB 0
+	DTA C"Error while reading !"
+	DTA 0
 
 DUMPX3	JMP	ERR2X
 
@@ -469,8 +469,8 @@ DESC	LDA	#$FF
 
 	JSR	VRAT82
 	JSR	PRINT
-	ASC "<Aborted>"
-	DFB 0
+	DTA C"<Aborted>"
+	DTA 0
 	JMP	ERR2
 
 *****
@@ -492,7 +492,7 @@ DPRTHX2	AND	#15
 
 	ADC	#6
 **
-	DFB $2C
+	DTA $2C
 DSPAC	LDA	#' '
 
 DPRT1	INC	LPOS

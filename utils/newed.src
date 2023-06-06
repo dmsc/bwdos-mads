@@ -1,4 +1,4 @@
-	ORG	$6000,$A800
+	ORG	$6000
 	JMP	START
 
 *************************************
@@ -13,8 +13,8 @@ NAME	EQU	$6800
 
 ***
 
-COMNAM	DFB 155
-	ASC "MOC."
+COMNAM	DTA 155
+	DTA C"MOC."
 ***
 
 START	LDA	$700
@@ -33,10 +33,10 @@ START	LDA	$700
 	BCS	START2
 
 ST0ER	JSR	PRINT
-	DFB 155
-	ASC "Error: Not BW-DOS "
-	ASC "ver.1.20 or later !"
-	DFB 155,0
+	DTA 155
+	DTA C"Error: Not BW-DOS "
+	DTA C"ver.1.20 or later !"
+	DTA 155,0
 
 	JMP	(10)
 ***
@@ -105,10 +105,10 @@ RED1	LDA	$31A,Y
 	BCC	RED1
 *
 	JSR	PRINT
-	DFB 155
-	ASC "Error: Handler 'E:'"
-	ASC " not present !"
-	DFB 155,0
+	DTA 155
+	DTA C"Error: Handler 'E:'"
+	DTA C" not present !"
+	DTA 155,0
 
 	JMP	ERR5
 **
@@ -125,9 +125,9 @@ RED2	LDA	#0
 DOIT	LDX	#$10
 	STA	$342,X
 
-	LDA	#NAME:L
+	LDA	#<NAME
 	STA	$344,X
-	LDA	#NAME:H
+	LDA	#>NAME
 	STA	$345,X
 
 	LDA	#4
@@ -170,9 +170,9 @@ ERROR	TYA
 	PHA
 
 	JSR	PRINT
-	DFB 155
-	ASC "Error "
-	DFB 0
+	DTA 155
+	DTA C"Error "
+	DTA 0
 
 	LDX	#2
 	PLA
@@ -224,7 +224,7 @@ ERR5J	JSR	XDOS
 XDOS	JMP	(10)
 **
 
-ERRTAB	DFB 1,10,100
+ERRTAB	DTA 1,10,100
 
 ***
 

@@ -1,4 +1,4 @@
-	ORG	$6000,$A800
+	ORG	$6000
 	JMP	START
 
 *************************************
@@ -7,21 +7,21 @@
 *				*
 *************************************
 
-NAMOFFS	EPZ	128
-TMP	EPZ	129
+NAMOFFS	EQU	128
+TMP	EQU	129
 
-EMPTYPOS	EPZ	130
-STATUS	EPZ	132
-FILEPOS	EPZ	133
+EMPTYPOS	EQU	130
+STATUS	EQU	132
+FILEPOS	EQU	133
 
-SECT1ST	EPZ	135
-MAINSECT	EPZ	137
+SECT1ST	EQU	135
+MAINSECT	EQU	137
 
-MAINSTAT	EPZ	140
-SRCPOS	EPZ	141
-DSTPOS	EPZ	143
+MAINSTAT	EQU	140
+SRCPOS	EQU	141
+DSTPOS	EQU	143
 
-SUBD1ST	EPZ	145
+SUBD1ST	EQU	145
 
 **VOLNO: 147
 
@@ -177,9 +177,9 @@ ERROR	TYA
 	PHA
 
 	JSR	PRINT
-	DFB 155
-	ASC "Error "
-	DFB 0
+	DTA 155
+	DTA C"Error "
+	DTA 0
 
 	LDX	#2
 	PLA
@@ -226,7 +226,7 @@ ERR5	JSR	CLOSE
 	JMP	(10)
 **
 
-ERRTAB	DFB 1,10,100
+ERRTAB	DTA 1,10,100
 
 ***
 
@@ -289,15 +289,15 @@ CIOERR	JMP	ERROR
 GETHEAD	JSR	POINT0
 
 GETDIR	LDA	#7
-	DFB $2C
+	DTA $2C
 PUTDIR	LDA	#11
 
 	LDX	#$10
 	STA	$342,X
 
-	LDA	#DIRBUF:L
+	LDA	#<DIRBUF
 	STA	$344,X
-	LDA	#DIRBUF:H
+	LDA	#>DIRBUF
 	STA	$345,X
 	LDA	#23
 	STA	$348,X
@@ -316,9 +316,9 @@ GTDRET	RTS
 ****
 
 NOTE	LDX	#$10
-	LDA	#SRC:L
+	LDA	#<SRC
 	STA	$344,X
-	LDA	#SRC:H
+	LDA	#>SRC
 	STA	$345,X
 	LDA	#38
 
@@ -355,9 +355,9 @@ POINT	TXA
 	LDA	#0
 	STA	$34E,X
 
-	LDA	#SRC:L
+	LDA	#<SRC
 	STA	$344,X
-	LDA	#SRC:H
+	LDA	#>SRC
 	STA	$345,X
 
 	LDA	#37
@@ -433,9 +433,9 @@ START	LDA	$700
 	BEQ	START2
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Incorrect DOS version"
-	DFB 155,0
+	DTA 155,253
+	DTA C"Incorrect DOS version"
+	DTA 155,0
 
 	JMP	(10)
 ***
@@ -475,10 +475,10 @@ STRT2B	INY
 *JINY DRIVE
 
 	JSR	PRINT
-	DFB 155
-	ASC "Can't move to "
-	ASC "another drive!"
-	DFB 155,0
+	DTA 155
+	DTA C"Can't move to "
+	DTA C"another drive!"
+	DTA 155,0
 	JMP	ERR5X
 ***
 
@@ -486,8 +486,8 @@ STRT2C	JSR	GETFLTR
 
 *SEARCH SOURCE
 
-	LDY	#SRC:L
-	LDX	#SRC:H
+	LDY	#<SRC
+	LDX	#>SRC
 	LDA	#$14
 	JSR	OPEN
 
@@ -502,9 +502,9 @@ STRT2CA	LDA	DIRBUF,X
 	BPL	STRT2D
 
 NOTF	JSR	PRINT
-	DFB 155
-	ASC "File not found !"
-	DFB 155,0
+	DTA 155
+	DTA C"File not found !"
+	DTA 155,0
 	JMP	ERR5X
 
 * OK
@@ -600,8 +600,8 @@ STRT3P	STA	DST,X
 
 ** SEARCH V DEST DIR
 
-STRT4	LDY	#DST:L
-	LDX	#DST:H
+STRT4	LDY	#<DST
+	LDX	#>DST
 	LDA	#$14
 	JSR	OPEN
 
@@ -621,24 +621,24 @@ STRT4AA	LDA	DIRBUF,X
 	BPL	STRT4AA
 *SAME DIR
 	JSR	PRINT
-	DFB 155
-	ASC "Source and destination"
-	ASC " directory"
-	DFB 155
-	ASC "is the same."
-	DFB 155,0
+	DTA 155
+	DTA C"Source and destination"
+	DTA C" directory"
+	DTA 155
+	DTA C"is the same."
+	DTA 155,0
 	JMP	ERR5
 **
 STRT4AB	JSR	SEARCH
 	BMI	STRT5
 *UZ JE!
 	JSR	PRINT
-	DFB 155
-	ASC "May not move - "
-	ASC "already exists"
-	DFB 155
-	ASC "in target directory !"
-	DFB 155,0
+	DTA 155
+	DTA C"May not move - "
+	DTA C"already exists"
+	DTA 155
+	DTA C"in target directory !"
+	DTA 155,0
 	JMP	ERR5X
 
 *JDE O SUBDIR?
@@ -650,9 +650,9 @@ STRT5	LDA	EMPTYPOS
 	BPL	STRT5AA
 *
 	JSR	PRINT
-	DFB 155
-	ASC "Directory full !"
-	DFB 155,0
+	DTA 155
+	DTA C"Directory full !"
+	DTA 155,0
 	JMP	ERR5X
 **
 
@@ -751,12 +751,12 @@ STRT5H	LDA	#'>'
 *NELZE - LOOPED
 
 LOOPED	JSR	PRINT
-	DFB 155
-	ASC "May not move - "
-	ASC "loop in directory"
-	DFB 155
-	ASC "structure !"
-	DFB 155,0
+	DTA 155
+	DTA C"May not move - "
+	DTA C"loop in directory"
+	DTA 155
+	DTA C"structure !"
+	DTA 155,0
 	JMP	ERR5X
 
 *NEXT DIR
@@ -780,8 +780,8 @@ STRT5J	LDA	#':'
 
 *ZJISTI SECT1ST
 
-	LDY	#PATHBUF:L
-	LDX	#PATHBUF:H
+	LDY	#<PATHBUF
+	LDX	#>PATHBUF
 	LDA	#$14
 	JSR	OPEN
 
@@ -791,9 +791,9 @@ STRT5J	LDA	#':'
 *NENASEL - DIVNE...
 
 DIVNE	JSR	PRINT
-	DFB 155
-	ASC "Disk corrupted !"
-	DFB 155,0
+	DTA 155
+	DTA C"Disk corrupted !"
+	DTA 155,0
 	JMP	ERR5X
 **
 
@@ -823,8 +823,8 @@ STRT5K	LDA	STATUS
 
 * READ SOURCE ENTRY
 
-STRT6	LDY	#SRC:L
-	LDX	#SRC:H
+STRT6	LDY	#<SRC
+	LDX	#>SRC
 	LDA	#$1C
 	JSR	OPEN
 
@@ -847,8 +847,8 @@ STRT6	LDY	#SRC:L
 
 * SAVE DEST ENTRY
 
-	LDY	#DST:L
-	LDX	#DST:H
+	LDY	#<DST
+	LDX	#>DST
 	LDA	#$1C
 	JSR	OPEN
 
@@ -892,8 +892,8 @@ STRT6BAB	STA	DST+4,X
 	LDA	#'.'
 	STA	DST+2,X
 
-	LDY	#DST:L
-	LDX	#DST:H
+	LDY	#<DST
+	LDX	#>DST
 	LDA	#$1C
 	JSR	OPEN
 * READ
@@ -925,9 +925,9 @@ STRT6BC	LDA	SECT1ST
 ** HOTOVO!
 
 STRT6C	JSR	PRINT
-	DFB 155
-	ASC "O.K."
-	DFB 155,0
+	DTA 155
+	DTA C"O.K."
+	DTA 155,0
 
 	JMP	ERR5
 
@@ -951,12 +951,12 @@ PUTNM2	LDA	PATHBUF-1,X
 ***
 
 PTHTOOL	JSR	PRINT
-	DFB 155
-	ASC "Internal buffer for "
-	ASC "dest. path"
-	DFB 155
-	ASC "overflow. Sorry!"
-	DFB 155,0
+	DTA 155
+	DTA C"Internal buffer for "
+	DTA C"dest. path"
+	DTA 155
+	DTA C"overflow. Sorry!"
+	DTA 155,0
 	JMP	ERR5X
 ***
 
@@ -1015,13 +1015,13 @@ ERJP2	JMP	ERROR
 
 **
 
-RWSIOT	DFB	$31
-RWSDRIV	DFB	0,'R'
-	DFB	64
-	DFW	SECBUF
-	DFB 7,0
-SECLEN	DFW	128
-SECNUM	DFW	1
+RWSIOT	DTA	$31
+RWSDRIV	DTA	0,'R'
+	DTA	64
+	DTA	A(SECBUF)
+	DTA 7,0
+SECLEN	DTA	A(128)
+SECNUM	DTA	A(1)
 
 ***
 

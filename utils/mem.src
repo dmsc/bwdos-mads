@@ -1,4 +1,4 @@
-	ORG	$6000,$A800
+	ORG	$6000
 	JMP	START
 
 *************************************
@@ -84,18 +84,18 @@ START2	LDA	10
 ***
 
 START3	JSR	PRINT
-	DFB 155
-	ASC "MEMLO = "
-	DFB 0
+	DTA 155
+	DTA C"MEMLO = "
+	DTA 0
 
 	LDY	743
 	LDX	744
 	JSR	PRTHEX
 
 	JSR	PRINT
-	DFB 155
-	ASC "MEMHI = "
-	DFB 0
+	DTA 155
+	DTA C"MEMHI = "
+	DTA 0
 
 	LDY	741
 	LDX	742
@@ -108,24 +108,24 @@ START3	JSR	PRINT
 ***
 
 LONG	JSR	PRINT
-	DFB 155
-	ASC "Current Memory-map :"
-	DFB 155,155
+	DTA 155
+	DTA C"Current Memory-map :"
+	DTA 155,155
 
-	ASC "$0000-$007F "
-	ASC "System area"
-	DFB 155
-	ASC "$0080-$00FF "
-	ASC "User area"
-	DFB 155
-	ASC "$0100-$047F "
-	ASC "System area"
-	DFB 155
-	ASC "$0480-$06FF "
-	ASC "User area"
-	DFB 155
-	ASC "$0700-"
-	DFB 0
+	DTA C"$0000-$007F "
+	DTA C"System area"
+	DTA 155
+	DTA C"$0080-$00FF "
+	DTA C"User area"
+	DTA 155
+	DTA C"$0100-$047F "
+	DTA C"System area"
+	DTA 155
+	DTA C"$0480-$06FF "
+	DTA C"User area"
+	DTA 155
+	DTA C"$0700-"
+	DTA 0
 
 	LDY	#31
 	LDA	(10),Y
@@ -139,8 +139,8 @@ LONG	JSR	PRINT
 	JSR	PRTHEXM
 
 	JSR	PRINT
-	ASC " DOS"
-	DFB 155,0
+	DTA C" DOS"
+	DTA 155,0
 
 	PLA
 	TAY
@@ -160,8 +160,8 @@ LONG2	JSR	PRTHEX
 	JSR	PRTHEXM
 
 	JSR	PRINT
-	ASC " Resident handlers"
-	DFB 155,0
+	DTA C" Resident handlers"
+	DTA 155,0
 
 LONG3	LDY	743
 	LDX	744
@@ -173,8 +173,8 @@ LONG3	LDY	743
 	JSR	PRTHEXM
 
 	JSR	PRINT
-	ASC " User area"
-	DFB 155,0
+	DTA C" User area"
+	DTA 155,0
 
 	LDY	741
 	LDX	742
@@ -186,8 +186,8 @@ LONG3	LDY	743
 	JSR	PRTHEXM
 
 	JSR	PRINT
-	ASC " Screen memory"
-	DFB 155,0
+	DTA C" Screen memory"
+	DTA 155,0
 
 	LDY	#0
 	LDX	106
@@ -198,20 +198,20 @@ LONG3	LDY	743
 	JSR	PRTHEX
 
 	JSR	PRINT
-	ASC "-$BFFF Cartridge or "
-	ASC "Reserved"
-	DFB 155,0
+	DTA C"-$BFFF Cartridge or "
+	DTA C"Reserved"
+	DTA 155,0
 
 LONG4	JSR	PRINT
-	ASC "$C000-$CFFF Operating"
-	ASC " System"
-	DFB 155
-	ASC "$D000-$D7FF Input"
-	ASC "/Output area"
-	DFB 155
-	ASC "$D800-$FFFF Operating"
-	ASC " System"
-	DFB 155,0
+	DTA C"$C000-$CFFF Operating"
+	DTA C" System"
+	DTA 155
+	DTA C"$D000-$D7FF Input"
+	DTA C"/Output area"
+	DTA 155
+	DTA C"$D800-$FFFF Operating"
+	DTA C" System"
+	DTA 155,0
 
 	JMP	(10)
 ****

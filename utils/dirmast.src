@@ -1,4 +1,4 @@
-	ORG	$3800,$A800
+	ORG	$3800
 	JMP	START
 *************************************
 *				*
@@ -6,26 +6,26 @@
 *				*
 *************************************
 
-POCET	EPZ	130
-ZPG1	EPZ	132
-SCRPOS	EPZ	134
-KURPOS	EPZ	136
-KURFLG	EPZ	138
-ZPG2	EPZ	140
-KURTYP	EPZ	152
-ORIPO	EPZ	154
+POCET	EQU	130
+ZPG1	EQU	132
+SCRPOS	EQU	134
+KURPOS	EQU	136
+KURFLG	EQU	138
+ZPG2	EQU	140
+KURTYP	EQU	152
+ORIPO	EQU	154
 
-SCRCNT	EPZ	139
-AKTPOS	EPZ	142
-ZOBZ	EPZ	144
-ZIF	EPZ	146
-KAFE	EPZ	147
-FLAGZ	EPZ	148
-ODDEL	EPZ	150	;MUSI ZPG
-TIX	EPZ	151
-NASTYP	EPZ	153
+SCRCNT	EQU	139
+AKTPOS	EQU	142
+ZOBZ	EQU	144
+ZIF	EQU	146
+KAFE	EQU	147
+FLAGZ	EQU	148
+ODDEL	EQU	150	;MUSI ZPG
+TIX	EQU	151
+NASTYP	EQU	153
 
-CONVPR	EPZ	156
+CONVPR	EQU	156
 
 *** VOLNO: 159
 
@@ -40,9 +40,9 @@ L0OD2	LDA	FNAME-1,X
 	RTS
 ***
 
-STERR	ASC "Incorrect DOS "
-	ASC "version !"
-	DFB 253,155
+STERR	DTA C"Incorrect DOS "
+	DTA C"version !"
+	DTA 253,155
 ***
 
 START	LDA	$700
@@ -51,8 +51,8 @@ START	LDA	$700
 
 	JSR	EOL
 
-	LDX	#STERR:H
-	LDY	#STERR:L
+	LDX	#>STERR
+	LDY	#<STERR
 	JSR	PRINT
 
 	JMP	(10)
@@ -77,8 +77,8 @@ INI1	STA	PRAL,X
 	LDA	#0
 	STA	$34B,X
 
-	LDY	#KNAME:L
-	LDA	#KNAME:H
+	LDY	#<KNAME
+	LDA	#>KNAME
 
 	JSR	OPEN
 
@@ -126,8 +126,8 @@ L0BAB	INY
 
 **CEKANI NA KLAVESU
 
-	LDX	#QTEXT:H
-	LDY	#QTEXT:L
+	LDX	#>QTEXT
+	LDY	#<QTEXT
 	JSR	PRINT
 	JSR	GETK
 
@@ -135,18 +135,18 @@ L2J	JMP	LOOP2
 
 ***
 
-SYNTER	LDX	#SYNTTX:H
-	LDY	#SYNTTX:L
+SYNTER	LDX	#>SYNTTX
+	LDY	#<SYNTTX
 	JMP	DOSPRT
 **
 
-SYNTTX	ASC "Syntax: DIRMAST [Dn:]"
-	ASC "[path] [/Q]"
-	DFB 253,155
+SYNTTX	DTA C"Syntax: DIRMAST [Dn:]"
+	DTA C"[path] [/Q]"
+	DTA 253,155
 
-QTEXT	ASC "Insert disk, and press"
-	ASC " any key..."
-	DFB 155
+QTEXT	DTA C"Insert disk, and press"
+	DTA C" any key..."
+	DTA 155
 ****
 
 GETNM	JMP	INSER7
@@ -195,9 +195,9 @@ LOOP2	LDA	#155
 	LDA	#$14
 	JSR	OPENFNM
 
-	LDA	#KONEC:L
+	LDA	#<KONEC
 	STA	ZPG2
-	LDA	#KONEC:H
+	LDA	#>KONEC
 	STA	ZPG2+1
 
 LOOP3	LDX	#$10
@@ -244,8 +244,8 @@ LOOP4A	JSR	ADZ2
 	CPY	#23
 	BCS	LOOP3
 
-	LDX	#TOOLONG:H
-	LDY	#TOOLONG:L
+	LDX	#>TOOLONG
+	LDY	#<TOOLONG
 	JMP	DOSPRT
 
 LOOP5	LDX	#$10
@@ -253,8 +253,8 @@ LOOP5	LDX	#$10
 
 *** CHKDSK
 
-LOOP6	LDX	#CHK1:H
-	LDY	#CHK1:L
+LOOP6	LDX	#>CHK1
+	LDY	#<CHK1
 	JSR	CHKDSK
 
 *** NASAD SVUJ OBRAZ
@@ -289,16 +289,16 @@ MAINLOOP	LDA	88
 
 *** NADPIS
 
-	LDX	#BWLN:H
-	LDY	#BWLN:L
+	LDX	#>BWLN
+	LDY	#<BWLN
 	JSR	ZOBR
 
-	LDX	#OL1:H
-	LDY	#OL1:L
+	LDX	#>OL1
+	LDY	#<OL1
 	JSR	ZOBR
 
-	LDX	#OL2:H
-	LDY	#OL2:L
+	LDX	#>OL2
+	LDY	#<OL2
 	JSR	ZOBR
 
 *** INIT PRO ZOBRAZENI DIR.
@@ -306,9 +306,9 @@ MAINLOOP	LDA	88
 	LDA	#21
 	STA	SCRCNT
 
-	LDA	#KONEC:L
+	LDA	#<KONEC
 	STA	ZPG2
-	LDA	#KONEC:H
+	LDA	#>KONEC
 	STA	ZPG2+1
 
 	LDA	#0
@@ -440,8 +440,8 @@ ML7Y	DEX
 
 *** VLASTNI VYPIS
 
-ML8	LDX	#BUFFT:H
-	LDY	#BUFFT:L
+ML8	LDX	#>BUFFT
+	LDY	#<BUFFT
 	JSR	ZOBR
 
 	JSR	ADZ2
@@ -488,15 +488,15 @@ TEXTJ	JMP	TEXT
 **
 
 NORI	AND	#$5F
-	CMP	#'E
+	CMP	#'E'
 	BEQ	ERASE
-	CMP	#'D
+	CMP	#'D'
 	BEQ	DATUM
-	CMP	#'C
+	CMP	#'C'
 	BEQ	TEXTJ
-	CMP	#'Q
+	CMP	#'Q'
 	BEQ	QUIT
-	CMP	#'T
+	CMP	#'T'
 	BNE	MENU
 
 *** NOVY CAS
@@ -505,8 +505,8 @@ CAS	LDA	#':'
 	STA	ODDEL
 
 	LDA	#20
-	LDX	#TIMLIN:H
-	LDY	#TIMLIN:L
+	LDX	#>TIMLIN
+	LDY	#<TIMLIN
 
 TIME2J	JMP	TIME2
 
@@ -515,8 +515,8 @@ TIME2J	JMP	TIME2
 DATUM	LDA	#'-'
 	STA	ODDEL
 
-	LDX	#DATLIN:H
-	LDY	#DATLIN:L
+	LDX	#>DATLIN
+	LDY	#<DATLIN
 	LDA	#17
 	BNE	TIME2J
 
@@ -524,8 +524,8 @@ DATUM	LDA	#'-'
 
 ESCRUT	JSR	HORNI
 
-	LDX	#ESCLIN:H
-	LDY	#ESCLIN:L
+	LDX	#>ESCLIN
+	LDY	#<ESCLIN
 	JSR	ZOBR
 
 	JSR	GETK
@@ -590,8 +590,8 @@ TLOPKU	LDA	#126
 	STA	TBU,X
 
 TLOP	JSR	HORREP
-	LDX	#TEXTT:H
-	LDY	#TEXTT:L
+	LDX	#>TEXTT
+	LDY	#<TEXTT
 	JSR	ZOBR
 
 	JSR	GETK
@@ -795,8 +795,8 @@ Q2	LDA	KURFLG
 	BNE	DWX
 
 	JSR	HORNI
-	LDX	#QTX:H
-	LDY	#QTX:L
+	LDX	#>QTX
+	LDY	#<QTX
 	JSR	ZOBR
 
 	JSR	GETK
@@ -806,8 +806,8 @@ Q2	LDA	KURFLG
 	BNE	DWX
 
 Q3	JSR	HORREP
-	LDX	#QTX2:H
-	LDY	#QTX2:L
+	LDX	#>QTX2
+	LDY	#<QTX2
 	JSR	ZOBR
 
 	LDX	#$10
@@ -815,8 +815,8 @@ Q3	JSR	HORREP
 
 *** NEVYMENIL NEKDO DISKETU ???
 
-	LDX	#CHK2:H
-	LDY	#CHK2:L
+	LDX	#>CHK2
+	LDY	#<CHK2
 	JSR	CHKDSK
 
 	LDX	#16
@@ -849,10 +849,10 @@ Q4	LDA	CHK1,X
 
 	LDA	ZPG2
 	SEC
-	SBC	#KONEC:L
+	SBC	#<KONEC
 	PHA
 	LDA	ZPG2+1
-	SBC	#KONEC:H
+	SBC	#>KONEC
 	TAY
 
 	PLA
@@ -885,9 +885,9 @@ ORIDOP	LDA	POCET
 	BEQ	ORIDOPX
 
 ORIDP1	LDX	#$10
-	LDA	#BUFFF:L
+	LDA	#<BUFFF
 	STA	$344,X
-	LDA	#BUFFF:H
+	LDA	#>BUFFF
 	STA	$345,X
 
 	LDA	#23
@@ -923,18 +923,18 @@ ZAPIS2	LDA	#$18
 	JSR	POSKU
 
 	LDX	#$10
-	LDA	#KONEC:L
+	LDA	#<KONEC
 	STA	$344,X
-	LDA	#KONEC:H
+	LDA	#>KONEC
 	STA	$345,X
 
 	LDA	ZPG2
 	SEC
-	SBC	#KONEC:L
+	SBC	#<KONEC
 	STA	$348,X
 
 	LDA	ZPG2+1
-	SBC	#KONEC:H
+	SBC	#>KONEC
 	STA	$349,X
 
 	ORA	$348,X
@@ -1136,7 +1136,7 @@ TIME2Z	TYA
 	JSR	OBNKU
 
 	LDA	#160
-	DFB $2C
+	DTA $2C
 TIME3	LDA	ODDEL
 
 	JSR	PRT1
@@ -1253,18 +1253,18 @@ FPOR2	ORA	(FLAGZ),Y
 	BNE	FTXN
 
 	LDA	#34	;"
-	DFB $2C
+	DTA $2C
 FTXN	LDA	#'*'
 
 FEND	RTS
 
 **
 
-FTB1	DFB 0,$28,$29,$18,$19
-	DFB $38,$39,$10,9,8
+FTB1	DTA 0,$28,$29,$18,$19
+	DTA $38,$39,$10,9,8
 
-FTB2	ASC "?>>=="
-	ASC "===* "
+FTB2	DTA C"?>>=="
+	DTA C"===* "
 
 ***
 
@@ -1329,8 +1329,8 @@ OPENFNM	LDX	#$10
 	LDA	#0
 	STA	$34B,X
 
-	LDY	#FNAME:L
-	LDA	#FNAME:H
+	LDY	#<FNAME
+	LDA	#>FNAME
 
 OPEN	STA	$345,X
 	TYA
@@ -1363,8 +1363,8 @@ ERR5Y	JSR	$E474
 	STX	ERNM+1
 	STA	ERNM
 
-	LDX	#ERTX:H
-	LDY	#ERTX:L
+	LDX	#>ERTX
+	LDY	#<ERTX
 
 DOSPRT	JSR	PRINT
 
@@ -1390,44 +1390,44 @@ DOSCLO	LDX	#$10
 
 ***
 
-ERTX	DFB	125
-	ASC	"Error "
-ERNM	ASC	"??? !"
-	DFB	253,155
+ERTX	DTA	125
+	DTA	C"Error "
+ERNM	DTA	C"??? !"
+	DTA	253,155
 
 ***
 
-KNAME	ASC	"K:"
-EOLT	DFB	$9B
+KNAME	DTA	C"K:"
+EOLT	DTA	$9B
 
 ***
 
-TOOLONG	DFB	125,253
-	ASC	"Directory too "
-	ASC	"long !"
-	DFB	$9B
+TOOLONG	DTA	125,253
+	DTA	C"Directory too "
+	DTA	C"long !"
+	DTA	$9B
 
 ***
 
-BWLN	ASC	"BW-DOS Dir"
-	ASC	". Master V"
-	ASC	"1.2    BEW"
-	ASC	"ESOFT 1995"
+BWLN	DTA	C"BW-DOS Dir"
+	DTA	C". Master V"
+	DTA	C"1.2    BEW"
+	DTA	C"ESOFT 1995"
 
 ***
 
-OL1	DFB	160,156,157,158,159
-	ASC	/=Move/
-	ASC	/  C=Commen/
-	ASC	/t line  Q=/
-	ASC	/Quit+Save /
+OL1	DTA	160,156,157,158,159
+	DTA	C"=Move"*
+	DTA	C"  C=Commen"*
+	DTA	C"t line  Q="*
+	DTA	C"Quit+Save "*
 
 ***
 
-OL2	ASC	/ E=Erase  /
-	ASC	/ESC=Abort /
-	ASC	/ T,D=New t/
-	ASC	/ime, date /
+OL2	DTA	C" E=Erase  "*
+	DTA	C"ESC=Abort "*
+	DTA	C" T,D=New t"*
+	DTA	C"ime, date "*
 
 ***
 GETK	LDX	#$20
@@ -1455,8 +1455,8 @@ HORNI	LDA	88
 	ADC	#0
 	STA	ZPG1+1
 
-	LDX	#PRAL:H
-	LDY	#PRAL:L
+	LDX	#>PRAL
+	LDY	#<PRAL
 	JSR	ZOBR
 
 HORREP	LDA	88
@@ -1472,31 +1472,31 @@ HORREP	LDA	88
 
 **
 
-ESCLIN	ASC	/ Exit to D/
-	ASC	/OS  - Are /
-	ASC	/you sure (/
-	ASC	/Y or N) ? /
+ESCLIN	DTA	C" Exit to D"*
+	DTA	C"OS  - Are "*
+	DTA	C"you sure ("*
+	DTA	C"Y or N) ? "*
 
 **
 
-DATLIN	ASC	/  Enter ne/
-	ASC	/w date (dd/
-	ASC	/-mm-yy) : /
-	ASC	"        "
-	ASC	/  /
+DATLIN	DTA	C"  Enter ne"*
+	DTA	C"w date (dd"*
+	DTA	C"-mm-yy) : "*
+	DTA	C"        "
+	DTA	C"  "*
 
 **
 
-TIMLIN	ASC	/  Enter ne/
-	ASC	/w time (hh/
-	ASC	/-mm-ss) : /
-	ASC	"        "
-	ASC	/  /
+TIMLIN	DTA	C"  Enter ne"*
+	DTA	C"w time (hh"*
+	DTA	C"-mm-ss) : "*
+	DTA	C"        "
+	DTA	C"  "*
 
 ***
 
 CLS	LDA	#125
-	DFB $2C
+	DTA $2C
 EOL	LDA	#155
 
 PRT1	PHA
@@ -1523,8 +1523,8 @@ CUROFF	LDX	#0
 
 	JSR	OBNKU
 
-	LDX	#EOLT:H
-	LDY	#EOLT:L
+	LDX	#>EOLT
+	LDY	#<EOLT
 **
 
 PRINT	TXA
@@ -1540,7 +1540,7 @@ PRINT	TXA
 	STA	$349,X
 
 	LDA	#9
-	DFB $2C
+	DTA $2C
 CLOSE	LDA	#12
 
 	STA	$342,X
@@ -1549,9 +1549,9 @@ CLOSE	LDA	#12
 
 ***
 
-POSKU	LDA	#KONEC:L
+POSKU	LDA	#<KONEC
 	STA	ZPG2
-	LDA	#KONEC:H
+	LDA	#>KONEC
 	STA	ZPG2+1
 
 	LDA	#0
@@ -1574,33 +1574,33 @@ POSKUE	RTS
 
 ***
 
-TEXTT	ASC	/      Comm/
-	ASC	/ent line :/
-	ASC	/ /
-TBU	ASC	"          "
-	ASC	"   "
-	ASC	/        /
+TEXTT	DTA	C"      Comm"*
+	DTA	C"ent line :"*
+	DTA	C" "*
+TBU	DTA	C"          "
+	DTA	C"   "
+	DTA	C"        "*
 
 ***
 
-COMLIN	DFB	9,0,0,0,0,0
-	ASC	"           "
-	DFB	0,0,0
-	DFB	0,0,0
+COMLIN	DTA	9,0,0,0,0,0
+	DTA	C"           "
+	DTA	0,0,0
+	DTA	0,0,0
 
 ***
 
-QTX	ASC	/ Save chan/
-	ASC	/ges - are /
-	ASC	/you sure (/
-	ASC	/Y or N) ? /
+QTX	DTA	C" Save chan"*
+	DTA	C"ges - are "*
+	DTA	C"you sure ("*
+	DTA	C"Y or N) ? "*
 
 ***
 
-QTX2	ASC	/       Wri/
-	ASC	/tting new /
-	ASC	/directory /
-	ASC	/...       /
+QTX2	DTA	C"       Wri"*
+	DTA	C"tting new "*
+	DTA	C"directory "*
+	DTA	C"...       "*
 
 ***
 
@@ -1624,9 +1624,9 @@ CHKDSK	TXA
 	JMP	CIOCMD
 ***
 
-ADFNAME	LDA	#FNAME:L
+ADFNAME	LDA	#<FNAME
 	STA	$344,X
-	LDA	#FNAME:H
+	LDA	#>FNAME
 	STA	$345,X
 
 	RTS
@@ -1657,7 +1657,7 @@ ZEXI	RTS
 
 **
 
-CONT	DFB 1,10,100
+CONT	DTA 1,10,100
 
 ****
 

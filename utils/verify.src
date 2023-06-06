@@ -1,4 +1,4 @@
-	ORG	$6000,$A800
+	ORG	$6000
 	JMP	START
 
 *************************************
@@ -7,7 +7,7 @@
 *				*
 *************************************
 
-WRTADR	EPZ	128
+WRTADR	EQU	128
 
 * VOLNO: 130
 
@@ -61,9 +61,9 @@ START	LDA	$700
 	BEQ	START2
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Incorrect DOS version"
-	DFB 155,0
+	DTA 155,253
+	DTA C"Incorrect DOS version"
+	DTA 155,0
 
 	JMP	(10)
 ***
@@ -126,9 +126,9 @@ ONOF2	LDY	#0
 **
 
 BADPAR	JSR	PRINT
-	DFB 155
-	ASC "Bad parameter!"
-	DFB 155,0
+	DTA 155
+	DTA C"Bad parameter!"
+	DTA 155,0
 
 ERR5X	LDY	#8
 	LDA	(10),Y

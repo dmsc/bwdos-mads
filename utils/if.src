@@ -1,4 +1,4 @@
-	ORG	$6000,$A800
+	ORG	$6000
 	JMP	START
 
 *************************************
@@ -66,9 +66,9 @@ START	LDA	$700
 	BEQ	START2
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Incorrect DOS version"
-	DFB 155,0
+	DTA 155,253
+	DTA C"Incorrect DOS version"
+	DTA 155,0
 
 	JMP	(10)
 ***
@@ -94,8 +94,8 @@ START2	LDA	10
 	JSR	GETLINE
 
 	JSR	PRINT
-	ASC "<Y>...Yes  <N>...No  "
-	DFB 0
+	DTA C"<Y>...Yes  <N>...No  "
+	DTA 0
 ***
 
 START3	JSR	CLOSE
@@ -104,9 +104,9 @@ START3	JSR	CLOSE
 	LDA	#3
 	STA	$342,X
 
-	LDA	#KNAM:L
+	LDA	#<KNAM
 	STA	$344,X
-	LDA	#KNAM:H
+	LDA	#>KNAM
 	STA	$345,X
 
 	LDA	#4
@@ -140,8 +140,8 @@ START3	JSR	CLOSE
 *
 
 YES0	JSR	PRINT
-	ASC "Yes!"
-	DFB 155,0
+	DTA C"Yes!"
+	DTA 155,0
 
 	JMP	(10)
 ***
@@ -156,17 +156,17 @@ ESCAPE	LDY	#1
 	JSR	XDIVIO
 
 	JSR	PRINT
-	DFB 155
-	ASC "(Batch file aborted)"
-	DFB 155,0
+	DTA 155
+	DTA C"(Batch file aborted)"
+	DTA 155,0
 
 NO3	JMP	(10)
 
 ***
 
 NO	JSR	PRINT
-	ASC "No!"
-	DFB 155,155,0
+	DTA C"No!"
+	DTA 155,155,0
 
 NO2	JSR	GETLINE
 
@@ -181,10 +181,10 @@ NO2	JSR	GETLINE
 
 ***
 
-VZOR	ASC "ENDIF"
-	DFB 155
-VZ2	ASC "ELSE"
-	DFB 155
+VZOR	DTA C"ENDIF"
+	DTA 155
+VZ2	DTA C"ELSE"
+	DTA 155
 
 ***
 
@@ -212,18 +212,18 @@ CLOSE	LDX	#$10
 	JMP	$E456
 ***
 
-KNAM	ASC "K:"
-	DFB 155
+KNAM	DTA C"K:"
+	DTA 155
 ****
 
 GETLNX	LDY	#1
 	JSR	XDIVIO
 
 	JSR	PRINT
-	DFB 155
-	ASC "Error: End of batch "
-	ASC "file!"
-	DFB 155,0
+	DTA 155
+	DTA C"Error: End of batch "
+	DTA C"file!"
+	DTA 155,0
 
 	JMP	(10)
 **
@@ -235,9 +235,9 @@ GETLINE	JSR	BATFLG
 	LDA	#5
 	STA	$342,X
 
-	LDA	#BUFFER:L
+	LDA	#<BUFFER
 	STA	$344,X
-	LDA	#BUFFER:H
+	LDA	#>BUFFER
 	STA	$345,X
 
 	LDA	#64

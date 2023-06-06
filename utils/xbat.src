@@ -1,4 +1,4 @@
-	ORG	$6000,$A800
+	ORG	$6000
 	JMP	START
 
 *************************************
@@ -13,8 +13,8 @@ NAME	EQU	$6800
 
 ***
 
-COMNAM	DFB 155
-	ASC "MOC."
+COMNAM	DTA 155
+	DTA C"MOC."
 ***
 
 START	LDA	$700
@@ -22,9 +22,9 @@ START	LDA	$700
 	BEQ	START2
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Incorrect DOS version"
-	DFB 155,0
+	DTA 155,253
+	DTA C"Incorrect DOS version"
+	DTA 155,0
 
 	JMP	(10)
 ***
@@ -89,9 +89,9 @@ ERR5Y	JSR	$E474
 DOIT	LDX	#$10
 	STA	$342,X
 
-	LDA	#NAME:L
+	LDA	#<NAME
 	STA	$344,X
-	LDA	#NAME:H
+	LDA	#>NAME
 	STA	$345,X
 
 	LDA	#4
@@ -134,9 +134,9 @@ ERROR	TYA
 	PHA
 
 	JSR	PRINT
-	DFB 155
-	ASC "Error "
-	DFB 0
+	DTA 155
+	DTA C"Error "
+	DTA 0
 
 	LDX	#2
 	PLA
@@ -174,7 +174,7 @@ ERR5	JSR	CLOSE
 XDOS	JMP	(10)
 **
 
-ERRTAB	DFB 1,10,100
+ERRTAB	DTA 1,10,100
 
 ***
 

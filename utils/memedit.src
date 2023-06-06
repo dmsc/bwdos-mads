@@ -1,4 +1,4 @@
-	ORG	$500,$A800
+	ORG	$500
 	JMP	START
 
 *************************************
@@ -61,8 +61,8 @@ GETNAME	JMP	PRTEX
 
 ***
 
-KNAME	ASC "K:"
-	DFB 155
+KNAME	DTA C"K:"
+	DTA 155
 **
 
 GETKEY	JSR	CLOSE
@@ -71,9 +71,9 @@ GETKEY	JSR	CLOSE
 	LDA	#3
 	STA	$342,X
 
-	LDA	#KNAME:L
+	LDA	#<KNAME
 	STA	$344,X
-	LDA	#KNAME:H
+	LDA	#>KNAME
 	STA	$345,X
 
 	LDA	#4
@@ -174,9 +174,9 @@ HEXH	EQU	GHXRTS+3
 ***
 
 GHXERR	JSR	PRINT
-	DFB 155
-	ASC "Bad parameter !"
-	DFB 155,0
+	DTA 155
+	DTA C"Bad parameter !"
+	DTA 155,0
 
 ERR2X	LDY	#8
 	LDA	(10),Y
@@ -202,9 +202,9 @@ START	LDA	$700
 	BEQ	START2
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Incorrect DOS!"
-	DFB 155,0
+	DTA 155,253
+	DTA C"Incorrect DOS!"
+	DTA 155,0
 
 	JMP	(10)
 ***
@@ -242,8 +242,8 @@ EDIT1	JSR	PRTEOL
 	JSR	PRTHEX
 
 	JSR	PRINT
-	ASC ": "
-	DFB 0
+	DTA C": "
+	DTA 0
 *
 
 ED1PS	LDA	$FFFF
@@ -255,8 +255,8 @@ POS	EQU	ED1PS+1
 ***
 
 EDIT1D	JSR	PRINT
-	ASC " => "
-	DFB 0
+	DTA C" => "
+	DTA 0
 
 	LDA	#$20
 	STA	EDBUF

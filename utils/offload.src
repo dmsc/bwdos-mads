@@ -1,6 +1,5 @@
-	ORG	$6000,$A800
+	ORG	$6000
 	JMP	START
-	OUT	N
 
 *************************************
 *				*
@@ -75,9 +74,9 @@ GETHX4	ASL	HEXL
 ***
 
 GHXERR	JSR	PRINT
-	DFB 155
-	ASC "Bad parameter !"
-	DFB 155,0
+	DTA 155
+	DTA C"Bad parameter !"
+	DTA 155,0
 	JMP	ERR2X
 ***
 
@@ -86,9 +85,9 @@ START	LDA	$700
 	BEQ	START2
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Incorrect DOS !"
-	DFB 155,0
+	DTA 155,253
+	DTA C"Incorrect DOS !"
+	DTA 155,0
 
 	JMP	(10)
 ***
@@ -112,12 +111,12 @@ START2	LDA	10
 **SYNTAX
 
 	JSR	PRINT
-	DFB 155
-	ASC "Syntax:"
-	DFB 155
-	ASC "OFFLOAD fname [offs.] "
-	ASC "[/QL]"
-	DFB 155,0
+	DTA 155
+	DTA C"Syntax:"
+	DTA 155
+	DTA C"OFFLOAD fname [offs.] "
+	DTA C"[/QL]"
+	DTA 155,0
 	JMP	ERR2
 ***
 
@@ -187,9 +186,9 @@ STRT4	JSR	CLOSE
 	LDA	#3
 	STA	$342,X
 
-	LDA	#NAME:L
+	LDA	#<NAME
 	STA	$344,X
-	LDA	#NAME:H
+	LDA	#>NAME
 	STA	$345,X
 
 	LDA	#4
@@ -202,9 +201,9 @@ STRT4	JSR	CLOSE
 **
 
 	JSR	PRINT
-	DFB 155
-	ASC "Can't open file !"
-	DFB 155,0
+	DTA 155
+	DTA C"Can't open file !"
+	DTA 155,0
 	JMP	ERR2X
 ***
 
@@ -219,9 +218,9 @@ STRT5B	AND	#0
 **
 
 STRT5ER	JSR	PRINT
-	DFB 155
-	ASC "Not binary load file !"
-	DFB 155,0
+	DTA 155
+	DTA C"Not binary load file !"
+	DTA 155,0
 	JMP	ERR2X
 *
 **********
@@ -242,7 +241,11 @@ O2 EQU *
 *
 **********
 *
-	ORG	$500,$B000
+        OPT     H-
+        ORG     0
+        DTA     255,255
+        OPT     H+
+	ORG	$500
 
 ***
 
@@ -280,9 +283,9 @@ GET1	LDX	#$10
 	BNE	ERROR
 
 	JSR	PRINT
-	DFB 155
-	ASC "<EOF>"
-	DFB 155,0
+	DTA 155
+	DTA C"<EOF>"
+	DTA 155,0
 
 ERR2	JSR	CLOSE
 	JMP	(10)
@@ -300,17 +303,17 @@ ERR5Y	JSR	$E474
 ***
 
 ERROR	JSR	PRINT
-	DFB 155
-	ASC "I/O Error !"
-	DFB 155,0
+	DTA 155
+	DTA C"I/O Error !"
+	DTA 155,0
 	JMP	ERR2X
 ***
 
 NOTPOI	STA	$342,X
 
-	LDA	#DNAM:L
+	LDA	#<DNAM
 	STA	$344,X
-	LDA	#DNAM:H
+	LDA	#>DNAM
 	STA	$345,X
 
 	JSR	$E456
@@ -319,8 +322,8 @@ NOTPOI	STA	$342,X
 	RTS
 *
 
-DNAM	ASC "D1:"
-	DFB 155
+DNAM	DTA C"D1:"
+	DTA 155
 
 ***
 
@@ -364,7 +367,7 @@ CLOSE	LDX	#$10
 *****
 
 LOAD1	JSR	PRINT
-	DFB 155,0
+	DTA 155,0
 
 LOAD1A	JSR	GET1
 	STA	ADRL
@@ -398,8 +401,8 @@ LOAD1A	JSR	GET1
 **POZICE
 
 	JSR	PRINT
-	ASC " Pos."
-	DFB 0
+	DTA C" Pos."
+	DTA 0
 *NOTE
 	LDX	#$10
 	LDA	#38
@@ -487,8 +490,8 @@ POSH	EQU	LN8+1
 **LOAD!
 
 LOAD2	JSR	PRINT
-	ASC " Load at "
-	DFB 0
+	DTA C" Load at "
+	DTA 0
 
 	LDA	ADRL
 	CLC
@@ -517,14 +520,14 @@ NOQUE	EQU	LD23+1
 	BEQ	LD24
 
 	JSR	PRINT
-	ASC " ! "
-	DFB 0
+	DTA C" ! "
+	DTA 0
 	JMP	LOAD3
 **
 
 LD24	JSR	PRINT
-	ASC " ? "
-	DFB 0
+	DTA C" ? "
+	DTA 0
 ***
 
 LD25	LDX	764
@@ -547,9 +550,9 @@ LD25	LDX	764
 **
 
 LD25ESC	JSR	PRINT
-	DFB 155
-	ASC "<Aborted>"
-	DFB 155,0
+	DTA 155
+	DTA C"<Aborted>"
+	DTA 155,0
 	JMP	ERR2X
 **
 

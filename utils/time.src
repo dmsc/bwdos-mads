@@ -1,4 +1,4 @@
-	ORG	$6000,$A800
+	ORG	$6000
 	JMP	START
 
 *************************************
@@ -7,9 +7,9 @@
 *				*
 *************************************
 
-DECOUT	EPZ	128
-INDEX	EPZ	130
-TMP	EPZ	131
+DECOUT	EQU	128
+INDEX	EQU	130
+TMP	EQU	131
 
 ***
 
@@ -70,9 +70,9 @@ START	LDA	$700
 	BEQ	START2
 
 STERR	JSR	PRINT
-	DFB 155
-	ASC "Error: Not BW-DOS"
-	DFB 155,0
+	DTA 155
+	DTA C"Error: Not BW-DOS"
+	DTA 155,0
 
 	JMP	(10)
 ***
@@ -94,14 +94,14 @@ GETTD	JMP	($706)
 SETTD	JMP	($708)
 CONVDC	JMP	($70A)
 
-VZOR	ASC "  :  :   "
+VZOR	DTA C"  :  :   "
 
-MYTD	DFB 0,0,0
+MYTD	DTA 0,0,0
 
-KNAME	ASC "K:"
-	DFB 155
+KNAME	DTA C"K:"
+	DTA 155
 
-ETAB	DFB 0,1,3,4,6,7,8
+ETAB	DTA 0,1,3,4,6,7,8
 
 ***
 
@@ -116,9 +116,9 @@ START2	LDA	10
 	JSR	GETTD
 
 	JSR	PRINT
-	DFB 155
-	ASC "Current time is "
-	DFB 0
+	DTA 155
+	DTA C"Current time is "
+	DTA 0
 
 	LDY	#16
 
@@ -159,7 +159,7 @@ STL2	PLA
 ***
 
 	JSR	PRINT
-	DFB 155,0
+	DTA 155,0
 
 	LDX	#8
 	LDA	#32
@@ -177,9 +177,9 @@ STL3	LDA	VZOR,X
 	JSR	CLOSES
 
 	LDX	#$10
-	LDA	#KNAME:L
+	LDA	#<KNAME
 	STA	$344,X
-	LDA	#KNAME:H
+	LDA	#>KNAME
 	STA	$345,X
 	LDA	#4
 	STA	$34A,X
@@ -205,9 +205,9 @@ EDLOOP	LDX	INDEX
 	STA	TEXT,Y
 
 	LDX	#$20
-	LDA	#TXT0:L
+	LDA	#<TXT0
 	STA	$344,X
-	LDA	#TXT0:H
+	LDA	#>TXT0
 	STA	$345,X
 	LDA	#26
 	STA	$348,X
@@ -269,9 +269,9 @@ EDDEL	LDX	INDEX
 EDESC	JSR	CLOSES
 
 	JSR	PRINT
-	DFB 155
-	ASC "Aborted."
-	DFB 155,0
+	DTA 155
+	DTA C"Aborted."
+	DTA 155,0
 
 	JMP	(10)
 ***
@@ -319,30 +319,30 @@ EDRET2	LDA	MYTD-16,Y
 
 	JSR	PRINT
 
-TXT0	ASC "Enter new time: "
-TEXT	ASC "  :  :   "
-	DFB 155,0
+TXT0	DTA C"Enter new time: "
+TEXT	DTA C"  :  :   "
+	DTA 155,0
 
 	JMP	(10)
 ***
 
 NOTCHG	JSR	PRINT
-	ASC "(Time not changed)"
-	ASC "         "
-	DFB 155,0
+	DTA C"(Time not changed)"
+	DTA C"         "
+	DTA 155,0
 	JMP	(10)
 ***
 
 INVALID	JSR	PRINT
-	DFB 155
-	ASC "Invalid Time!"
-	DFB 155,0
+	DTA 155
+	DTA C"Invalid Time!"
+	DTA 155,0
 
 	JMP	(10)
 ***
 
-EDGTB	DFB 0,10,20,30,40
-	DFB 50,60,70,80,90
+EDGTB	DTA 0,10,20,30,40
+	DTA 50,60,70,80,90
 ***
 
 EDGET	JSR	EDGT2

@@ -1,4 +1,4 @@
-	ORG	$6000,$A800
+	ORG	$6000
 	JMP	START
 
 *************************************
@@ -7,11 +7,11 @@
 *				*
 *************************************
 
-HEX	EPZ	128
+HEX	EQU	128
 
-POS	EPZ	131
+POS	EQU	131
 
-EDIX	EPZ	134
+EDIX	EQU	134
 
 * VOLNO: 135
 
@@ -69,8 +69,8 @@ GETNAME	JMP	PRTEX
 
 ***
 
-KNAME	ASC "K:"
-	DFB 155
+KNAME	DTA C"K:"
+	DTA 155
 **
 
 GETKEY	JSR	CLOSE2
@@ -79,9 +79,9 @@ GETKEY	JSR	CLOSE2
 	LDA	#3
 	STA	$342,X
 
-	LDA	#KNAME:L
+	LDA	#<KNAME
 	STA	$344,X
-	LDA	#KNAME:H
+	LDA	#>KNAME
 	STA	$345,X
 
 	LDA	#4
@@ -187,9 +187,9 @@ GHXRTS	RTS
 ***
 
 GHXERR	JSR	PRINT
-	DFB 155
-	ASC "Bad parameter !"
-	DFB 155,0
+	DTA 155
+	DTA C"Bad parameter !"
+	DTA 155,0
 
 ERR2X	LDY	#8
 	LDA	(10),Y
@@ -219,10 +219,10 @@ POINT	LDX	#$10
 	BPL	GHXRTS
 ***
 	JSR	PRINT
-	DFB 155
-	ASC "Can't set "
-	ASC "file-position !"
-	DFB 155,0
+	DTA 155
+	DTA C"Can't set "
+	DTA C"file-position !"
+	DTA 155,0
 	JMP	ERR2X
 
 ***
@@ -242,9 +242,9 @@ CLERJ	JMP	EDERR
 
 ***
 
-CIONAME	LDA	#NAME:L
+CIONAME	LDA	#<NAME
 	STA	$344,X
-	LDA	#NAME:H
+	LDA	#>NAME
 	STA	$345,X
 
 	JMP	$E456
@@ -255,9 +255,9 @@ START	LDA	$700
 	BEQ	START2
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Incorrect DOS !"
-	DFB 155,0
+	DTA 155,253
+	DTA C"Incorrect DOS !"
+	DTA 155,0
 
 	JMP	(10)
 ***
@@ -315,9 +315,9 @@ ST8	JSR	CLOSE
 	BPL	EDIT1
 **
 	JSR	PRINT
-	DFB 155
-	ASC "Can't open file !"
-	DFB 155,0
+	DTA 155
+	DTA C"Can't open file !"
+	DTA 155,0
 	JMP	ERR2X
 
 *** EDIT LOOP
@@ -332,8 +332,8 @@ EDIT1	JSR	PRTEOL
 	JSR	PRTHEX
 
 	JSR	PRINT
-	ASC ": "
-	DFB 0
+	DTA C": "
+	DTA 0
 
 ** JSME V SOUBORU? (GETLEN)
 
@@ -346,9 +346,9 @@ EDIT1	JSR	PRTEOL
 **ERR
 
 EDERR	JSR	PRINT
-	DFB 155
-	ASC "I/O Error !"
-	DFB 155,0
+	DTA 155
+	DTA C"I/O Error !"
+	DTA 155,0
 	JMP	ERR2X
 ***
 
@@ -363,8 +363,8 @@ EDIT1B	LDX	#$10
 	BCC	EDIT1C
 *ZA
 	JSR	PRINT
-	ASC "  "
-	DFB 0
+	DTA C"  "
+	DTA 0
 	JMP	EDIT1D
 **V
 
@@ -378,8 +378,8 @@ EDIT1C	JSR	POINT
 ***
 
 EDIT1D	JSR	PRINT
-	ASC " => "
-	DFB 0
+	DTA C" => "
+	DTA 0
 
 	LDA	#$20
 	STA	EDBUF

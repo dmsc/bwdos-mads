@@ -1,4 +1,4 @@
-	ORG	$500,$A800
+	ORG	$500
 	JMP	START
 
 *************************************
@@ -21,21 +21,21 @@ NAME	EQU	$6D6
 
 ***
 
-SYNTAX	DFB 155
-	ASC "Syntax Error!"
-OPNER	DFB 155
-	ASC "Can't open file!"
-DATERR	DFB 155
-	ASC "I/O Error !"
-	DFB 155
+SYNTAX	DTA 155
+	DTA C"Syntax Error!"
+OPNER	DTA 155
+	DTA C"Can't open file!"
+DATERR	DTA 155
+	DTA C"I/O Error !"
+	DTA 155
 
-HEADER	DFW $FFFF
-FROM	DFW 0
-TO	DFW 0
+HEADER	DTA A($FFFF)
+FROM	DTA A(0)
+TO	DTA A(0)
 
-DOSVER	DFB 155
-	ASC "Incorrect DOS !"
-TXTEND	DFB 155
+DOSVER	DTA 155
+	DTA C"Incorrect DOS !"
+TXTEND	DTA 155
 
 ***
 
@@ -201,9 +201,9 @@ STRT4	JSR	CLOSE
 	LDA	#3
 	STA	$342,X
 
-	LDA	#NAME:L
+	LDA	#<NAME
 	STA	$344,X
-	LDA	#NAME:H
+	LDA	#>NAME
 	STA	$345,X
 
 	LDA	AUX

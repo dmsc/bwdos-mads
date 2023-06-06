@@ -1,6 +1,5 @@
-	ORG	$4D0,$A800
+	ORG	$4D0
 	JMP	START
-	OUT	N
 *************************************
 *				*
 *    " M D U M P "   PRO BW-DOS	*
@@ -122,9 +121,9 @@ GETHX4	ASL	HEXL
 ***
 
 GHXERR	JSR	PRINT
-	DFB 155
-	ASC "Bad parameter!"
-	DFB 155,0
+	DTA 155
+	DTA C"Bad parameter!"
+	DTA 155,0
 
 ERR2X	LDY	#8
 	LDA	(10),Y
@@ -144,9 +143,9 @@ START	LDA	$700
 	BEQ	START2
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Bad DOS !"
-	DFB 155,0
+	DTA 155,253
+	DTA C"Bad DOS !"
+	DTA 155,0
 
 	JMP	(10)
 ***
@@ -364,9 +363,9 @@ DESC	LDA	#$FF
 	STA	764
 
 	JSR	PRINT
-	DFB 155
-	ASC "<Aborted>"
-	DFB 155,0
+	DTA 155
+	DTA C"<Aborted>"
+	DTA 155,0
 
 DUMPX2	JMP	ERR2
 
@@ -389,7 +388,7 @@ DPRTHX2	AND	#15
 
 	ADC	#6
 **
-	DFB $2C
+	DTA $2C
 DSPAC	LDA	#' '
 
 DPRT1	INC	LPOS
