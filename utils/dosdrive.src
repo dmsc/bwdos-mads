@@ -1,5 +1,4 @@
 	ORG	$5FFD,$A800
-	OUT	N
 
 O	EQU	$A800-$5FFD
 	JMP	UTAJ+O
@@ -14,9 +13,9 @@ O	EQU	$A800-$5FFD
 *				*
 *************************************
 
-SRCHADR	EPZ	128
+SRCHADR	EQU	128
 
-NUMB	EPZ	130
+NUMB	EQU	130
 
 ***
 
@@ -93,10 +92,10 @@ START	LDA	$700
 	BEQ	START2
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Incorrect DOS "
-	ASC "version !"
-	DFB 155,0
+	DTA	155,253
+	DTA	C"Incorrect DOS "
+	DTA	C"version !"
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -134,12 +133,12 @@ START2	LDA	10
 ***
 
 SYNTAX	JSR	PRINT
-	DFB 155
-	ASC "Syntax: "
-	ASC "DOSDRIVE n"
-	DFB 155
-	ASC "        DOSDRIVE OFF"
-	DFB 155,0
+	DTA	155
+	DTA	C"Syntax: "
+	DTA	C"DOSDRIVE n"
+	DTA	155
+	DTA	C"        DOSDRIVE OFF"
+	DTA	155,0
 
 	JMP	(10)
 
@@ -170,22 +169,22 @@ START3	LDY	#37
 	STA	(SRCHADR),Y
 
 	JSR	PRINT
-	DFB 155
-	ASC "DOSDRIVE: Drive "
-	ASC "number changed."
-	DFB 155,0
+	DTA	155
+	DTA	C"DOSDRIVE: Drive "
+	DTA	C"number changed."
+	DTA	155,0
 
 	JMP	(10)
 
 ***INSTALL
 
 STRT4ER	JSR	PRINT
-	DFB 155
-	ASC "Handler 'D:' not "
-	ASC "present !"
-	DFB 155
-	ASC "Can't install."
-	DFB 155,0
+	DTA	155
+	DTA	C"Handler 'D:' not "
+	DTA	C"present !"
+	DTA	155
+	DTA	C"Can't install."
+	DTA	155,0
 
 	JMP	(10)
 
@@ -310,9 +309,9 @@ INSTL4	JSR	$E474
 * HOTOVO
 
 	JSR	PRINT
-	DFB 155
-	ASC "DOSDRIVE installed."
-	DFB 155,0
+	DTA	155
+	DTA	C"DOSDRIVE installed."
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -336,25 +335,25 @@ DISABLE	JSR	SRCHRUT
 	BCS	DISABLE2
 
 	JSR	PRINT
-	DFB 155
-	ASC "DOSDRIVE"
-	ASC " not Installed!"
-	DFB 155,0
+	DTA	155
+	DTA	C"DOSDRIVE"
+	DTA	C" not Installed!"
+	DTA	155,0
 
 	JMP	DISERR2
 ***
 
 DISCANT	JSR	PRINT
-	DFB 155
-	ASC "DOSDRIVE is not the"
-	ASC " last installed"
-	DFB 155
-	ASC "handler! "
-	DFB 0
+	DTA	155
+	DTA	C"DOSDRIVE is not the"
+	DTA	C" last installed"
+	DTA	155
+	DTA	C"handler! "
+	DTA	0
 
 DISERR2	JSR	PRINT
-	ASC "Can't remove."
-	DFB 155,0
+	DTA	C"Can't remove."
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -394,10 +393,10 @@ DISBL2	LDA	(SRCHADR),Y
 	BNE	DISBL2
 **
 	JSR	PRINT
-	DFB 155
-	ASC "DOSDRIVE"
-	ASC " Removed."
-	DFB 155,0
+	DTA	155
+	DTA	C"DOSDRIVE"
+	DTA	C" Removed."
+	DTA	155,0
 
 	JMP	(10)
 ****
@@ -485,23 +484,23 @@ RHTSRCH	DEY
 	CMP	#'D'
 	BNE	RHTSRCH
 
-R03	LDA	#TAB:L
+R03	LDA	#<TAB
 	STA	$31B,Y
-R04	LDA	#TAB:H
+R04	LDA	#>TAB
 	STA	$31C,Y
 
 RINIX	RTS
 
 **
 
-TABPUV	DFW	0
+TABPUV	DTA	A(0)
 
-TAB	DFW	$E473
-	DFW	$E473
-	DFW	$E473
-	DFW	$E473
-	DFW	$E473
-	DFW	$E473
+TAB	DTA	A($E473)
+	DTA	A($E473)
+	DTA	A($E473)
+	DTA	A($E473)
+	DTA	A($E473)
+	DTA	A($E473)
 **
 
 OPEN	LDA	$2A	;AUX1=4?
@@ -551,7 +550,7 @@ SPECPUV	JMP	$E474	;ORIG. SPEC
 
 ***
 
-RESLEN	EPZ	*-RESID
+RESLEN	EQU	*-RESID
 
 ***
 
@@ -562,9 +561,9 @@ RESLEN	EPZ	*-RESID
 *
 **************
 
-UTAJ	LDA	#(PRINT+O):L
+UTAJ	LDA	#<((PRINT+O))
 	STA	0
-	LDA	#(PRINT+O):H
+	LDA	#>((PRINT+O))
 	STA	1
 
 UTAJ2	LDY	#0
@@ -577,11 +576,11 @@ UTAJ2	LDY	#0
 	INC	1
 
 UTAJ3	LDA	0
-	CMP	#(UTAJ+O):L
+	CMP	#<((UTAJ+O))
 	BNE	UTAJ2
 
 	LDA	1
-	CMP	#(UTAJ+O):H
+	CMP	#>((UTAJ+O))
 	BNE	UTAJ2
 
 	RTS

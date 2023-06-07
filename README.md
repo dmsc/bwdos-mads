@@ -54,5 +54,17 @@ stub that includes all parts:
       utils/menu_c.src
 
 Note that some of the utilities are "protected" by exor-ing  part of the code,
-so those can´t be assembled directly from source.
+so those can´t be assembled directly from source:
+
+    utils/argsprn.src
+    utils/argsrtc.src
+    utils/autocwd.src
+    utils/clock.src
+    utils/dosdrive.src
+    utils/keybuff.src
+    utils/rambox.src
+    utils/ramdisk.src
+    utils/rtime8.src
+    utils/xfsio.src
+    utils/xlrdisk.src
 

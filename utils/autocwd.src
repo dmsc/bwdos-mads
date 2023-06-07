@@ -1,5 +1,4 @@
 	ORG	$5FFD,$A800
-	OUT	N
 
 O	EQU	$A800-$5FFD
 	JMP	UTAJ+O
@@ -14,9 +13,9 @@ O	EQU	$A800-$5FFD
 *				*
 *************************************
 
-SRCHADR	EPZ	128
+SRCHADR	EQU	128
 
-ALINST	EPZ	130
+ALINST	EQU	130
 
 ***
 
@@ -93,10 +92,10 @@ START	LDA	$700
 	BEQ	START2
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Incorrect DOS "
-	ASC "version !"
-	DFB 155,0
+	DTA	155,253
+	DTA	C"Incorrect DOS "
+	DTA	C"version !"
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -136,12 +135,12 @@ START2	LDA	10
 ***
 
 SYNTAX	JSR	PRINT
-	DFB 155
-	ASC "Syntax: "
-	ASC "AUTOCWD [Dn:]path"
-	DFB 155
-	ASC "        AUTOCWD OFF"
-	DFB 155,0
+	DTA	155
+	DTA	C"Syntax: "
+	DTA	C"AUTOCWD [Dn:]path"
+	DTA	155
+	DTA	C"        AUTOCWD OFF"
+	DTA	155,0
 
 	JMP	(10)
 
@@ -232,18 +231,18 @@ ST5C	LDA	RESNAM,X
 	BMI	START6
 *
 	JSR	PRINT
-	DFB 155
-	ASC "AutoCWD "
-	ASC "Installed."
-	DFB 155,0
+	DTA	155
+	DTA	C"AutoCWD "
+	DTA	C"Installed."
+	DTA	155,0
 
 	JMP	(10)
 **
 
 START6	JSR	PRINT
-	DFB 155
-	ASC "AutoCWD: Path changed."
-	DFB 155,0
+	DTA	155
+	DTA	C"AutoCWD: Path changed."
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -252,25 +251,25 @@ DISABLE	JSR	SRCHRUT
 	BCS	DISABLE2
 
 	JSR	PRINT
-	DFB 155
-	ASC "AutoCWD"
-	ASC " not Installed!"
-	DFB 155,0
+	DTA	155
+	DTA	C"AutoCWD"
+	DTA	C" not Installed!"
+	DTA	155,0
 
 	JMP	DISERR2
 ***
 
 DISCANT	JSR	PRINT
-	DFB 155
-	ASC "AutoCWD is not the"
-	ASC " last installed"
-	DFB 155
-	ASC " handler!"
-	DFB 155,0
+	DTA	155
+	DTA	C"AutoCWD is not the"
+	DTA	C" last installed"
+	DTA	155
+	DTA	C" handler!"
+	DTA	155,0
 
 DISERR2	JSR	PRINT
-	ASC "Can't remove."
-	DFB 155,0
+	DTA	C"Can't remove."
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -299,10 +298,10 @@ DISBL2	LDA	(SRCHADR),Y
 	BNE	DISBL2
 **
 	JSR	PRINT
-	DFB 155
-	ASC "AutoCWD"
-	ASC " Removed."
-	DFB 155,0
+	DTA	155
+	DTA	C"AutoCWD"
+	DTA	C" Removed."
+	DTA	155,0
 
 	JMP	(10)
 ****
@@ -362,9 +361,9 @@ TST1	STA	744
 	LDA	#12
 R05	JSR	RESSUB
 
-R03	LDA	#RESNAM:L
+R03	LDA	#<RESNAM
 	STA	$354
-R04	LDA	#RESNAM:H
+R04	LDA	#>RESNAM
 TST2	STA	$355
 
 	LDA	#0
@@ -379,12 +378,12 @@ RESSUB	STA	$352
 	JMP	$E456
 **
 
-RESNAM	ASC "There will"
-	ASC " be specif"
-	ASC "ied path"
+RESNAM	DTA	C"There will"
+	DTA	C" be specif"
+	DTA	C"ied path"
 **
 
-RESLEN	EPZ	*-RESID
+RESLEN	EQU	*-RESID
 
 ***
 
@@ -395,9 +394,9 @@ RESLEN	EPZ	*-RESID
 *
 **************
 
-UTAJ	LDA	#(PRINT+O):L
+UTAJ	LDA	#<((PRINT+O))
 	STA	0
-	LDA	#(PRINT+O):H
+	LDA	#>((PRINT+O))
 	STA	1
 
 UTAJ2	LDY	#0
@@ -410,11 +409,11 @@ UTAJ2	LDY	#0
 	INC	1
 
 UTAJ3	LDA	0
-	CMP	#(UTAJ+O):L
+	CMP	#<((UTAJ+O))
 	BNE	UTAJ2
 
 	LDA	1
-	CMP	#(UTAJ+O):H
+	CMP	#>((UTAJ+O))
 	BNE	UTAJ2
 
 	RTS

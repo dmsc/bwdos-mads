@@ -1,5 +1,4 @@
 	ORG	$3FFD,$A800
-	OUT	N
 
 O	EQU	$A800-$3FFD
 	JMP	UTAJ+O
@@ -14,13 +13,13 @@ O	EQU	$A800-$3FFD
 *				*
 *************************************
 
-SRCHADR	EPZ	128
-SIOADR	EPZ	130
+SRCHADR	EQU	128
+SIOADR	EQU	130
 
-DNUMB	EPZ	132
-FFLAG	EPZ	134
+DNUMB	EQU	132
+FFLAG	EQU	134
 
-ROMSAVE	EPZ	143
+ROMSAVE	EQU	143
 
 *** VOLNO: 144
 
@@ -97,9 +96,9 @@ START	LDA	$700
 	BEQ	START2
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Incorrect DOS version"
-	DFB 155,0
+	DTA	155,253
+	DTA	C"Incorrect DOS version"
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -128,14 +127,14 @@ START2	LDA	10
 	BNE	START3
 *HELP
 	JSR	PRINT
-	DFB 155
-	ASC "  Syntax:"
-	DFB 155
-	ASC "XLRDISK "
-	ASC "drive#[N]"
-	DFB 155
-	ASC "XLRDISK OFF"
-	DFB 155,0
+	DTA	155
+	DTA	C"  Syntax:"
+	DTA	155
+	DTA	C"XLRDISK "
+	DTA	C"drive#[N]"
+	DTA	155
+	DTA	C"XLRDISK OFF"
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -184,9 +183,9 @@ STRT4D	SEC
 **
 
 ST4ER	JSR	PRINT
-	DFB 155,253
-	ASC "Syntax Error!"
-	DFB 155,0
+	DTA	155,253
+	DTA	C"Syntax Error!"
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -233,9 +232,9 @@ ST5B	LDA	(SRCHADR),Y
 ST5BAD	JSR	ENROM
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Error in extra RAM !"
-	DFB 155,0
+	DTA	155,253
+	DTA	C"Error in extra RAM !"
+	DTA	155,0
 
 	JMP	(10)
 
@@ -343,10 +342,10 @@ STRT7C	LDA	RES2,Y
 	JSR	DISROM
 
 	LDA	$C10B
-	CMP	#110:L
+	CMP	#<110
 	BNE	FORM0
 	LDA	$C10C
-	CMP	#110:H
+	CMP	#>110
 	BNE	FORM0
 
 	LDA	$C120
@@ -364,10 +363,10 @@ STRT7C	LDA	RES2,Y
 FORM0	JSR	ENROM
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "XL RAM-Disk format "
-	ASC "was different!"
-	DFB 155,0
+	DTA	155,253
+	DTA	C"XL RAM-Disk format "
+	DTA	C"was different!"
+	DTA	155,0
 *#MAPS
 
 FORM1	JSR	DISROM
@@ -411,17 +410,17 @@ FORM1D	STA	$C180,X
 	JSR	ENROM
 
 	JSR	PRINT
-	DFB 155
-	ASC "XL RAM-Disk "
-	ASC "formatted."
-	DFB 0
+	DTA	155
+	DTA	C"XL RAM-Disk "
+	DTA	C"formatted."
+	DTA	0
 ***
 
 FORMEND	JSR	PRINT
-	DFB 155
-	ASC "XL RAM-Disk "
-	ASC "is D"
-	DFB 0
+	DTA	155
+	DTA	C"XL RAM-Disk "
+	DTA	C"is D"
+	DTA	0
 
 	LDA	DNUMB
 	CLC
@@ -429,22 +428,22 @@ FORMEND	JSR	PRINT
 	JSR	PRT1
 
 	JSR	PRINT
-	ASC ": (Size: 14 kB)
-	DFB 155,0
+	DTA	C": (Size: 14 kB)"
+	DTA	155,0
 
 	JMP	(10)
 ***
 
-VZBOOT	DFB 0,3,0,48,$E0,7
+VZBOOT	DTA	0,3,0,48,$E0,7
 	JMP $3080
-	DFW 3,110,106
-	DFB 1
-	DFW 2,16,4
-	ASC "XL-RDISK"
-	DFB 0,128,$22
+	DTA	A(3,110,106)
+	DTA	1
+	DTA	A(2,16,4)
+	DTA	C"XL-RDISK"
+	DTA	0,128,$22
 
-VZDIR	DFB 23,0,0
-	ASC "MAIN       "
+VZDIR	DTA	23,0,0
+	DTA	C"MAIN       "
 
 ****
 
@@ -454,25 +453,25 @@ REMOVE	JSR	SRCHRUT
 **
 
 REMNOT	JSR	PRINT
-	DFB 155
-	ASC "XL RAM-Disk not "
-	ASC "installed!"
-	DFB 155,0
+	DTA	155
+	DTA	C"XL RAM-Disk not "
+	DTA	C"installed!"
+	DTA	155,0
 
 REMCANT	JSR	PRINT
-	ASC "Can't remove."
-	DFB 155,253,0
+	DTA	C"Can't remove."
+	DTA	155,253,0
 
 	JMP	(10)
 **
 
 REM2LST	JSR	PRINT
-	DFB 155
-	ASC "XL RAM-Disk is"
-	ASC " not the last"
-	DFB 155
-	ASC "installed handler!"
-	DFB 155,0
+	DTA	155
+	DTA	C"XL RAM-Disk is"
+	DTA	C" not the last"
+	DTA	155
+	DTA	C"installed handler!"
+	DTA	155,0
 
 	JMP	REMCANT
 **
@@ -515,10 +514,10 @@ REM3	LDA	(SRCHADR),Y
 ***
 
 	JSR	PRINT
-	DFB 155
-	ASC "XL RAM-Disk "
-	ASC "removed."
-	DFB 155,0
+	DTA	155
+	DTA	C"XL RAM-Disk "
+	DTA	C"removed."
+	DTA	155,0
 
 	JMP	(10)
 ****
@@ -650,7 +649,7 @@ TST4	RTS
 
 **
 
-RESLEN	EPZ	*-RESID
+RESLEN	EQU	*-RESID
 
 *******
 
@@ -691,9 +690,9 @@ RR8	STA	R05+1
 	CPY	#4
 	BNE	R2NAK
 
-	LDA	#(RDSTAT+RESO):L
+	LDA	#<((RDSTAT+RESO))
 	STA	$32
-	LDA	#(RDSTAT+RESO):H
+	LDA	#>((RDSTAT+RESO))
 	STA	$33
 
 	BNE	RR10
@@ -769,7 +768,7 @@ RR10	INC	R05+1
 	RTS
 ***
 
-RDSTAT	DFB $10,$FF,$FF,$FF
+RDSTAT	DTA	$10,$FF,$FF,$FF
 
 ***
 
@@ -784,9 +783,9 @@ RES2LEN	EQU	*-RES2
 *
 **************
 
-UTAJ	LDA	#(PRINT+O):L
+UTAJ	LDA	#<((PRINT+O))
 	STA	0
-	LDA	#(PRINT+O):H
+	LDA	#>((PRINT+O))
 	STA	1
 
 UTAJ2	LDY	#0
@@ -799,11 +798,11 @@ UTAJ2	LDY	#0
 	INC	1
 
 UTAJ3	LDA	0
-	CMP	#(UTAJ+O):L
+	CMP	#<((UTAJ+O))
 	BNE	UTAJ2
 
 	LDA	1
-	CMP	#(UTAJ+O):H
+	CMP	#>((UTAJ+O))
 	BNE	UTAJ2
 
 	RTS

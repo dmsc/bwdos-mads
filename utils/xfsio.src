@@ -1,5 +1,4 @@
 	ORG	$5FFD,$A800
-	OUT	N
 
 O	EQU	$A800-$5FFD
 	JMP	UTAJ+O
@@ -14,9 +13,9 @@ O	EQU	$A800-$5FFD
 *				*
 *************************************
 
-SRCHADR	EPZ	128
-REFLAG	EPZ	130
-SIOADR	EPZ	131
+SRCHADR	EQU	128
+REFLAG	EQU	130
+SIOADR	EQU	131
 
 ***
 
@@ -86,7 +85,7 @@ PRT1	TAY
 
 GETNAME	JMP	PRTEX
 
-DTAB	DFW 0,0
+DTAB	DTA	A(0,0)
 
 ***
 
@@ -95,9 +94,9 @@ START	LDA	$700
 	BEQ	START2
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Incorrect DOS version"
-	DFB 155,0
+	DTA	155,253
+	DTA	C"Incorrect DOS version"
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -150,20 +149,20 @@ STRT3	STA	DTAB,X
 ***
 
 HELP	JSR	PRINT
-	DFB 155
-	ASC "Syntax: XFSIO drive_"
-	ASC "number(s)"
-	DFB 155
-	ASC "        XFSIO OFF"
-	DFB 155,0
+	DTA	155
+	DTA	C"Syntax: XFSIO drive_"
+	DTA	C"number(s)"
+	DTA	155
+	DTA	C"        XFSIO OFF"
+	DTA	155,0
 
 	JMP	(10)
 ***
 
 SYNTAX	JSR	PRINT
-	DFB 155
-	ASC "Syntax Error"
-	DFB 155,0
+	DTA	155
+	DTA	C"Syntax Error"
+	DTA	155,0
 *XDIV
 	LDY	#8
 	LDA	(10),Y
@@ -222,9 +221,9 @@ STRT6B	LDA	DRITST,X
 	STA	ST6IQJ+2
 	PHA
 
-	LDA	#ST6IRQ:L
+	LDA	#<ST6IRQ
 	STA	$20A
-	LDA	#ST6IRQ:H
+	LDA	#>ST6IRQ
 	STA	$20B
 
 	JSR	$E459
@@ -238,9 +237,9 @@ STRT6B	LDA	DRITST,X
 	BPL	STRT6C
 *
 	JSR	PRINT
-	DFB 155
-	ASC "Drive "
-	DFB 0
+	DTA	155
+	DTA	C"Drive "
+	DTA	0
 
 	LDY	REFLAG
 	LDA	#0
@@ -252,8 +251,8 @@ STRT6B	LDA	DRITST,X
 	JSR	PRT1
 
 	JSR	PRINT
-	ASC " is not XF 551."
-	DFB 0
+	DTA	C" is not XF 551."
+	DTA	0
 **
 
 STRT6C	INC	REFLAG
@@ -269,12 +268,12 @@ ST6IQJ	JMP	$FFFF
 
 **
 
-DRITST	DFB	$31,0
-	ASC /N/
-	DFB 64
-	DFW $500
-	DFB 7,0
-	DFW 12,1
+DRITST	DTA	$31,0
+	DTA	C"N"*
+	DTA	64
+	DTA	A($500)
+	DTA	7,0
+	DTA	A(12,1)
 
 ***
 
@@ -374,19 +373,19 @@ STRT8	LDA	DTAB,X
 	BMI	REINTXT
 **
 	JSR	PRINT
-	DFB 155
-	ASC "SIO for "
-	ASC "XF 551 Installed."
-	DFB 155,0
+	DTA	155
+	DTA	C"SIO for "
+	DTA	C"XF 551 Installed."
+	DTA	155,0
 
 	JMP	(10)
 ***
 
 REINTXT	JSR	PRINT
-	DFB 155
-	ASC "XF 551 SIO: "
-	ASC "Configuration changed."
-	DFB 155,0
+	DTA	155
+	DTA	C"XF 551 SIO: "
+	DTA	C"Configuration changed."
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -399,25 +398,25 @@ DISABLE	JSR	SRCHRUT
 	BCS	DISABL2J
 
 	JSR	PRINT
-	DFB 155
-	ASC "XF 551 SIO"
-	ASC " Not Installed!"
-	DFB 155,0
+	DTA	155
+	DTA	C"XF 551 SIO"
+	DTA	C" Not Installed!"
+	DTA	155,0
 
 	JMP	DISERR2
 ***
 
 DISCANT	JSR	PRINT
-	DFB 155
-	ASC "XF 551 SIO is not the"
-	ASC " last"
-	DFB 155
-	ASC "installed handler!"
-	DFB 155,0
+	DTA	155
+	DTA	C"XF 551 SIO is not the"
+	DTA	C" last"
+	DTA	155
+	DTA	C"installed handler!"
+	DTA	155,0
 
 DISERR2	JSR	PRINT
-	ASC "Can't remove."
-	DFB 155,0
+	DTA	C"Can't remove."
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -460,10 +459,10 @@ DISBL2	LDA	(SRCHADR),Y
 **
 
 	JSR	PRINT
-	DFB 155
-	ASC "XF 551 SIO"
-	ASC " Removed."
-	DFB 155,0
+	DTA	155
+	DTA	C"XF 551 SIO"
+	DTA	C" Removed."
+	DTA	155,0
 
 	JMP	(10)
 ****
@@ -564,9 +563,9 @@ XFSIO2	LDA	$20A
 	ORA	#$80
 	STA	$302
 
-R04	LDA	#IRQ:L
+R04	LDA	#<IRQ
 	STA	$20A
-R05	LDA	#IRQ:H
+R05	LDA	#>IRQ
 TST2	STA	$20B
 
 XFSIO3	LDA	$10
@@ -600,11 +599,11 @@ IRQJP	JMP	$FFFF
 
 ***
 
-RESTAB	DFW 0,0
+RESTAB	DTA	A(0,0)
 
 ***
 
-RESLEN	EPZ	*-RESID
+RESLEN	EQU	*-RESID
 
 **************
 *
@@ -613,9 +612,9 @@ RESLEN	EPZ	*-RESID
 *
 **************
 
-UTAJ	LDA	#(PRINT+O):L
+UTAJ	LDA	#<((PRINT+O))
 	STA	0
-	LDA	#(PRINT+O):H
+	LDA	#>((PRINT+O))
 	STA	1
 
 UTAJ2	LDY	#0
@@ -628,11 +627,11 @@ UTAJ2	LDY	#0
 	INC	1
 
 UTAJ3	LDA	0
-	CMP	#(UTAJ+O):L
+	CMP	#<((UTAJ+O))
 	BNE	UTAJ2
 
 	LDA	1
-	CMP	#(UTAJ+O):H
+	CMP	#>((UTAJ+O))
 	BNE	UTAJ2
 
 	RTS
