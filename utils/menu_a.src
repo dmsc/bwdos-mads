@@ -1,4 +1,3 @@
-	OUT	N
 *				*
 *  " M E N U " PRO BW-DOS - CAST 1  *
 *				*
@@ -23,50 +22,50 @@ ERR	EQU	START3+3
 
 *
 
-SIOADR	EPZ	128
-WRTCMD	EPZ	130
+SIOADR	EQU	128
+WRTCMD	EQU	130
 
-DRIVNUM	EPZ	131
-SL	EPZ	132
-MEDFLG	EPZ	134
+DRIVNUM	EQU	131
+SL	EQU	132
+MEDFLG	EQU	134
 
-DOFF	EPZ	135
-DPOS	EPZ	136
-DSECT	EPZ	137
+DOFF	EQU	135
+DPOS	EQU	136
+DSECT	EQU	137
 
-RWA	EPZ	138
-RWL	EPZ	140
+RWA	EQU	138
+RWL	EQU	140
 
-T	EPZ	142
-SSAVE	EPZ	145
+T	EQU	142
+SSAVE	EQU	145
 
-DTS	EPZ	146
-POS	EPZ	148
-DTAIX	EPZ	151
-
-*
-
-PRTMSK	EPZ	157
-PADR	EPZ	153
-MT1	EPZ	170
-
-BELLFLG	EPZ	200
+DTS	EQU	146
+POS	EQU	148
+DTAIX	EQU	151
 
 *
-	ORG	STARTA,$A800
 
-JMPS	MACRO	A1,A2,A3,A4
-	JMP	A1
-	JMP	A2
-	JMP	A3
-	JMP	A4
-	MEND
+PRTMSK	EQU	157
+PADR	EQU	153
+MT1	EQU	170
 
-JSRS	MACRO	A1,A2,A3
-	JSR	A1
-	JSR	A2
-	JSR	A3
-	MEND
+BELLFLG	EQU	200
+
+*
+	ORG	STARTA
+
+JMPS	.MACRO	A1,A2,A3,A4
+	JMP	:A1
+	JMP	:A2
+	JMP	:A3
+	JMP	:A4
+	.MEND
+
+JSRS	.MACRO	A1,A2,A3
+	JSR	:A1
+	JSR	:A2
+	JSR	:A3
+	.MEND
 
  JMPS START0,WAITKB,INIT25,RWSECTX
  JMPS READD,PROTECT,UNPROT,RENAME
@@ -76,33 +75,33 @@ JSRS	MACRO	A1,A2,A3
  JMPS WAITKEY,GETKB,CONVFNM,$E477
 *
 
-BIT3	MACRO
-	DFB $2C
-	MEND
+BIT3	.MACRO
+	DTA	$2C
+	.MEND
 
-LDSTA	MACRO	BYT,ADR
-	LDA	#BYT
-	STA	ADR
-	MEND
+LDSTA	.MACRO	BYT,ADR
+	LDA	#:BYT
+	STA	:ADR
+	.MEND
 
-LDXY	MACRO	A1
-	LDX	#A1:H
-	LDY	#A1:L
-	MEND
+LDXY	.MACRO	A1
+	LDX	#>(:A1)
+	LDY	#<(:A1)
+	.MEND
 
 **
 
-RWST1	DFB '"'
-	ASC "!ONSWRP"
+RWST1	DTA	'"'
+	DTA	C"!ONSWRP"
 
-RWST2	DFB 64,64,128,64
-	DFB 64,128,64,128
+RWST2	DTA	64,64,128,64
+	DTA	64,128,64,128
 
-RWST3	DFB 0,0,12,12
-	DFB 4,0,0,0
+RWST3	DTA	0,0,12,12
+	DTA	4,0,0,0
 
-RWST4	DFB 255,255,7,7
-	DFB 7,7,7,7
+RWST4	DTA	255,255,7,7
+	DTA	7,7,7,7
 
 **
 
@@ -594,7 +593,7 @@ ERROR	LDX	SSAVE
 *
 
 PROTECT	SEC
-	DFB $24
+	DTA	$24
 UNPROT	CLC
 
 	TSX
@@ -718,7 +717,7 @@ CHKD4	INY
 	RTS
 *
 
-CHKDNAM	ASC "AtariDOS"
+CHKDNAM	DTA	C"AtariDOS"
 
 *
 
@@ -805,10 +804,10 @@ ERADT5	LSR	T+1
 
 	LDA	T
 	CLC
-	ADC	#MAPB+10:L
+	ADC	#<(MAPB+10)
 	STA	T
 	LDA	T+1
-	ADC	#MAPB+10:H
+	ADC	#>(MAPB+10)
 	STA	T+1
 
 	PLA
@@ -1464,21 +1463,21 @@ FM4C	LDA	FALBOT-1,X
 	RTS
 *
 
-FT1	DFB 128,128,0
-FT2	DFB 0,0,1
-FT3	DFB 0,255,0
-FT4	DFB 18,26,18
-FT5	DFB 0,4,4
+FT1	DTA	128,128,0
+FT2	DTA	0,0,1
+FT3	DTA	0,255,0
+FT4	DTA	18,26,18
+FT5	DTA	0,4,4
 
-FALBOT	DFB 1,0,32,6,32
+FALBOT	DTA	1,0,32,6,32
 	SEC
 	RTS
 
 ****
 
-EOL	MACRO
-	DFB 155
-	MEND
+EOL	.MACRO
+	DTA	155
+	.MEND
 *
 
 START0	LDA	$700
@@ -1491,14 +1490,14 @@ START0E	LDX	#0
 	LDA	#11
 	STA	$342,X
 
-	LDA	#STERT:L
+	LDA	#<STERT
 	STA	$344,X
-	LDA	#STERT:H
+	LDA	#>STERT
 	STA	$345,X
 
-	LDA	#STERL:L
+	LDA	#<STERL
 	STA	$348,X
-	LDA	#STERL:H
+	LDA	#>STERL
 	STA	$349,X
 
 	JSR	$E456
@@ -1506,271 +1505,271 @@ START0E	LDX	#0
 	JMP	(10)
 *
 
-STERT	DFB 155,155
-	ASC "Incorrect DOS "
-	ASC "version !!!"
-	DFB 253,253,253,253,155
+STERT	DTA	155,155
+	DTA	C"Incorrect DOS "
+	DTA	C"version !!!"
+	DTA	253,253,253,253,155
 
 STERL	EQU	*-STERT
 
 *
 
-LOOPTX	ASC "      BW-DOS MENU 1."
-	ASC "2  By BEWESOFT      "
+LOOPTX	DTA	C"      BW-DOS MENU 1."
+	DTA	C"2  By BEWESOFT      "
 	EOL
 L EQU LOOPTX
 
 ERRTX EQU *-L
-	ASC "Error    !"
+	DTA	C"Error    !"
 	EOL
 
 SRTM EQU *-L
-	DFB 5,0,20
-	DFB 9,16,24,29,37
-	DFB 6,7,4,7,2
-	ASC "ENSD0"
-	ASC "Sorting: Ext+N. Name"
-	ASC "+E. Size Date+T. No"
+	DTA	5,0,20
+	DTA	9,16,24,29,37
+	DTA	6,7,4,7,2
+	DTA	C"ENSD0"
+	DTA	C"Sorting: Ext+N. Name"
+	DTA	C"+E. Size Date+T. No"
 	EOL
 
 NDSKT EQU *-L
-	ASC "New disk: Drive:"
+	DTA	C"New disk: Drive:"
 	EOL
 
 NDSKM EQU *-L
-	DFB 5,17,20
-	DFB 0,3,6,9,12
-	DFB 3,3,3,3,3
-	ASC "12348"
-	ASC " 1  2  3  4  8 "
+	DTA	5,17,20
+	DTA	0,3,6,9,12
+	DTA	3,3,3,3,3
+	DTA	C"12348"
+	DTA	C" 1  2  3  4  8 "
 PRESSK EQU *-L
 	EOL
 
-WKTX	ASC "Press a key..."
-	DFB 160,155
+WKTX	DTA	C"Press a key..."
+	DTA	160,155
 
 SELTX EQU *-L
-	ASC "S"
+	DTA	C"S"
 	EOL
 DESTX EQU *-L
-	ASC "Des"
+	DTA	C"Des"
 	EOL
 SDTX EQU *-L
-	ASC "elect group:"
+	DTA	C"elect group:"
 	EOL
 
 DIT1 EQU *-L
-	ASC "Volume:"
+	DTA	C"Volume:"
 DIT2 EQU *-L
-	ASC "Bytes/sector:"
+	DTA	C"Bytes/sector:"
 DIT3 EQU *-L
-	ASC "Total bytes:"
+	DTA	C"Total bytes:"
 DIT4 EQU *-L
-	ASC "Bytes free:"
+	DTA	C"Bytes free:"
 
 DI1 EQU *-L
-	ASC %1222222222222222%
-	ASC %222222222222222%
-	DFB 5,155
+	DTA	D"1222222222222222"
+	DTA	D"222222222222222"
+	DTA	5,155
 
 DI2 EQU *-L
-	ASC "|          Disk "
-	ASC "info:          |"
+	DTA	C"|          Disk "
+	DTA	C"info:          |"
 	EOL
 
 DI3 EQU *-L
-	ASC %!222222222222222%
-	ASC %222222222222222$%
+	DTA	D"!222222222222222"
+	DTA	D"222222222222222$"
 	EOL
 
 DI4 EQU *-L
-	ASC %:222222222222222%
-	ASC %222222222222222#%
+	DTA	D":222222222222222"
+	DTA	D"222222222222222#"
 	EOL
 
 NOTSAM EQU *-L
-	ASC "Disk changed!"
+	DTA	C"Disk changed!"
 	EOL
 
 MDTX EQU *-L
-	ASC "Directory name:"
+	DTA	C"Directory name:"
 	EOL
 
 RNTX EQU *-L
-	ASC "Rename to:"
+	DTA	C"Rename to:"
 	EOL
 
 AINM EQU *-L
-	DFB 4,0,20
-	DFB 26,29,32,35
-	DFB 3,3,3,3
-	ASC "1234"
-	ASC "Format Atari disk: "
-	ASC "Drive: "
-	ASC " 1  2  3  4 "
+	DTA	4,0,20
+	DTA	26,29,32,35
+	DTA	3,3,3,3
+	DTA	C"1234"
+	DTA	C"Format Atari disk: "
+	DTA	C"Drive: "
+	DTA	C" 1  2  3  4 "
 	EOL
 
 AINS EQU *-L
-	DFB 2,19,20
-	DFB 14,17
-	DFB 2,3
-	ASC "NY"
-	ASC "Are you sure? "
-	ASC "No Yes"
+	DTA	2,19,20
+	DTA	14,17
+	DTA	2,3
+	DTA	C"NY"
+	DTA	C"Are you sure? "
+	DTA	C"No Yes"
 	EOL
 
 AIND EQU *-L
-	DFB 3,19,20
-	DFB 0,7,14
-	DFB 6,6,6
-	ASC "SMD"
-	ASC "Single Medium Double"
+	DTA	3,19,20
+	DTA	0,7,14
+	DTA	6,6,6
+	DTA	C"SMD"
+	DTA	C"Single Medium Double"
 	EOL
 
 FRMTNG EQU *-L
-	ASC "Formatting..."
-	DFB 160,155
+	DTA	C"Formatting..."
+	DTA	160,155
 
 MTTX EQU *-L
-	ASC "Filename:"
+	DTA	C"Filename:"
 	EOL
 
 COPTX1 EQU *-L
-	ASC "  Copy to drive:"
+	DTA	C"  Copy to drive:"
 	EOL
 
 COPMEN EQU *-L
-	DFB 2,0,20
-	DFB 11,15
-	DFB 3,2
-	ASC "YN"
-	ASC "Same disk? Yes No"
+	DTA	2,0,20
+	DTA	11,15
+	DTA	3,2
+	DTA	C"YN"
+	DTA	C"Same disk? Yes No"
 	EOL
 
 COPTX2 EQU *-L
-	ASC "Dest. path:"
+	DTA	C"Dest. path:"
 	EOL
 
 SRCTX EQU *-L
-	ASC "Insert source disk..."
-	DFB 160,155
+	DTA	C"Insert source disk..."
+	DTA	160,155
 
 DSTTX EQU *-L
-	ASC "Insert destination"
-	ASC " disk..."
-	DFB 160,155
+	DTA	C"Insert destination"
+	DTA	C" disk..."
+	DTA	160,155
 
 BELLMEN EQU *-L
-	DFB 2,0,20
-	DFB 6,10
-	DFB 3,2
-	ASC "YN"
-	ASC "Bell: Yes No"
+	DTA	2,0,20
+	DTA	6,10
+	DTA	3,2
+	DTA	C"YN"
+	DTA	C"Bell: Yes No"
 	EOL
 
 CLTBT EQU *-L
-	DFW CTN,CTM,CTP,CTP
-	DFW CTP,CTP,CTP,CTP
-	DFW CTP,CTP,CTP,CTP
-	DFW CTP,CTP,CTP,CTP
-	DFW CTP,CTP,CTD
+	DTA	A(CTN,CTM,CTP,CTP)
+	DTA	A(CTP,CTP,CTP,CTP)
+	DTA	A(CTP,CTP,CTP,CTP)
+	DTA	A(CTP,CTP,CTP,CTP)
+	DTA	A(CTP,CTP,CTD)
 
-CTN	ASC "|  Filename  |P|  Si"
-	ASC "ze  |  Date  |Time |"
+CTN	DTA	C"|  Filename  |P|  Si"
+	DTA	C"ze  |  Date  |Time |"
 	EOL
 
-CTM	ASC %!2222222272223232222%
-	ASC %2222322222222322222$%
+CTM	DTA	D"!2222222272223232222"
+	DTA	D"2222322222222322222$"
 	EOL
 
 CTPOFF EQU *-L
-CTP	ASC "|        |   | |    "
-	ASC "    |        |     |"
+CTP	DTA	C"|        |   | |    "
+	DTA	C"    |        |     |"
 	EOL
 
-CTD	ASC %:2222222282228282222%
-	ASC %2222822222222822222#%
+CTD	DTA	D":2222222282228282222"
+	DTA	D"2222822222222822222#"
 	EOL
 
 
 CMDS EQU *-L
-	ASC "New disk "
+	DTA	C"New disk "
 	EOL
-	ASC "Disk info"
+	DTA	C"Disk info"
 	EOL
-	ASC "Sub dir  "
+	DTA	C"Sub dir  "
 	EOL
-	ASC "Up dir   "
+	DTA	C"Up dir   "
 	EOL
-	ASC "Make dir "
+	DTA	C"Make dir "
 	EOL
-	ASC "Del. dir "
+	DTA	C"Del. dir "
 	EOL
-	ASC "Copy     "
+	DTA	C"Copy     "
 	EOL
-	ASC "Erase    "
+	DTA	C"Erase    "
 	EOL
-	ASC "Rename   "
+	DTA	C"Rename   "
 	EOL
-	ASC "Protect  "
+	DTA	C"Protect  "
 	EOL
-	ASC "Unprotect"
+	DTA	C"Unprotect"
 	EOL
-	ASC "View text"
+	DTA	C"View text"
 	EOL
-	ASC "Make text"
+	DTA	C"Make text"
 	EOL
-	ASC "Ainit    "
+	DTA	C"Ainit    "
 	EOL
-	ASC "Exit     "
+	DTA	C"Exit     "
 	EOL
-	ASC "Setup    "
+	DTA	C"Setup    "
 	EOL
-	ASC "Select   "
+	DTA	C"Select   "
 	EOL
-	ASC "Deselect "
+	DTA	C"Deselect "
 	EOL
 *
 
 RAMPH EQU *-L
-	ASC %22222222227222222222%
-	ASC %72222222227222222222%
+	DTA	D"22222222227222222222"
+	DTA	D"72222222227222222222"
 	EOL
 
 RAMPM EQU *-L
-	ASC "          |         "
-	ASC "|         |         "
+	DTA	C"          |         "
+	DTA	C"|         |         "
 	EOL
 
 RAMPL EQU *-L
-	ASC %22222222228222222222%
-	ASC %82222222228222222222%
+	DTA	D"22222222228222222222"
+	DTA	D"82222222228222222222"
 	EOL
 
 RDD3T EQU *-L
-	DFW SRTB0,SRTB1,SRTB2,SRTB3
+	DTA	A(SRTB0,SRTB1,SRTB2,SRTB3)
 
-SRTB0	DFB 14,15,16
-	DFB 6,7,8,9,10,11,12,13
-	DFB 255
+SRTB0	DTA	14,15,16
+	DTA	6,7,8,9,10,11,12,13
+	DTA	255
 
-SRTB1	DFB 6,7,8,9,10,11,12,13
-	DFB 14,15,16
-	DFB 255
+SRTB1	DTA	6,7,8,9,10,11,12,13
+	DTA	14,15,16
+	DTA	255
 
-SRTB2	DFB 5,4,3
-	DFB 255
+SRTB2	DTA	5,4,3
+	DTA	255
 
-SRTB3	DFB 19,18,17,20,21,22
-	DFB 255
+SRTB3	DTA	19,18,17,20,21,22
+	DTA	255
 
 QMEN EQU *-L
-	DFB 2,0,20
-	DFB 24,28
-	DFB 3,2
-	ASC "YN"
-	ASC "Question for overwrite"
-	ASC ": Yes No"
+	DTA	2,0,20
+	DTA	24,28
+	DTA	3,2
+	DTA	C"YN"
+	DTA	C"Question for overwrite"
+	DTA	C": Yes No"
 	EOL
 
 * PRO B
@@ -1783,9 +1782,9 @@ AUXS0	LDX	#$10
 *
 
 CIODAB	STA	$342,X
-	LDA	#DAB:L
+	LDA	#<DAB
 	STA	$344,X
-	LDA	#DAB:H
+	LDA	#>DAB
 	STA	$345,X
 
 	JMP	$E456
@@ -1808,9 +1807,9 @@ REOPNS	JSR	CLOSE0
 	LDA	#3
 	STA	$342,X
 
-	LDA	#ENAM:L
+	LDA	#<ENAM
 	STA	$344,X
-	LDA	#ENAM:H
+	LDA	#>ENAM
 	STA	$345,X
 
 	LDA	#12
@@ -1824,11 +1823,11 @@ REOPNS	JSR	CLOSE0
 *
 REOPER	JMP	$E474
 *
-ENAM	ASC "E:"
-	DFB 155
+ENAM	DTA	C"E:"
+	DTA	155
 
-KNAM	ASC "K:"
-	DFB 155
+KNAM	DTA	C"K:"
+	DTA	155
 *
 
 WAITKEY	LDA	#0
@@ -1836,8 +1835,8 @@ WAITKEY	LDA	#0
 WAITKB	LDA	#$FF
 	PHA
 
-	LDSTA	WKTX:L,PADR
-	LDSTA	WKTX:H,PADR+1
+	LDSTA	<WKTX,PADR
+	LDSTA	>WKTX,PADR+1
 	LDY	#20
 	LDA	#0
 	JSR	PRINT
@@ -1889,9 +1888,9 @@ GETKEY	JSR	CLOSE2
 	LDA	#0
 	STA	$34B,X
 
-	LDA	#KNAM:L
+	LDA	#<KNAM
 	STA	$344,X
-	LDA	#KNAM:H
+	LDA	#>KNAM
 	STA	$345,X
 
 	JSR	$E456
@@ -1971,9 +1970,9 @@ COND5	TYA
 	RTS
 *
 
-CDT1 DFB $98,$0F,$01,0,0,0,0,0
-CDT2 DFB $96,$42,$86,$27,3,0,0,0
-CDT3 DFB $80,$40,$A0,$10,$E8,100,10,1
+CDT1	DTA	$98,$0F,$01,0,0,0,0,0
+CDT2	DTA	$96,$42,$86,$27,3,0,0,0
+CDT3	DTA	$80,$40,$A0,$10,$E8,100,10,1
 
 **
 
