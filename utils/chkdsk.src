@@ -1,4 +1,4 @@
-	ORG	$6000,$A800
+	ORG	$6000
 	JMP	START
 
 *************************************
@@ -7,9 +7,9 @@
 *				*
 *************************************
 
-DECOUT	EPZ	128
-PRTADR	EPZ	130
-PRTCNT	EPZ	132
+DECOUT	EQU	128
+PRTADR	EQU	130
+PRTCNT	EQU	132
 
 * VOLNO: 133
 
@@ -64,9 +64,9 @@ ERROR	TYA
 	PHA
 
 	JSR	PRINT
-	DFB 155
-	ASC "Error"
-	DFB 0
+	DTA	155
+	DTA	C"Error"
+	DTA	0
 
 	PLA
 	JSR	PRTBYT
@@ -89,7 +89,7 @@ ERR5	JSR	CLOSE
 	JMP	(10)
 **
 
-ERRTAB	DFB 1,10,100
+ERRTAB	DTA	1,10,100
 
 ***
 
@@ -113,9 +113,9 @@ START	LDA	$700
 	BEQ	START2
 
 ERROR0	JSR	PRINT
-	DFB 155,253
-	ASC "Error: Not BW-DOS !"
-	DFB 155,0
+	DTA	155,253
+	DTA	C"Error: Not BW-DOS !"
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -152,9 +152,9 @@ START2	LDA	10
 	ADC	#0
 	STA	$345,X
 
-	LDA	#BUFFER:L
+	LDA	#<BUFFER
 	STA	$348,X
-	LDA	#BUFFER:H
+	LDA	#>BUFFER
 	STA	$349,X
 
 	JSR	$E456
@@ -164,12 +164,12 @@ START2	LDA	10
 ***
 
 START4	JSR	PRINT
-	DFB 155
-	ASC "      Volume: "
-	DFB 0
+	DTA	155
+	DTA	C"      Volume: "
+	DTA	0
 
-	LDY	#BUFFER+6:L
-	LDX	#BUFFER+6:H
+	LDY	#<(BUFFER+6)
+	LDX	#>(BUFFER+6)
 	LDA	#8
 	JSR	PRTIT
 
@@ -180,9 +180,9 @@ START4	JSR	PRINT
 	JSR	PRTBYT
 *
 	JSR	PRINT
-	DFB 155
-	ASC "Bytes/sector:"
-	DFB 0
+	DTA	155
+	DTA	C"Bytes/sector:"
+	DTA	0
 
 	LDX	#0
 	LDA	BUFFER+1
@@ -192,17 +192,17 @@ START5	JSR	PRTDVA
 
 *
 	JSR	PRINT
-	DFB 155
-	ASC " Total bytes: "
-	DFB 0
+	DTA	155
+	DTA	C" Total bytes: "
+	DTA	0
 
 	LDY	#2
 	JSR	PRTBTS
 
 	JSR	PRINT
-	DFB 155
-	ASC "  Bytes free: "
-	DFB 0
+	DTA	155
+	DTA	C"  Bytes free: "
+	DTA	0
 
 	LDY	#4
 	JSR	PRTBTS

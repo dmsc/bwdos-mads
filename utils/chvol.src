@@ -1,4 +1,4 @@
-	ORG	$6000,$A800
+	ORG	$6000
 	JMP	START
 
 *************************************
@@ -7,7 +7,7 @@
 *				*
 *************************************
 
-ZPG1	EPZ	128
+ZPG1	EQU	128
 
 * VOLNO: 130
 
@@ -60,9 +60,9 @@ ERROR	TYA
 	PHA
 
 	JSR	PRINT
-	DFB 155
-	ASC "Error "
-	DFB 0
+	DTA	155
+	DTA	C"Error "
+	DTA	0
 
 	LDX	#2
 	PLA
@@ -108,7 +108,7 @@ ERR5	JMP	(10)
 
 **
 
-ERRTAB	DFB 1,10,100
+ERRTAB	DTA	1,10,100
 
 ***
 
@@ -117,9 +117,9 @@ START	LDA	$700
 	BEQ	START2
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Incorrect DOS version"
-	DFB 155,0
+	DTA	155,253
+	DTA	C"Incorrect DOS version"
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -173,7 +173,7 @@ START2	LDA	10
 	BEQ	START3
 **
 STER2	LDY	#148
-	DFB $2C
+	DTA	$2C
 STER1	LDY	#146
 	JMP	ERROR
 ***
@@ -229,11 +229,11 @@ SIOJP	JSR	SIOEX
 	JMP	ERROR
 ***
 
-RWST	DFB $31
-SIODRIV	DFB 0
-SIOCMD	DFB 0
-SIOSTAT	DFB 0
-	DFW BUFF,7,128,1
+RWST	DTA	$31
+SIODRIV	DTA	0
+SIOCMD	DTA	0
+SIOSTAT	DTA	0
+	DTA	A(BUFF,7,128,1)
 
 ****
 

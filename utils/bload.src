@@ -1,4 +1,4 @@
-	ORG	$500,$A800
+	ORG	$500
 	JMP	START
 
 *************************************
@@ -116,9 +116,9 @@ GETHX4	ASL	HEXL
 ***
 
 GHXERR	JSR	PRINT
-	DFB 155
-	ASC "Bad parameter !"
-	DFB 155,0
+	DTA	155
+	DTA	C"Bad parameter !"
+	DTA	155,0
 
 ERR2X	LDY	#8
 	LDA	(10),Y
@@ -144,9 +144,9 @@ START	LDA	$700
 	BEQ	START2
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Bad DOS !"
-	DFB 155,0
+	DTA	155,253
+	DTA	C"Bad DOS !"
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -170,10 +170,10 @@ START2	LDA	10
 **SYNTAX
 
 	JSR	PRINT
-	DFB 155
-	ASC "BLOAD fname adr. "
-	ASC "[len.]"
-	DFB 155,0
+	DTA	155
+	DTA	C"BLOAD fname adr. "
+	DTA	C"[len.]"
+	DTA	155,0
 	JMP	ERR2
 ***
 
@@ -190,10 +190,10 @@ START3	LDA	(10),Y
 	BNE	START4
 **
 	JSR	PRINT
-	DFB 155
-	ASC "No address"
-	ASC " specified !"
-	DFB 155,0
+	DTA	155
+	DTA	C"No address"
+	DTA	C" specified !"
+	DTA	155,0
 	JMP	ERR2X
 **
 
@@ -226,9 +226,9 @@ START5	TXA
 	LDA	#3
 	STA	$342,X
 
-	LDA	#NAME:L
+	LDA	#<NAME
 	STA	$344,X
-	LDA	#NAME:H
+	LDA	#>NAME
 	STA	$345,X
 
 	LDA	#4
@@ -240,9 +240,9 @@ START5	TXA
 	BPL	START6
 ***
 	JSR	PRINT
-	DFB 155
-	ASC "Can't open !"
-	DFB 155,0
+	DTA	155
+	DTA	C"Can't open !"
+	DTA	155,0
 	JMP	ERR2X
 ***
 
@@ -267,9 +267,9 @@ START6	LDX	#$10
 	BEQ	ST6EOF
 
 	JSR	PRINT
-	DFB 155
-	ASC "I/O Error !"
-	DFB 155,0
+	DTA	155
+	DTA	C"I/O Error !"
+	DTA	155,0
 	JMP	ERR2X
 **
 
@@ -280,9 +280,9 @@ LENFLG	EQU	ST6EOF+1
 	BPL	START7
 
 	JSR	PRINT
-	DFB 155
-	ASC "EOF found !"
-	DFB 155,0
+	DTA	155
+	DTA	C"EOF found !"
+	DTA	155,0
 
 START7	JMP	ERR2
 

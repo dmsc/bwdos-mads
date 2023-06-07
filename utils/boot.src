@@ -1,4 +1,4 @@
-	ORG	$6000,$A800
+	ORG	$6000
 	JMP	START
 
 *************************************
@@ -7,9 +7,9 @@
 *				*
 *************************************
 
-NAMOFFS	EPZ	128
-TMP	EPZ	129
-SIOADR	EPZ	130
+NAMOFFS	EQU	128
+TMP	EQU	129
+SIOADR	EQU	130
 
 **VOLNO: 132
 
@@ -165,9 +165,9 @@ ERROR	TYA
 	PHA
 
 	JSR	PRINT
-	DFB 155
-	ASC "Error "
-	DFB 0
+	DTA	155
+	DTA	C"Error "
+	DTA	0
 
 	LDX	#2
 	PLA
@@ -214,7 +214,7 @@ ERR5	JSR	CLOSE
 	JMP	(10)
 **
 
-ERRTAB	DFB 1,10,100
+ERRTAB	DTA	1,10,100
 
 ***
 
@@ -251,9 +251,9 @@ START	LDA	$700
 	BEQ	START2
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Incorrect DOS version"
-	DFB 155,0
+	DTA	155,253
+	DTA	C"Incorrect DOS version"
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -285,9 +285,9 @@ START2	LDA	10
 	LDA	#3
 	STA	$342,X
 
-	LDA	#SRC:L
+	LDA	#<SRC
 	STA	$344,X
-	LDA	#SRC:H
+	LDA	#>SRC
 	STA	$345,X
 
 	LDA	#$14
@@ -307,9 +307,9 @@ MAIN2	LDX	#$10
 	LDA	#7
 	STA	$342,X
 
-	LDA	#DIRBUF:L
+	LDA	#<DIRBUF
 	STA	$344,X
-	LDA	#DIRBUF:H
+	LDA	#>DIRBUF
 	STA	$345,X
 
 	LDA	#23
@@ -324,9 +324,9 @@ MAIN2	LDX	#$10
 	BNE	ERRJP
 
 	JSR	PRINT
-	DFB 155
-	ASC "File not found!"
-	DFB 155,0
+	DTA	155
+	DTA	C"File not found!"
+	DTA	155,0
 
 	JMP	ERR5X
 ***
@@ -363,9 +363,9 @@ MAIN2D	DEX
 **
 
 	JSR	PRINT
-	DFB 155
-	ASC "BOOT-file installed."
-	DFB 155,0
+	DTA	155
+	DTA	C"BOOT-file installed."
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -401,12 +401,12 @@ ERJP2	JMP	ERROR
 
 **
 
-RWSIOT	DFB	$31
-RWSDRIV	DFB	0,0,0
-	DFW	SRC
-	DFB 7,0
-	DFW	128
-	DFW	1
+RWSIOT	DTA	$31
+RWSDRIV	DTA	0,0,0
+	DTA	A(SRC)
+	DTA	7,0
+	DTA	A(128)
+	DTA	A(1)
 
 ***
 

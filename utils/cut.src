@@ -1,4 +1,4 @@
-	ORG	$4000,$A800
+	ORG	$4000
 	JMP	START
 
 *************************************
@@ -7,16 +7,16 @@
 *				*
 *************************************
 
-HEX	EPZ	128
+HEX	EQU	128
 
-POS	EPZ	131
-LEN	EPZ	134
+POS	EQU	131
+LEN	EQU	134
 
-LENFLG	EPZ	137
+LENFLG	EQU	137
 
-MEMLEN	EPZ	138
+MEMLEN	EQU	138
 
-STATUS	EPZ	140
+STATUS	EQU	140
 
 * VOLNO: 141
 
@@ -120,9 +120,9 @@ GETHX4	ASL	HEX
 ***
 
 GHXERR	JSR	PRINT
-	DFB 155
-	ASC "Bad parameter !"
-	DFB 155,0
+	DTA	155
+	DTA	C"Bad parameter !"
+	DTA	155,0
 
 ERR2X	LDY	#8
 	LDA	(10),Y
@@ -150,15 +150,15 @@ CLSS2	LDA	#12
 ***
 
 IOERR	JSR	PRINT
-	DFB 155
-	ASC "I/O Error !"
-	DFB 155,0
+	DTA	155
+	DTA	C"I/O Error !"
+	DTA	155,0
 	JMP	ERR2X
 ***
 
-CIONAM1	LDA	#NAME1:L
+CIONAM1	LDA	#<NAME1
 	STA	$344,X
-	LDA	#NAME1:H
+	LDA	#>NAME1
 	STA	$345,X
 
 	JMP	$E456
@@ -181,9 +181,9 @@ START	LDA	$700
 	BEQ	START2
 
 	JSR	PRINT
-	DFB 155,253
-	ASC "Incorrect DOS !"
-	DFB 155,0
+	DTA	155,253
+	DTA	C"Incorrect DOS !"
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -262,9 +262,9 @@ ST7	JSR	CLOSES
 **
 
 ST7ER	JSR	PRINT
-	DFB 155
-	ASC "Can't open file !"
-	DFB 155,0
+	DTA	155
+	DTA	C"Can't open file !"
+	DTA	155,0
 	JMP	ERR2X
 
 *** POINT
@@ -289,10 +289,10 @@ ST9	LDA	POS
 	BPL	ST10
 ***
 	JSR	PRINT
-	DFB 155
-	ASC "Can't set "
-	ASC "file-position !"
-	DFB 155,0
+	DTA	155
+	DTA	C"Can't set "
+	DTA	C"file-position !"
+	DTA	155,0
 	JMP	ERR2X
 
 *** OPEN2
@@ -307,9 +307,9 @@ ST10	LDX	#$20
 	LDA	#0
 	STA	$34B,X
 
-	LDA	#NAME:L
+	LDA	#<NAME
 	STA	$344,X
-	LDA	#NAME:H
+	LDA	#>NAME
 	STA	$345,X
 
 	JSR	$E456
@@ -327,17 +327,17 @@ ST11B	LDX	#$10
 	LDA	#7
 	STA	$342,X
 
-	LDA	#BUFF:L
+	LDA	#<BUFF
 	STA	$344,X
-	LDA	#BUFF:H
+	LDA	#>BUFF
 	STA	$345,X
 
 	LDA	741
 	SEC
-	SBC	#BUFF:L
+	SBC	#<BUFF
 	STA	$348,X
 	LDA	742
-	SBC	#BUFF:H
+	SBC	#>BUFF
 	STA	$349,X
 
 	LDA	LEN+2
@@ -376,9 +376,9 @@ ST11D	LDX	#$10
 	LDA	#11
 	STA	$342,X
 
-	LDA	#BUFF:L
+	LDA	#<BUFF
 	STA	$344,X
-	LDA	#BUFF:H
+	LDA	#>BUFF
 	STA	$345,X
 
 	LDA	MEMLEN
@@ -418,9 +418,9 @@ ST14EOF	LDA	LENFLG
 	BEQ	ST15
 
 	JSR	PRINT
-	DFB 155
-	ASC "EOF found !"
-	DFB 155,0
+	DTA	155
+	DTA	C"EOF found !"
+	DTA	155,0
 **
 
 ST15	JMP	ERR2

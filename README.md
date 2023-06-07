@@ -11,6 +11,13 @@ This is a work in progress, currently the converted files are:
     dos/bwdosc.src
     dos/bwmac.src
     dos/comtab.src
+	utils/bload.src
+	utils/boot.src
+	utils/chkdsk.src
+	utils/chvol.src
+	utils/copy.src
+	utils/cut.src
+	utils/date.src
 	utils/dirmast.src
 	utils/disass.src
 	utils/dump.src
