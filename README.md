@@ -41,6 +41,17 @@ This is a work in progress, currently the converted files are:
 	utils/verify.src
 	utils/xbat.src
 
+The following utilities are multi-part sources, and must be assembled with the
+stub that includes all parts:
+
+    utils/backup.asm
+      utils/bk_a.src
+      utils/bk_b.src
+
+    utils/menu.asm
+      utils/menu_a.src
+      utils/menu_b.src
+      utils/menu_c.src
 
 Note that some of the utilities are "protected" by exor-ing  part of the code,
 so those can´t be assembled directly from source.
