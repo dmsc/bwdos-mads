@@ -1,0 +1,132 @@
+# BW-DOS build recipes
+# --------------------
+
+# Build folder
+BUILD=build
+
+# Output disk
+DISK=$(BUILD)/disk
+
+# Standard tools:
+TOOLS=\
+      dos/bload.com\
+      dos/boot.com\
+      dos/chkdsk.com\
+      dos/chvol.com\
+      dos/copy.com\
+      dos/cut.com\
+      dos/date.com\
+      dos/dirmast.com\
+      dos/disass.com\
+      dos/dump.com\
+      dos/else.com\
+      dos/endif.com\
+      dos/format.com\
+      dos/hexedit.com\
+      dos/if.com\
+      dos/mdump.com\
+      dos/mem.com\
+      dos/memedit.com\
+      dos/move.com\
+      dos/msdos.com\
+      dos/msini.com\
+      dos/newed.com\
+      dos/offload.com\
+      dos/pause.com\
+      dos/save.com\
+      dos/time.com\
+      dos/unerase.com\
+      dos/verify.com\
+      dos/xbat.com\
+
+# Tools from multiple files
+TOOLS_MULTI=\
+      dos/backup.com\
+      dos/menu.com\
+
+# Tools that are EOR-ed in the file
+TOOLS_EOR=\
+      dos/argsprn.com\
+      dos/argsrtc.com\
+      dos/autocwd.com\
+      dos/clock.com\
+      dos/dosdrive.com\
+      dos/keybuff.com\
+      dos/rambox.com\
+      dos/ramdisk.com\
+      dos/rtime8.com\
+      dos/xfsio.com\
+      dos/xlrdisk.com\
+
+# And the main DOS file
+XDOS=dos/xbw130.dos
+
+# The extra files included in the original BW-DOS disk:
+EXTRA=\
+      readme.txt\
+      startup.bat\
+      bwdfunct.bas\
+
+#######################################################################
+# Main rules
+
+# Our C EOR program
+CFLAGS=-O2 -Wall
+EOR=$(BUILD)/tmp/exor
+
+# The output files
+O_TOOLS=$(TOOLS:%=$(DISK)/%)
+O_TOOLS_MULTI=$(TOOLS_MULTI:%=$(DISK)/%)
+O_TOOLS_EOR=$(TOOLS_EOR:%=$(DISK)/%)
+O_XDOS=$(XDOS:%=$(DISK)/%)
+O_EXTRA=$(EXTRA:%=$(DISK)/%)
+
+OUT=\
+    $(O_TOOLS)\
+    $(O_TOOLS_MULTI)\
+    $(O_TOOLS_EOR)\
+    $(O_XDOS)\
+    $(O_EXTRA)\
+
+all: $(OUT)
+
+# Build DOS
+$(O_XDOS):dos/bwdos.asm | $(DISK)/dos
+	mads -o:$@ $<
+
+# Simple assembly for the main tools:
+$(O_TOOLS):$(DISK)/dos/%.com:utils/%.src | $(DISK)/dos
+	mads -o:$@ $<
+
+# Assembly from multiple files:
+$(O_TOOLS_MULTI):$(DISK)/dos/%.com:utils/%.asm | $(DISK)/dos
+	mads -o:$@ $<
+
+# EOR using C tool:
+$(O_TOOLS_EOR):$(DISK)/dos/%.com:$(BUILD)/tmp/%.pre $(EOR) | $(DISK)/dos
+	$(EOR) $< $@
+
+$(BUILD)/tmp/%.pre:utils/%.src | $(BUILD)/tmp
+	mads -o:$@ $<
+
+# EOR tool
+$(EOR): extra/exor.c | $(BUILD)/tmp
+	$(CC) $(CFLAGS) -o $@ $<
+
+# Extra files
+$(O_EXTRA):$(DISK)/%:extra/%
+	cp $< $@
+
+# Make build folder
+$(BUILD):
+	mkdir -p $@
+
+$(DISK): | $(BUILD)
+	mkdir -p $@
+
+$(DISK)/dos: | $(DISK)
+	mkdir -p $@
+
+$(BUILD)/tmp: | $(BUILD)
+	mkdir -p $@
+

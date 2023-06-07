@@ -4,13 +4,25 @@ BW-DOS Original Sources
 This repository contains the sources of BW-DOS version 1.30, converted to MADS
 assembly syntax.
 
-This is a work in progress, currently the converted files are:
+All the sources assemble and produce exactly the same binaries than in the
+original distribution, there is a makefile to assemble all sources, just type
+`make` to regenerate all the files in the `build/disk` folder.
 
-    dos/bwdosa.src
-    dos/bwdosb.src
-    dos/bwdosc.src
-    dos/bwmac.src
-    dos/comtab.src
+
+Description of the files
+========================
+
+DOS Sources, those are assembled using the ASM file that includes all the parts:
+
+    dos/bwdos.asm
+      dos/bwdosa.src
+      dos/bwdosb.src
+      dos/bwdosc.src
+      dos/bwmac.src
+      dos/comtab.src
+
+Standard tools, those are assembled directly:
+
 	utils/bload.src
 	utils/boot.src
 	utils/chkdsk.src
@@ -53,8 +65,10 @@ stub that includes all parts:
       utils/menu_b.src
       utils/menu_c.src
 
-Note that some of the utilities are "protected" by exor-ing  part of the code,
-so those can´t be assembled directly from source:
+And the following utilities were "protected" in the original distribution by
+exclusive-or-ing the program in the file with the constant $55. After
+assembling those, there is a little C program that generates the protected
+binary from the unprotected one:
 
     utils/argsprn.src
     utils/argsrtc.src
@@ -67,4 +81,5 @@ so those can´t be assembled directly from source:
     utils/rtime8.src
     utils/xfsio.src
     utils/xlrdisk.src
+
 
