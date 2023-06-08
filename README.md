@@ -6,7 +6,8 @@ assembly syntax.
 
 All the sources assemble and produce exactly the same binaries than in the
 original distribution, there is a makefile to assemble all sources, just type
-`make` to regenerate all the files in the `build/disk` folder.
+`make` to regenerate all the files in the `build/disk` folder and build a
+disk image using the `mkatr` tool.
 
 
 Description of the files

@@ -67,6 +67,9 @@ EXTRA=\
       startup.bat\
       bwdfunct.bas\
 
+# The resulting ATR image
+ATR=bwdos.atr
+
 #######################################################################
 # Main rules
 
@@ -80,6 +83,7 @@ O_TOOLS_MULTI=$(TOOLS_MULTI:%=$(DISK)/%)
 O_TOOLS_EOR=$(TOOLS_EOR:%=$(DISK)/%)
 O_XDOS=$(XDOS:%=$(DISK)/%)
 O_EXTRA=$(EXTRA:%=$(DISK)/%)
+O_ATR=$(ATR:%=$(BUILD)/%)
 
 OUT=\
     $(O_TOOLS)\
@@ -88,7 +92,13 @@ OUT=\
     $(O_XDOS)\
     $(O_EXTRA)\
 
-all: $(OUT)
+# Main rule: build the ATR image
+all: $(O_ATR)
+
+# Build boot-able DOS disk image
+$(O_ATR): $(OUT) | $(BUILD)
+	mkatr $@ $(DISK)/dos -b $(O_XDOS) \
+		$(sort $(O_TOOLS) $(O_TOOLS_MULTI) $(O_TOOLS_EOR) $(O_EXTRA))
 
 # Build DOS
 $(O_XDOS):dos/bwdos.asm | $(DISK)/dos
