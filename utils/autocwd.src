@@ -1,12 +1,3 @@
-	ORG	$5FFD,$A800
-
-O	EQU	$A800-$5FFD
-	JMP	UTAJ+O
-***
-*   PRED SAVE SPUSTIT OD $A800,
-*   PAK ULOZIT OD A803 NA 6000
-***
-
 *************************************
 *				*
 *   " A U T O C W D "  PRO BW-DOS	*
@@ -19,28 +10,8 @@ ALINST	EQU	130
 
 ***
 
-ODT0	LDA	START
-
-	LDX	#0
-	LDY	#6
-
-ODTAJ	LDA	PRINT,X
-	EOR	#$55
-ODT2	STA	PRINT,X
-
-	INX
-	BNE	ODTAJ
-
-	INC	ODTAJ+2
-	INC	ODT2+2
-
-	DEY
-	BNE	ODTAJ
-*
-	LDA	ODT3
-	STA	ODT0
-
-ODT3	JMP	START
+	ORG	$6000
+	JMP	START
 
 ***
 
@@ -386,39 +357,3 @@ RESNAM	DTA	C"There will"
 RESLEN	EQU	*-RESID
 
 ***
-
-**************
-*
-* KONEC PROGRAMU, NASLEDUJE SLUZEBNI
-* RUTINKA
-*
-**************
-
-UTAJ	LDA	#<((PRINT+O))
-	STA	0
-	LDA	#>((PRINT+O))
-	STA	1
-
-UTAJ2	LDY	#0
-	LDA	(0),Y
-	EOR	#$55
-	STA	(0),Y
-
-	INC	0
-	BNE	UTAJ3
-	INC	1
-
-UTAJ3	LDA	0
-	CMP	#<((UTAJ+O))
-	BNE	UTAJ2
-
-	LDA	1
-	CMP	#>((UTAJ+O))
-	BNE	UTAJ2
-
-	RTS
-
-****
-
-SAVEOD	EQU	$A803
-SAVETO	EQU	UTAJ+O

@@ -1,13 +1,12 @@
-BW-DOS Original Sources
------------------------
+Modernized BW-DOS Sources
+-------------------------
 
-This repository contains the sources of BW-DOS version 1.30, converted to MADS
-assembly syntax.
+This repository contains "modernized" sources of BW-DOS, converted from the
+original to MADS assembly syntax and with modifications by DMSC and HolgerJanz.
 
-All the sources assemble and produce exactly the same binaries than in the
-original distribution, there is a makefile to assemble all sources, just type
-`make` to regenerate all the files in the `build/disk` folder and build a
-disk image using the `mkatr` tool.
+There is a makefile to assemble all sources, just type `make` to generate all
+the bianry files in the `build/disk` folder and build and a disk image using
+the `mkatr` tool.
 
 
 Description of the files
@@ -53,24 +52,6 @@ Standard tools, those are assembled directly:
 	utils/unerase.src
 	utils/verify.src
 	utils/xbat.src
-
-The following utilities are multi-part sources, and must be assembled with the
-stub that includes all parts:
-
-    utils/backup.asm
-      utils/bk_a.src
-      utils/bk_b.src
-
-    utils/menu.asm
-      utils/menu_a.src
-      utils/menu_b.src
-      utils/menu_c.src
-
-And the following utilities were "protected" in the original distribution by
-exclusive-or-ing the program in the file with the constant $55. After
-assembling those, there is a little C program that generates the protected
-binary from the unprotected one:
-
     utils/argsprn.src
     utils/argsrtc.src
     utils/autocwd.src
@@ -83,4 +64,15 @@ binary from the unprotected one:
     utils/xfsio.src
     utils/xlrdisk.src
 
+The following utilities are multi-part sources, and must be assembled with the
+stub that includes all parts:
+
+    utils/backup.asm
+      utils/bk_a.src
+      utils/bk_b.src
+
+    utils/menu.asm
+      utils/menu_a.src
+      utils/menu_b.src
+      utils/menu_c.src
 

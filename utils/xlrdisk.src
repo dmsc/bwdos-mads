@@ -1,12 +1,3 @@
-	ORG	$3FFD,$A800
-
-O	EQU	$A800-$3FFD
-	JMP	UTAJ+O
-***
-*   PRED SAVE SPUSTIT OD $A800,
-*   PAK ULOZIT OD A803 NA 4000
-***
-
 *************************************
 *				*
 *   RAM-DISK V OS-RAM  PRO BW-DOS	*
@@ -23,27 +14,7 @@ ROMSAVE	EQU	143
 
 *** VOLNO: 144
 
-ODT0	LDA	START
-
-	LDX	#0
-	LDY	#9
-
-ODTAJ	LDA	PRINT,X
-	EOR	#$55
-ODT2	STA	PRINT,X
-
-	INX
-	BNE	ODTAJ
-
-	INC	ODTAJ+2
-	INC	ODT2+2
-
-	DEY
-	BNE	ODTAJ
-*
-	LDA	#76
-	STA	ODT0
-
+	ORG	$4000
 	JMP	START
 
 ***
@@ -776,38 +747,3 @@ RESO	EQU	$C000-RES2
 
 RES2LEN	EQU	*-RES2
 
-**************
-*
-* KONEC PROGRAMU, NASLEDUJE SLUZEBNI
-* RUTINKA
-*
-**************
-
-UTAJ	LDA	#<((PRINT+O))
-	STA	0
-	LDA	#>((PRINT+O))
-	STA	1
-
-UTAJ2	LDY	#0
-	LDA	(0),Y
-	EOR	#$55
-	STA	(0),Y
-
-	INC	0
-	BNE	UTAJ3
-	INC	1
-
-UTAJ3	LDA	0
-	CMP	#<((UTAJ+O))
-	BNE	UTAJ2
-
-	LDA	1
-	CMP	#>((UTAJ+O))
-	BNE	UTAJ2
-
-	RTS
-
-****
-
-SAVEOD	EQU	$A803
-SAVETO	EQU	UTAJ+O

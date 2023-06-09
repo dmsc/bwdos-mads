@@ -1,12 +1,3 @@
-	ORG	$36FD,$A800
-
-O	EQU	$A800-$36FD
-	JMP	UTAJ+O
-***
-*   PRED SAVE SPUSTIT OD $A800,
-*   PAK ULOZIT OD A803 NA 3700
-***
-
 *************************************
 *				*
 *	RAM-DISK PRO BW-DOS	*
@@ -43,27 +34,7 @@ SWTAB	EQU	$480
 
 ***
 
-ODT0	LDA	START
-
-	LDX	#0
-	LDY	#9
-
-ODTAJ	LDA	PRINT,X
-	EOR	#$55
-ODT2	STA	PRINT,X
-
-	INX
-	BNE	ODTAJ
-
-	INC	ODTAJ+2
-	INC	ODT2+2
-
-	DEY
-	BNE	ODTAJ
-*
-	LDA	#76
-	STA	ODT0
-
+	ORG	$3700
 	JMP	START
 
 ***
@@ -1317,38 +1288,3 @@ RESO	EQU	$4000-RES2
 
 RES2LEN	EQU	RBTAB+64-RES2
 
-**************
-*
-* KONEC PROGRAMU, NASLEDUJE SLUZEBNI
-* RUTINKA
-*
-**************
-
-UTAJ	LDA	#<((PRINT+O))
-	STA	0
-	LDA	#>((PRINT+O))
-	STA	1
-
-UTAJ2	LDY	#0
-	LDA	(0),Y
-	EOR	#$55
-	STA	(0),Y
-
-	INC	0
-	BNE	UTAJ3
-	INC	1
-
-UTAJ3	LDA	0
-	CMP	#<((UTAJ+O))
-	BNE	UTAJ2
-
-	LDA	1
-	CMP	#>((UTAJ+O))
-	BNE	UTAJ2
-
-	RTS
-
-****
-
-SAVEOD	EQU	$A803
-SAVETO	EQU	UTAJ+O

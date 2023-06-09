@@ -38,14 +38,6 @@ TOOLS=\
       dos/unerase.com\
       dos/verify.com\
       dos/xbat.com\
-
-# Tools from multiple files
-TOOLS_MULTI=\
-      dos/backup.com\
-      dos/menu.com\
-
-# Tools that are EOR-ed in the file
-TOOLS_EOR=\
       dos/argsprn.com\
       dos/argsrtc.com\
       dos/autocwd.com\
@@ -57,6 +49,11 @@ TOOLS_EOR=\
       dos/rtime8.com\
       dos/xfsio.com\
       dos/xlrdisk.com\
+
+# Tools from multiple files
+TOOLS_MULTI=\
+      dos/backup.com\
+      dos/menu.com\
 
 # And the main DOS file
 XDOS=dos/xbw130.dos
@@ -73,14 +70,9 @@ ATR=bwdos.atr
 #######################################################################
 # Main rules
 
-# Our C EOR program
-CFLAGS=-O2 -Wall
-EOR=$(BUILD)/tmp/exor
-
 # The output files
 O_TOOLS=$(TOOLS:%=$(DISK)/%)
 O_TOOLS_MULTI=$(TOOLS_MULTI:%=$(DISK)/%)
-O_TOOLS_EOR=$(TOOLS_EOR:%=$(DISK)/%)
 O_XDOS=$(XDOS:%=$(DISK)/%)
 O_EXTRA=$(EXTRA:%=$(DISK)/%)
 O_ATR=$(ATR:%=$(BUILD)/%)
@@ -88,7 +80,6 @@ O_ATR=$(ATR:%=$(BUILD)/%)
 OUT=\
     $(O_TOOLS)\
     $(O_TOOLS_MULTI)\
-    $(O_TOOLS_EOR)\
     $(O_XDOS)\
     $(O_EXTRA)\
 
@@ -98,7 +89,7 @@ all: $(O_ATR)
 # Build boot-able DOS disk image
 $(O_ATR): $(OUT) | $(BUILD)
 	mkatr $@ $(DISK)/dos -b $(O_XDOS) \
-		$(sort $(O_TOOLS) $(O_TOOLS_MULTI) $(O_TOOLS_EOR) $(O_EXTRA))
+		$(sort $(O_TOOLS) $(O_TOOLS_MULTI) $(O_EXTRA))
 
 # Build DOS
 $(O_XDOS):dos/bwdos.asm | $(DISK)/dos
@@ -112,17 +103,6 @@ $(O_TOOLS):$(DISK)/dos/%.com:utils/%.src | $(DISK)/dos
 $(O_TOOLS_MULTI):$(DISK)/dos/%.com:utils/%.asm | $(DISK)/dos
 	mads -o:$@ $<
 
-# EOR using C tool:
-$(O_TOOLS_EOR):$(DISK)/dos/%.com:$(BUILD)/tmp/%.pre $(EOR) | $(DISK)/dos
-	$(EOR) $< $@
-
-$(BUILD)/tmp/%.pre:utils/%.src | $(BUILD)/tmp
-	mads -o:$@ $<
-
-# EOR tool
-$(EOR): extra/exor.c | $(BUILD)/tmp
-	$(CC) $(CFLAGS) -o $@ $<
-
 # Extra files
 $(O_EXTRA):$(DISK)/%:extra/%
 	cp $< $@
@@ -135,8 +115,5 @@ $(DISK): | $(BUILD)
 	mkdir -p $@
 
 $(DISK)/dos: | $(DISK)
-	mkdir -p $@
-
-$(BUILD)/tmp: | $(BUILD)
 	mkdir -p $@
 
