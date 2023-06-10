@@ -117,3 +117,5 @@ $(DISK): | $(BUILD)
 $(DISK)/dos: | $(DISK)
 	mkdir -p $@
 
+# Dependencies
+$(O_XDOS): dos/bwdosa.src dos/bwdosb.src dos/bwdosc.src dos/bwmac.src dos/comtab.src
