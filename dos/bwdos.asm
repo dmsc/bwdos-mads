@@ -1,4 +1,11 @@
 
+* Default DATE and TIME
+DEFDAY	EQU	28
+DEFMON	EQU	11
+DEFYEA	EQU	95
+DEFHOU	EQU	22
+DEFMIN	EQU	14
+DEFSEC	EQU	06
 
 	ICL	"bwmac.src"
 	ICL	"bwdosa.src"
