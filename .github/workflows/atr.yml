@@ -1,0 +1,36 @@
+name: Build ATR image
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install FPC and CURL (to compile mads)
+      run: |
+        sudo apt-get update
+        sudo apt-get install fp-compiler curl --no-install-recommends
+
+    - name: Download and compile MADS
+      run: |
+        curl -L https://github.com/tebe6502/Mad-Assembler/raw/2.1.5/mads.pas -o mads.pas
+        fpc -Mdelphi -v0  -O3 mads.pas
+
+    - name: Download and compile mkatr
+      run: |
+        git clone https://github.com/dmsc/mkatr.git mkatr
+        make -C mkatr
+
+    - name: Build the ATR image
+      run: make MADS=./mads MKATR=mkatr/mkatr
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: bwdos.atr
+        path: build/bwdos.atr
