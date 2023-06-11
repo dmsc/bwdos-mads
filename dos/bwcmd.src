@@ -588,6 +588,12 @@ DIO2T1	DTA	8*2,4*2
 DIO2T2	DTA	$40,$50
 ***
 
+* prevent garbage screen
+	LDX	$14
+WVBLNK	CPX	$14
+	BEQ	WVBLNK
+	STA	$D400
+
 	LDA	$D301
 	ROR
 	ROR
@@ -596,7 +602,9 @@ DIO2T2	DTA	$40,$50
 	ROL
 	STA	$D301
 
-	LDX	#$CE
+* search end of RAM, varies depending
+* on cart or lower memory
+	LDX	#$CF
 
 CPBAS2B	TXA
 	SEC
@@ -611,12 +619,8 @@ CPBAS2B	TXA
 
 	BNE	CPBAS2B
 * A=0
-	STA	$2E5
-
-	INX
 	INX
 	STX	$2E4
-	STX	$2E6
 	STX	$6A
 
 	JSR	CPCIO
