@@ -207,9 +207,7 @@ KRESET	DTA	A(RESET)
 ***
 
 TNADP	DTA	155
-	DTA	C'      >> BW-DOS Ver. 1.30+ <<'
-	DTA	155
-	DTA	C' (C) BEWESOFT 1995 - Jiri Bernasek'
+	DTA	C'      BW-DOS 1.4 BEWESOFT 2023'
 	DTA	155
 T6BUF	EQU	*
 

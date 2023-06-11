@@ -1,1 +1,1 @@
-›    Welcome to BW-DOS !››This disk contains the whole BW-DOS›version 1.30+ disk operating system.›The user manual is on the second›side.›››Original by Jiri Bernasek - BEWESOFT›Modified by DMSC››
+›    Welcome to BW-DOS !››This disk contains the whole BW-DOS›version 1.4 disk operating system.››Original by Jiri Bernasek - BEWESOFT›Modified by Holger Janz and DMSC››
