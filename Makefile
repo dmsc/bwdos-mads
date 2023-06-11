@@ -68,6 +68,11 @@ EXTRA=\
 ATR=bwdos.atr
 
 #######################################################################
+# Build tools
+MADS=mads
+MKATR=mkatr
+
+#######################################################################
 # Main rules
 
 # The output files
@@ -88,20 +93,20 @@ all: $(O_ATR)
 
 # Build boot-able DOS disk image
 $(O_ATR): $(OUT) | $(BUILD)
-	mkatr $@ $(DISK)/dos -b $(O_XDOS) \
+	$(MKATR) $@ $(DISK)/dos -b $(O_XDOS) \
 		$(sort $(O_TOOLS) $(O_TOOLS_MULTI) $(O_EXTRA))
 
 # Build DOS
 $(O_XDOS):dos/bwdos.asm | $(DISK)/dos
-	mads -o:$@ $<
+	$(MADS) -o:$@ $<
 
 # Simple assembly for the main tools:
 $(O_TOOLS):$(DISK)/dos/%.com:utils/%.src | $(DISK)/dos
-	mads -o:$@ $<
+	$(MADS) -o:$@ $<
 
 # Assembly from multiple files:
 $(O_TOOLS_MULTI):$(DISK)/dos/%.com:utils/%.asm | $(DISK)/dos
-	mads -o:$@ $<
+	$(MADS) -o:$@ $<
 
 # Extra files
 $(O_EXTRA):$(DISK)/%:extra/%
