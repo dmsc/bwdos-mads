@@ -6,8 +6,6 @@
 *				*
 *************************************
 
-	ORG	START2, START2 + $3000
-
 *** DCB A FCB ADRESY
 
 FCBDRIV	EQU	FCBIOCB+1

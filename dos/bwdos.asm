@@ -2,6 +2,7 @@
 
 	ICL	"bwmac.src"
 	ICL	"bwdosa.src"
+	ICL	"bwcmd.src"
 	ICL	"bwdosb.src"
 	ICL	"bwdosc.src"
 
