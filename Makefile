@@ -56,7 +56,7 @@ TOOLS_MULTI=\
       dos/menu.com\
 
 # And the main DOS file
-XDOS=dos/xbw130.dos
+XDOS=dos/xbw14d.dos
 
 # The extra files included in the original BW-DOS disk:
 EXTRA=\
