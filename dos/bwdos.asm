@@ -7,6 +7,7 @@ DEFHOU	EQU	22
 DEFMIN	EQU	14
 DEFSEC	EQU	06
 
+	ICL	"equates.inc"
 	ICL	"bwmac.src"
 	ICL	"bwdosa.src"
 	ICL	"bwcmd.src"
