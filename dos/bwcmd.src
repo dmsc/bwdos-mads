@@ -475,7 +475,7 @@ CPCIO4	INY
 	LDA	$44
 	PHA
 
-	LDA	#$20 ;SPC KVULI TYPE
+	LDA	#$20	;SPC KVULI TYPE
 	JSR	CIOV
 
 	PLA
@@ -876,7 +876,7 @@ DIO2T3	DTA	16+128,20+128
 	.CB	'DIR'
 	.CB	'DIRS'
 	.CB	'BASIC'
-        .CB     'MAN'
+	.CB	'MAN'
 
 	DTA	0
 
@@ -959,12 +959,12 @@ EXE8	TAY
 
 * 6*2+1 EOR konst.CPDIRS EOR k.CPTYP
 
-CPDIR	LDA	#<(CPDIRS-1) ^ (6*2) ^ (6*2+1)
+CPDIR	LDA	#<(CPDIRS-1)^(6*2)^(6*2+1)
 
 ; A is <(CPDIRS-1) when called from EXE8:
 * CPDIRS-1:L EOR 6*2 EOR konst.CPTYP
 
-CPDIRS	EOR	#<(CPTYP-1) ^ (4*2) ^ <(CPDIRS-1) ^ (6*2)
+CPDIRS	EOR	#<(CPTYP-1)^(4*2)^<(CPDIRS-1)^(6*2)
 	PHA
 
 * JE TO? : < >
@@ -984,7 +984,7 @@ CPDIRS2	PLA
 ; A is <(CPTYP-1) when called from EXE8:
 * CPTYP-1:L EOR 4*2
 
-CPTYP	EOR	#<(CPTYP-1) ^ (4*2)
+CPTYP	EOR	#<(CPTYP-1)^(4*2)
 
 	STA	CPD2
 	JSR	CPC4
