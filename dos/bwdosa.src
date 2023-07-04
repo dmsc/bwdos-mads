@@ -2,7 +2,7 @@
 *				*
 *	B W  D O S  V 1.30  	*
 *				*
-*	     CAST 1		*
+*	     PART 1		*
 *				*
 *************************************
 *
@@ -13,10 +13,10 @@ BIT3	EQU	$2C
 BIT2	EQU	$24
 
 
-* HLAVICKA V 7. STRANCE
+* Header on page 7.
 	ORG	$700,$3700
 
-ZACATEK	DTA	C'S'
+START	DTA	C'S'
 	DTA	$32
 
 	DTA	0

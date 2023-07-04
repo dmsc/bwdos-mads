@@ -2,11 +2,9 @@
 *				*
 *	B W  D O S  V 1.30  	*
 *				*
-*	     CAST 3		*
+*	     PART 3		*
 *				*
 *************************************
-
-** DOMYSLENE HODNOTY Z PRENOSU
 
 STBUFF	EQU	*
 
@@ -47,7 +45,7 @@ FGETN2A	LDA	#'?'
 	JSR	FGPUT
 	BCC	FGETN2A
 
-* PLATNY ZN.
+* Valid ZN.
 
 FGETN1	JSR	FGPUT
 
@@ -73,7 +71,7 @@ FGETN2	INY
 	CMP	#$5B
 	BCC	FGETN1
 
-*NEPLATNY ZN.
+* Invalid ZN.
 
 FGETN3	SEC
 	ROR	ZAJBEST+1
@@ -120,7 +118,7 @@ CWD	JSR	UNI
 	UCALL	GODIR
 	UCSE	FCB1ST,DCBWD,2
 
-***RTS VYNECHAN - NEVADI
+***Fall trough to RTS - Ignore rest of code
 
 SRDDVOJ	LDY	#2
 
@@ -329,7 +327,7 @@ PRID3T	JSR	DINC
 	PLA
 	SEC
 
-* ZACHOVAT C!
+* Preserves C!
 
 PRID3B	PLA
 	TAY
@@ -350,7 +348,7 @@ PRID3E	LDA	VTOCSEC-254,X
 	DEY
 	BEQ	PRID3A
 
-* DSK FULL
+* DISK FULL
 
 	LDY	#$A2
 SIOERRJ	JMP	ERROR
@@ -375,7 +373,7 @@ ZAJ1	LDA	BUFTIME,X
 ZAJ2	DEX
 	BPL	ZAJ1
 
-*HLEDEJ V BUFS
+*Search in buffers
 
 	LDX	#2
 
@@ -421,7 +419,7 @@ ZAJ3B	RTS
 ZAJ4	DEX
 	BPL	ZAJ3
 
-*PRIDEL BUFF
+*Allocate buffer
 
 	STX	ZAJBEST+1
 	INX
@@ -440,7 +438,7 @@ ZAJBEST	CMP	#$FF
 ZAJ7	INX
 	CPX	#3
 	BCC	ZAJ5
-*UVOLNI
+*Release
 
 ZAJBUF	LDX	#0
 	JSR	UVOLN
@@ -780,7 +778,7 @@ LOAD	STX	LOSIT3+1
 	JSR	LOSIT2
 	BMI	LOSER2B
 
-*PO XIO JE X=IOCB#
+*After XIO, X=IOCB#
 	LDA	ZIOCB
 	STA	IOCB,X
 
@@ -805,7 +803,7 @@ LOS2T	LDA	#0
 LOS2B	JSR	LOSSGMD
 	BPL	LOS2
 
-*CHYBA VZDY PO XIO -> X=IOCB#
+*Error: always after XIO -> X=IOCB#
 
 LOSER2	LDA	#$FF
 	STA	IOCB,X

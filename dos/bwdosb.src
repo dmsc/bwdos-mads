@@ -6,7 +6,7 @@
 *				*
 *************************************
 
-*** DCB A FCB ADRESY
+*** DCB and FCB addresses
 
 FCBDRIV	EQU	FCBIOCB+1
 FCBSECT	EQU	FCBIOCB+2
@@ -31,7 +31,7 @@ DCBRND	EQU	DCBDRIV+23
 DCBSEQ	EQU	DCBDRIV+22
 DCBWD	EQU	DCBDRIV+24
 
-* DEFINICE
+* Definitions
 
 RWFLG	EQU	$48
 MYA1	EQU	$49
@@ -193,13 +193,13 @@ XIO6	LDA	DCBDRIV,Y
 
 	BCS	XIO6
 
-*MUSI SE JEDNAT O OPEN (JINAK BY NEBYL
-*NOVE ZADAN CHYBNY DRIVE), PROTO ERROR
-*ZRUSI FCB
+*It must be opened (otherwise the error drive
+*would not be entered), therefore the error will
+*be canceled by FCB)
 
 	JSR	ERRORS
-* DFB $A0 VYNECHANO - OPCODE LDY #
 
+* DFB $A0	Omitted, it is the opcode for "LDY #"
 XNOTOP	LDY	#$85
 
 	LDA	XIO8+1
@@ -224,7 +224,7 @@ XIO7B	LDA	DCBDRIV-230,X
 	BIT	XIO4+1
 	BPL	XIO8A
 
-*ZAHAJENI OPERACE TYPU OPEN
+*We need to perform an OPEN before operation
 
 	JSR	ZAJIST1
 
@@ -263,7 +263,7 @@ BGO31	LDA	DCBSEQ-38,Y
 	BCC	BGO31
 	BCS	XIO8A
 
-*JINY DSK
+*Changed DISK
 
 BGNOPN4	LDA	#$99	;STA
 	JSR	ENDCSUB
@@ -289,7 +289,7 @@ XIO8	LDY	#0
 	BIT	XIO4+1
 	BVC	XIO9
 
-*ZAKONCENI OPERACE TYPU CLOSE
+*CLOSE after end of operation
 
 	JSR	ODKLID
 	STX	FCBIOCB
@@ -367,7 +367,7 @@ ENDCLO3	DEX
 	BCC	ENDCLO3
 
 	JSR	UVOLN
-** PLATI VZDY
+** Branch always
 	BPL	ENDCLO2
 ***
 
@@ -387,7 +387,7 @@ DRNP2	JSR	NASLI
 DRNP3	DEX
 	BPL	DRNP2
 
-*** RTS VYNECHAN - NEVADI
+***Fall trough to RTS - Ignore rest of code
 
 XIOSRCH	LDY	#84
 
@@ -434,7 +434,7 @@ ENDCL1X	LDA	DCBMAIN-9,Y
 
 CHKDSK	JSR	UNI
 	UCE	ICBLLZ,CHKP2+1,2
-*X JE 0
+*X=0
 	LDY	#32
 	JSR	CHKP
 	LDY	#31
@@ -585,7 +585,7 @@ DLG01	JSR	UNI
 	UCE	DECOUT+1,DIBUF+12,7
 
 DLG03B	LDY	#251
-*X JE 0
+*X=0
 
 DLG03C	TXA
 	PHA
@@ -636,12 +636,11 @@ GET	LDX	FCBAUX1
 **
 KPUT	EQU	<(PUT-1)
 **
-	LDA	#255-KPUT	;BUDE 0
+	LDA	#255-KPUT	;Will be 0
 
-* PUT-1:L EOR FF
-* (ZARUCENY OBSAH A)
+* A contains "<(PUT-1) EOR $FF" on call to PUT
 
-PUT	EOR	#255-KPUT	;BUDE FF
+PUT	EOR	#255-KPUT	;Will be FF
 	STA	RWFLG
 
 	AND	#12
@@ -899,9 +898,9 @@ LDSA5B	JSR	UNI
 
 	JSR	ZMENEN
 
-* JSR ZMENEN NELZE SPOJIT DO BLOKU
-* POD UNI - UNI ZNICI REG. Y NA VSTUPU
-* DO PODPROGRAMU ZMENEN
+*The "JSR ZMENEN" can't be integrated in the
+*UNI above, as UNI destructs the register Y
+*on calling a subroutine.
 
 LDSA6	LDX	FCBSECT
 	LDA	FCBSECT+1
@@ -909,7 +908,7 @@ LDSA6	LDX	FCBSECT
 	JSR	UNI
 	UCALL	ZAJIST
 	UCE	LDSAAD,LDSA8+1,2
-*X JE 0
+*X=0
 	LDY	FCBIX
 
 	BIT	RWFLG
@@ -959,7 +958,7 @@ SETP3B	LDA	POSTMP
 
 	STX	POSTMP
 	STY	POSTMP+1
-*VPRED
+*Forward
 
 SETP4	JSR	NXTDAT
 
@@ -1048,7 +1047,7 @@ DLCL1	STA	DIBUF-1,X
 
 	STX	DLBX+1
 
-***RTS VYNECHAN - NEVADI
+***Fall trough to RTS - Ignore rest of code
 
 LDSA3B	LDA	POSTMP
 	RTS
@@ -1058,7 +1057,7 @@ LDSAUPL	CMP	LDSA7C+1
 	BCS	POSCXX
 	STA	LDSA7C+1
 
-***RTS VYNECHAN - NEVADI
+***Fall trough to RTS - Ignore rest of code
 
 POSCMP	BIT	MYSLEN
 	BPL	POSCMPX
@@ -1295,7 +1294,7 @@ OPN4B	BIT	FCBDIRP+1
 	AND	#$20
 	BEQ	OPN4D
 
-*** MEZI, NIKDY NESPLNENO
+*** Never true on from above
 OPNPT0J	BEQ	OPNPT0
 *************************
 
