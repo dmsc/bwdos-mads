@@ -457,6 +457,8 @@ LOSADR	EQU	CHKP2+1
 
 ***
 
+* Adds '0' at beginning of numbers and replace with '999'
+* if it is more than 999.
 NUMMOD	LDX	#253
 
 NUMMD1	LDA	DECOUT+4
@@ -475,6 +477,7 @@ NUMMD2	LDA	#$39
 	RTS
 **
 
+*Generate short directory "FREE SECTORS" line
 DLG01A	JSR	DLCLRS
 	DTA	17+128
 
@@ -486,6 +489,7 @@ DLG01A	JSR	DLCLRS
 	BEQ	DLG1EQ
 **
 
+*Generate long/short directory "FREE SECTORS" line
 DLG02	JSR	UNI
 	UC	DCBFREE,DECIN,2
 	UCALLE	CONVDC0
@@ -503,16 +507,18 @@ DTYPE	LDX	#0
 	BEQ	DLG1EQ
 **
 
+*Generate one short directory entry
 DLG01BA	JSR	DLCLRS
 	DTA	18
 
 	JSR	UNI
-	UCSE	DIRBUF+6,DIBUF+2,11
+	UCSE	DIRBUF+6,DIBUF+2,11	;File+Ext
 
 DIRBAD	LDA	DIRBUF
 	LSR
 	BCC	DLG01B
 
+*Protected file
 	LDX	#'*'
 	STX	DIBUF
 
@@ -520,13 +526,14 @@ DLG01B	AND	#16
 	BEQ	DLG01C
 
 	JSR	UNI
-	UCSE	DLG3TX,DIBUF+10,3
+	UCSE	DLG3TX,DIBUF+10,3	;DIR*
 
+*Convert size to number of sectors
 DLG01C	LDA	DIRBUF+3
 	LDX	DIRBUF+4
 	LDY	DIRBUF+5
 	JSR	POSCMP
-
+*Round up
 	CMP	#0
 	BEQ	DLG01D
 	INX
@@ -541,38 +548,40 @@ DLG01D	STX	DECIN
 	UCALL	NUMMOD
 	UCE	DECOUT+5,DIBUF+14,3
 
-DLG1EQ	BEQ	DLG1
+DLG1EQ	BEQ	DLG1	;Jump always
 **
 
+*Generate next directory line
 DLG01	JSR	UNI
 	UCS	DIRNAM,SRCHNAM,11
 	UCALLE	SRCHCOK
-	BNE	DLG02
+	BNE	DLG02	;No more entries
 *
 	BIT	DTYPE+1
 	BPL	DLG01BA
-*
 
+*Generate one long directory entry
 	JSR	DLCLRS
 	DTA	36
 
 	JSR	UNI
-	UCS	DIRBUF+6,DIBUF,8
-	UCS	DIRBUF+14,DIBUF+9,3
-	UCS	DLG3DT,DIBUF+13,5
-	UCS	KPOML,DIBUF+22,1
+	UCS	DIRBUF+6,DIBUF,8	;NAME
+	UCS	DIRBUF+14,DIBUF+9,3	;EXT
+	UCS	DLG3DT,DIBUF+13,5	;<DIR>
+	UCS	KPOML,DIBUF+22,1	;Date separators
 	UCS	KPOML,DIBUF+25,1
-	UCSE	KDVOJT,DIBUF+31,1
+	UCSE	KDVOJT,DIBUF+31,1	;Time separator
 
 	LDA	DIRBUF
 	AND	#32
 	BNE	DLG03B
 
 	JSR	UNI
-	UC	DIRBUF+3,DECIN,3
+	UC	DIRBUF+3,DECIN,3	;File size
 	UCALL	CONVDC
 	UCE	DECOUT+1,DIBUF+12,7
 
+*Convert Day, Month, Year, Hour and Min.
 DLG03B	LDY	#251
 *X=0
 
@@ -596,8 +605,8 @@ DLG03C	TXA
 
 	INY
 	BNE	DLG03C
-**
 
+*Line complete, start output characters
 DLG1	DEC	DLBL+1
 
 DLBX	LDX	#0
@@ -1018,6 +1027,8 @@ POSCXX	RTS
 
 ***
 
+*Init directory line buffer of given length
+*BIT-7 of length marks the last directory line.
 DLCLRS	JSR	GETSTK
 
 DLCLR	STA	DLBL+1
