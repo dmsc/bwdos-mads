@@ -52,3 +52,24 @@ DMACTL	EQU	$D400
 CIOV	EQU	$E456
 SIOV	EQU	$E459
 BLKBDV	EQU	$E471
+
+* DOS Errors
+PRVOPN	EQU	129	;($81) IOCB already open error
+WRONLY	EQU	131	;($83) IOCB opened for write only error
+NOTOPN	EQU	133	;($85) device/file not open error
+RDONLY	EQU	135	;($87) IOCB opened for read only error
+EOFERR	EQU	136	;($88) end of file error
+DSKFMT	EQU	148	;($94) SpartaDOS: unrecognized disk format
+DIRNFD	EQU	150	;($96) SpartaDOS: directory not found
+FEXIST	EQU	151	;($97) SpartaDOS: file exists
+NOTBIN	EQU	152	;($98) SpartaDOS: file not binary
+BADPRM	EQU	156	;($9C) SDX: bad parameter
+TMOF  	EQU	161	;($A1) too many open files
+DSKFLL	EQU	162	;($A2) disk full
+FATLIO	EQU	163	;($A3) fatal I/O error
+FNMSMT	EQU	164	;($A4) internal file number mismatch
+PDLERR	EQU	166	;($A6) point data length error
+EPERM 	EQU	167	;($A7) permission denied
+DINVCM	EQU	168	;($A8) command invalid for disk
+DIRFLL	EQU	169	;($A9) directory full
+FNTFND	EQU	170	;($AA) file not found
