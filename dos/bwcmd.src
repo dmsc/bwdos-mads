@@ -21,35 +21,30 @@ COND0	STX	CONDI+1
 
 	LDX	#24
 	LDA	#0
+	CLV		; V flag will be set if any quotient bit is 1
 
-COND1	ASL	DECIN
+COND1	CMP	#5	; is accumulator >= 5 ?
+	BCC	COND2
+	SBC	#$85	; if so, subtract 5, toggle bit 7 and set V flag
+	SEC		; set C (=next quotient bit)
+
+COND2	ROL	DECIN	; shift quotient
 	ROL	DECIN+1
 	ROL	DECIN+2
-	ROL
-
-	CMP	#10
-	BCC	COND2
-	SBC	#10
-
-	INC	DECIN
-
-COND2	DEX
+	ROL		; shift dividend into A
+	DEX
 	BNE	COND1
 
 	ORA	#$30
 CONDI	LDX	#0
 COND3	STA	DECOUT,X
 
-	DEX
-	BMI	RET3
-
-	LDA	DECIN
-	ORA	DECIN+1
-	ORA	DECIN+2
-	BNE	COND0
-
 	LDA	#$20
-	BNE	COND3
+	DEX
+	BVS	COND0	; quotient not zero, next digit
+	BPL	COND3	; store spaces
+	RTS
+
 ***
 
 CRNM2	INC	BUFOFF
