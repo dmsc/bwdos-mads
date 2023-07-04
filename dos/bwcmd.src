@@ -585,6 +585,7 @@ DIO2T1	DTA	8*2,4*2
 DIO2T2	DTA	$40,$50
 ***
 
+*A=Y=1
 * prevent garbage screen
 	LDX	RTCLOK+2
 WVBLNK	CPX	RTCLOK+2
@@ -601,13 +602,15 @@ WVBLNK	CPX	RTCLOK+2
 
 * search end of RAM, varies depending
 * on cart or lower memory
-	LDX	#$CF
+	LDX	#$C0
+	TXA
 
-CPBAS2B	TXA
-	SEC
-	SBC	#16
-	TAX
+* Code bellow depends on Y+$43 less than $100,
+* to read correct page.
+* Y is 1 from above (CIO CLOSE) and $43 is 0 at
+* end of CPCIO call.
 
+CPBAS2B	DEX
 	STX	$44
 
 	EOR	($43),Y
