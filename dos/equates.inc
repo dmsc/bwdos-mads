@@ -73,3 +73,12 @@ EPERM 	EQU	167	;($A7) permission denied
 DINVCM	EQU	168	;($A8) command invalid for disk
 DIRFLL	EQU	169	;($A9) directory full
 FNTFND	EQU	170	;($AA) file not found
+
+* CIO command codes
+COPEN	EQU	3
+GETREC	EQU	5
+GETCHR	EQU	7
+PUTREC	EQU	9
+PUTCHR	EQU	11
+CCLOSE	EQU	12
+CLOAD	EQU	40
