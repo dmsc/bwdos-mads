@@ -954,32 +954,34 @@ EXE8	TAY
 	RTS
 ***
 
-* Equals 6*2+1 after EOR-ing with constants bellow:
+* Equals 6*2+1 (open mode 6 with AUX2 128) after EOR-ing with constants bellow:
 * 6*2+1 EOR at CPDIRS EOR at CPTYP
 
 CPDIR	LDA	#<(CPDIRS-1)^(6*2)^(6*2+1)
 
-; A is <(CPDIRS-1) when called from EXE8:
+* Equals 6*2 (open mode 6 with AUX2 0) after EOR-ing
+* A is <(CPDIRS-1) when called from EXE8:
 * <(CPDIRS-1) EOR 6*2 EOR at CPTYP
 
 CPDIRS	EOR	#<(CPTYP-1)^(4*2)^<(CPDIRS-1)^(6*2)
 	PHA
 
-* JE TO? : < >
+* It is ':', '<' or '>' ?
 
 	LDA	COMFNAM-1,X
-	CMP	#$38
-	BEQ	CPDIRS2
-	AND	#$F9
-	CMP	#$38
-	BNE	CPDIRS2
+
+	LSR
+	BCS	CPDIRS2
+	SBC	#28
+	CMP	#3
+	BCS	CPDIRS2
 
 	LDY	#LHVE-LBUF
 	JSR	CROUTI
 
 CPDIRS2	PLA
 
-; A is <(CPTYP-1) when called from EXE8:
+* Equals 6*2 (open mode 4) after EOR-ing, A is <(CPTYP-1) when called from EXE8:
 * <(CPTYP-1) EOR 4*2
 
 CPTYP	EOR	#<(CPTYP-1)^(4*2)
