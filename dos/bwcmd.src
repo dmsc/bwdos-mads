@@ -1,12 +1,12 @@
 *** BW-DOS Command Line Interpreter
 
 CPACMDL	DTA	<(CPCAR-1),<(CPRUN-1)
-	DTA	<(CPPRT-1),<(CPTYP-1),<(CPDIR-1)
-	DTA	<(CPDIRS-1),<(CPBAS-1),<(CPTYP-1)
+	DTA	<(CPTYP-1),<(CPTYP-1),<(CPPRT-1),<(CPBAS-1)
+	DTA	<(CPDIRS-1),<(CPDIR-1)
 
 CPACMDH	DTA	>(CPCAR-1),>(CPRUN-1)
-	DTA	>(CPPRT-1),>(CPTYP-1),>(CPDIR-1)
-	DTA	>(CPDIRS-1),>(CPBAS-1),>(CPTYP-1)
+	DTA	>(CPTYP-1),>(CPTYP-1),>(CPPRT-1),>(CPBAS-1)
+	DTA	>(CPDIRS-1),>(CPDIR-1)
 
 ***
 
@@ -868,12 +868,12 @@ DIO2T3	DTA	16+128,20+128
 	.CB	'LOAD'
 	.CB	'CAR'
 	.CB	'RUN'
-	.CB	'PRINT'
 	.CB	'TYPE'
-	.CB	'DIR'
-	.CB	'DIRS'
-	.CB	'BASIC'
 	.CB	'MAN'
+	.CB	'PRINT'
+	.CB	'BASIC'
+	.CB	'DIRS'
+	.CB	'DIR'
 
 	DTA	0
 
@@ -954,37 +954,26 @@ EXE8	TAY
 	RTS
 ***
 
-* Equals 6*2+1 (open mode 6 with AUX2 128) after EOR-ing with constants bellow:
-* 6*2+1 EOR at CPDIRS EOR at CPTYP
-
-CPDIR	LDA	#<(CPDIRS-1)^(6*2)^(6*2+1)
-
-* Equals 6*2 (open mode 6 with AUX2 0) after EOR-ing
-* A is <(CPDIRS-1) when called from EXE8:
-* <(CPDIRS-1) EOR 6*2 EOR at CPTYP
-
-CPDIRS	EOR	#<(CPTYP-1)^(4*2)^<(CPDIRS-1)^(6*2)
-	PHA
-
+CPDIR
+CPDIRS
 * It is ':', '<' or '>' ?
 
 	LDA	COMFNAM-1,X
 
 	LSR
-	BCS	CPDIRS2
+	BCS	CPTYP
 	SBC	#28
 	CMP	#3
-	BCS	CPDIRS2
+	BCS	CPTYP
 
 	LDY	#LHVE-LBUF
 	JSR	CROUTI
 
-CPDIRS2	PLA
-
-* Equals 6*2 (open mode 4) after EOR-ing, A is <(CPTYP-1) when called from EXE8:
-* <(CPTYP-1) EOR 4*2
-
-CPTYP	EOR	#<(CPTYP-1)^(4*2)
+*$43 is the command index:
+* $10 for TYPE, $11 for MAN, $14 for DIRS and $15 for DIR,
+*we need to transform into OPEN flags (8, 12 and 13):
+CPTYP	LDA	$43
+	EOR	#($14^$C)
 
 	STA	CPD2
 	JSR	CPC4
