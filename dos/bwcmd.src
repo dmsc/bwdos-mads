@@ -865,15 +865,15 @@ DIO2T3	DTA	16+128,20+128
 	.CB	'MD'	;CIO 42
 	.CB	'RD'	;CIO 43
 	.CB	'CD'	;CIO 44
-	.CB	'LOAD'
-	.CB	'CAR'
-	.CB	'RUN'
-	.CB	'TYPE'
-	.CB	'MAN'
-	.CB	'PRINT'
-	.CB	'BASIC'
-	.CB	'DIRS'
-	.CB	'DIR'
+	.CB	'LOAD'	;#45
+	.CB	'CAR'	;#46
+	.CB	'RUN'	;#47
+	.CB	'TYPE'	;#48 ($30)
+	.CB	'MAN'	;#49 ($31)
+	.CB	'PRINT'	;#50
+	.CB	'BASIC'	;#51
+	.CB	'DIRS'	;#52 ($34)
+	.CB	'DIR'	;#53 (#35)
 
 	DTA	0
 
@@ -896,7 +896,7 @@ EXE9RTS	RTS
 
 **
 
-EXE2B	LDX	#$FF
+EXE2B	LDX	#31
 	STX	$43
 
 EXE3	LDX	#0
@@ -929,11 +929,10 @@ EXE5	INY
 	PLA
 
 	LDA	$43
-	CMP	#13	;'LOAD'
+	CMP	#45	;'LOAD'
 	BEQ	EXELD
 	BCS	EXE8
 *C=0
-	ADC	#32
 	STA	EXE7B
 
 	JSR	CPC4
@@ -944,10 +943,11 @@ EXE7B	DTA	0
 	RTS
 **
 
+*Call command, table starts at 46
 EXE8	TAY
-	LDA	CPACMDH-14,Y
+	LDA	CPACMDH-46,Y
 	PHA
-	LDA	CPACMDL-14,Y
+	LDA	CPACMDL-46,Y
 	PHA
 
 	CPX	#3
@@ -970,10 +970,10 @@ CPDIRS
 	JSR	CROUTI
 
 *$43 is the command index:
-* $10 for TYPE, $11 for MAN, $14 for DIRS and $15 for DIR,
+* $30 for TYPE, $31 for MAN, $34 for DIRS and $35 for DIR,
 *we need to transform into OPEN flags (8, 12 and 13):
 CPTYP	LDA	$43
-	EOR	#($14^$C)
+	EOR	#$38
 
 	STA	CPD2
 	JSR	CPC4
