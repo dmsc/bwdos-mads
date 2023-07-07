@@ -139,11 +139,12 @@ SECLENS	DTA	C'    '
 POSTMP	DTA	C'    '
 
 KFF	DTA	A($FFFF)
+*Name for DOS folder - 11 bytes, uses the first 32 above:
 DOSNAM	DTA	C'DOS       '
-*!
-RDPUTST	DTA	32,33
-*!
+*Flags for excluding files on REN/DEL/X/PROT/UNPROT:
+RDPUTST	DTA	32,33	; Plus 0,0,0 bellow
 NULY	DTA	0,0,0
+*Misc constants for copying with UCS:
 K02	DTA	A(2)
 K1C	DTA	$1C
 K23	DTA	A(23)
@@ -220,7 +221,9 @@ SEC1CHG	EQU	FCBIOCB+21
 LDSALEN	EQU	SEC1CHG+4
 DLOPF	EQU	SEC1CHG+6
 
+* DCB: 26 bytes for each drive, 130 bytes total:
 DCBDRIV	EQU	SEC1CHG+8
+* FCBS: 21 bytes for each open file, 105 bytes total:
 FCBS	EQU	DCBDRIV+130
 
 BUFDRIV	EQU	FCBS+105
