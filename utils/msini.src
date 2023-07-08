@@ -63,7 +63,7 @@ XIO	.MACRO	IOCB,CMD,A1,A2,FNM
 	JMP	E@
 N@	DTA	C":FNM"
 	DTA	$9B
-E@	NOP
+E@
 	.MEND
 *
 ***********
@@ -85,7 +85,7 @@ IXIO	.MACRO	IOCB,CMD,AD,DE
 	JSR	$E456
 	BPL	IE@
 	JMP	ERROR
-IE@	NOP
+IE@
 	.MEND
 *
 **************
@@ -103,7 +103,7 @@ CLOSE	.MACRO	IOCB
 	JSR	$E456
 	BPL	CLS@
 	JMP	ERROR
-CLS@	NOP
+CLS@
 	.MEND
 *
 ************
@@ -144,12 +144,11 @@ LPUT	.MACRO	IOCB,ADR,DEL
 *
 **********
 *
-PRINT	.MACRO	TEXT
-	LPUT	0,TX@,EX@-TX@+4
-	JMP	EX@
-TX@	DTA	C":TEXT"
+MPRINT	.MACRO	TEXT
+	JSR	PRINT
+	DTA	C":TEXT"
 	DTA	$9B
-EX@	NOP
+	DTA	0
 	.MEND
 *
 *************************************
@@ -208,18 +207,18 @@ START	LDA	$700
 	CMP	#'S'
 	BEQ	START0
 
-	PRINT "Incorrect DOS !"
+	MPRINT "Incorrect DOS !"
 	JMP	(10)
 ***
 
 START0	JSR	CLS1
 	JSR	CLS2
 
- PRINT "Initializer for Micro-SpartaDOS"
- PRINT "By BEWESOFT (1994)"
- PRINT " "
- PRINT "Insert disk into drive 1,"
- PRINT "and enter path:"
+	MPRINT "Initializer for Micro-SpartaDOS"
+	MPRINT "By BEWESOFT (1994)"
+	MPRINT " "
+	MPRINT "Insert disk into drive 1,"
+	MPRINT "and enter path:"
 
 	LGET	0,$403,128
 
@@ -338,7 +337,7 @@ FL2	STA	EDIT,X
 	AND	#32
 	BEQ	FL2AA
 
- PRINT "directory:"
+	MPRINT "directory:"
 
 	JMP	FL2AB
 
@@ -346,7 +345,7 @@ TXTENM	DTA C"Enter a name for this "
 
 **
 
-FL2AA	PRINT "file:"
+FL2AA	MPRINT "file:"
 
 TXTEL	EQU	FL2AA-TXTENM
 
@@ -356,7 +355,7 @@ FL2AB	BPUT	0,$406,11
 	LDA	#$9B
 	JSR	PUT0
 
- PRINT "(Press ESC to skip this one)"
+	MPRINT "(Press ESC to skip this one)"
 
 	LDA	#1
 	STA	752
@@ -492,7 +491,7 @@ KON	JSR	CLS1
 KON2	LDA	#125
 	JSR	DOSCLO
 
-	PRINT "Done..."
+	MPRINT "Done..."
 
 	JMP	(10)
 
@@ -623,5 +622,7 @@ CLS2	LDX	#$20
 
 	JMP	ERROR
 ***
+	ICL	"print.inc"
+	ICL	"print1.inc"
 
 END	EQU	*
