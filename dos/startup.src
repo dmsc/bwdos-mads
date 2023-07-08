@@ -27,6 +27,10 @@ T3	INX
 	LDA	#>RESET
 	STA	DOSINI+1
 
+*BASIC OFF
+	SEC
+	JSR	CPBAS2
+
 *TITLE
 	JSR	CPC192
 	DTA	PUTCHR
@@ -38,16 +42,12 @@ T3	INX
 	LDA	#$FF
 	STA	$47
 
+*Loads STARTUP.BAT
 	LDY	#1
 	JSR	DIVIO
-	BPL	RUNCP
-*No STARTUP.BAT, just run cartridge
-	CLC
-	RTS
 
 *End BOOT, jump to the CP and start
-*executing from BAT file
-RUNCP
+*executing from the STARTUP file
 	JSR	NULDW
 	STX	COLDST
 
@@ -56,7 +56,6 @@ RUNCP
 	STA	BOOTQ
 
 	JMP	CP
-
 **
 
 * ENTRY: Copy to run address and start
