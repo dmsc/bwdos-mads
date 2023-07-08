@@ -6,6 +6,8 @@ BUILD=build
 
 # Output disk
 DISK=$(BUILD)/disk
+# And folder with listings
+LST=$(BUILD)/lst
 
 # Standard tools:
 TOOLS=\
@@ -97,16 +99,16 @@ $(O_ATR): $(OUT) | $(BUILD)
 		$(sort $(O_TOOLS) $(O_TOOLS_MULTI) $(O_EXTRA))
 
 # Build DOS
-$(O_XDOS):dos/bwdos.asm | $(DISK)/dos
-	$(MADS) -o:$@ $<
+$(O_XDOS):dos/bwdos.asm | $(DISK)/dos $(LST)
+	$(MADS) -o:$@ -l:$(LST)/$(notdir $(@:%.dos=%.lst)) $<
 
 # Simple assembly for the main tools:
-$(O_TOOLS):$(DISK)/dos/%.com:utils/%.src | $(DISK)/dos
-	$(MADS) -o:$@ $<
+$(O_TOOLS):$(DISK)/dos/%.com:utils/%.src | $(DISK)/dos $(LST)
+	$(MADS) -o:$@ -l:$(LST)/$(notdir $(@:%.com=%.lst)) $<
 
 # Assembly from multiple files:
-$(O_TOOLS_MULTI):$(DISK)/dos/%.com:utils/%.asm | $(DISK)/dos
-	$(MADS) -o:$@ $<
+$(O_TOOLS_MULTI):$(DISK)/dos/%.com:utils/%.asm | $(DISK)/dos $(LST)
+	$(MADS) -o:$@ -l:$(LST)/$(notdir $(@:%.com=%.lst)) $<
 
 # Extra files
 $(O_EXTRA):$(DISK)/%:extra/%
@@ -120,6 +122,9 @@ $(DISK): | $(BUILD)
 	mkdir -p $@
 
 $(DISK)/dos: | $(DISK)
+	mkdir -p $@
+
+$(LST): | $(BUILD)
 	mkdir -p $@
 
 # Dependencies
