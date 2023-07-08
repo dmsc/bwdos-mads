@@ -1,4 +1,4 @@
-	ORG	$500
+	ORG	$4F0
 	JMP	START
 
 *************************************
@@ -101,20 +101,9 @@ CLOSE	LDX	#$10
 	STA	$342,X
 	JMP	$E456
 ***
-
-START	LDA	$700
-	CMP	#'S'
-	BEQ	START2
-
-	JSR	PRINT
-	DTA	155,253
-	DTA	C"Bad DOS !"
-	DTA	155,0
-
-	JMP	(10)
+	ICL	"chkdos.inc"
 ***
-
-START2	LDA	10
+	LDA	10
 	CLC
 	ADC	#3
 	STA	GETNAME+1

@@ -125,3 +125,5 @@ $(DISK)/dos: | $(DISK)
 # Dependencies
 $(O_XDOS): dos/bwdosa.src dos/bwdosb.src dos/bwdosc.src dos/bwmac.src\
            dos/comtab.src dos/bwcmd.src dos/equates.inc dos/startup.src
+
+$(O_TOOLS): utils/print.inc utils/print1.inc utils/chkdos.inc

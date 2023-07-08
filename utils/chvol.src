@@ -75,20 +75,9 @@ ERR5	JMP	(10)
 ERRTAB	DTA	1,10,100
 
 ***
-
-START	LDA	$700
-	CMP	#'S'
-	BEQ	START2
-
-	JSR	PRINT
-	DTA	155,253
-	DTA	C"Incorrect DOS version"
-	DTA	155,0
-
-	JMP	(10)
+	ICL	"chkdos.inc"
 ***
-
-START2	LDA	10
+	LDA	10
 	STA	ZPG1
 	CLC
 	ADC	#3

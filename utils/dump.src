@@ -132,20 +132,9 @@ CIONAME	LDA	#<NAME
 
 	JMP	$E456
 ***
-
-START	LDA	$700
-	CMP	#'S'
-	BEQ	START2
-
-	JSR	PRINT
-	DTA 155,253
-	DTA C"Incorrect DOS !"
-	DTA 155,0
-
-	JMP	(10)
+	ICL	"chkdos.inc"
 ***
-
-START2	LDA	82
+	LDA	82
 	STA	SAVE82
 	LDA	#0
 	STA	82

@@ -563,21 +563,9 @@ CIOBUFF	LDA	#<BUFF
 
 	JMP	$E456
 ***
-
-START	LDA	$700
-	CMP	#'S'
-	BEQ	START2
-
-	JSR	PRINT
-	DTA 155,253
-	DTA C"Incorrect DOS version"
-	DTA 155,0
-
-	JMP	(10)
-
+	ICL	"chkdos.inc"
 * HLEDEJ DOSy
-
-START2	JSR	PRINT
+	JSR	PRINT
 	DTA 155
 	DTA C"BW-DOS Formatter V"
 	DTA C" 1.00 By BEWESOFT"
