@@ -37,24 +37,7 @@ CNT2	EQU	$33	;---"---
 GETNAME	JMP	PRTEX
 
 ***
-
-START	LDA	$700
-	CMP	#'S'
-	BNE	STRTER
-
-	LDA	$703
-	CMP	#'B'
-	BNE	STRTER
-	LDA	$704
-	CMP	#'W'
-	BEQ	START2
-
-STRTER	JSR	PRINT
-	DTA	155,253
-	DTA	C"Error: Not BW-DOS !"
-	DTA	155,0
-
-	JMP	(10)
+	ICL	"chkbw.inc"
 ***
 
 START2	LDA	10

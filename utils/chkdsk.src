@@ -64,24 +64,7 @@ CLOSE	LDX	#$10
 	JMP	$E456
 
 ***
-
-START	LDA	$700
-	CMP	#'S'
-	BNE	ERROR0
-
-	LDA	$703
-	CMP	#'B'
-	BNE	ERROR0
-	LDA	$704
-	CMP	#'W'
-	BEQ	START2
-
-ERROR0	JSR	PRINT
-	DTA	155,253
-	DTA	C"Error: Not BW-DOS !"
-	DTA	155,0
-
-	JMP	(10)
+	ICL	"chkbw.inc"
 ***
 
 START2	LDA	10

@@ -20,25 +20,7 @@ PRTNM	LDA	(DECOUT),Y
 ***
 	ICL	"print1.inc"
 ***
-
-START	LDA	$700
-	CMP	#'S'
-	BNE	STERR
-
-	LDA	$703
-	CMP	#'B'
-	BNE	STERR
-
-	LDA	$704
-	CMP	#'W'
-	BEQ	START2
-
-STERR	JSR	PRINT
-	DTA	155
-	DTA	C"Error: Not BW-DOS"
-	DTA	155,0
-
-	JMP	(10)
+	ICL	"chkbw.inc"
 ***
 
 CLOSES	LDA	#0
