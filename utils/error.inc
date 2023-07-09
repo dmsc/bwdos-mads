@@ -9,32 +9,31 @@ ERROR	TYA
 	DTA 0
 
 	LDX	#2
+
+ERR2	LDY	#$2F
 	PLA
 
-ERR2	LDY	#0
-
-ERR3	CMP	ERRTAB,X
-	BCC	ERR4
-
+ERR4	PHA
+	SEC
 	SBC	ERRTAB,X
 	INY
-	BNE	ERR3
+	BCS	ERR4
 **
-
-ERR4	PHA
 	TXA
 	PHA
 
 	TYA
-	ORA	#$30
 	JSR	PRT1
 
 	PLA
 	TAX
-	PLA
 
 	DEX
 	BPL	ERR2
+
+*NOTE: we miss a PLA here, but the code will just jump to DOS
+*      after this, so we will skip that byte.
+
 **
 	LDA	#$9B
 	JSR	PRT1
