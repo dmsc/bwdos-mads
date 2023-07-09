@@ -136,45 +136,7 @@ DC1BTEC	LDA	#$20
 	RTS
 
 ****
-
-ERROR	TYA
-	PHA
-
-	JSR	PRINT
-	DTA 155
-	DTA C"Error "
-	DTA 0
-
-	LDX	#2
-	PLA
-
-ERR2	LDY	#0
-
-ERR3	CMP	ERRTAB,X
-	BCC	ERR4
-
-	SBC	ERRTAB,X
-	INY
-	BNE	ERR3
-**
-
-ERR4	PHA
-	TXA
-	PHA
-
-	TYA
-	ORA	#$30
-	JSR	PRT1
-
-	PLA
-	TAX
-	PLA
-
-	DEX
-	BPL	ERR2
-**
-	LDA	#$9B
-	JSR	PRT1
+	ICL	"error.inc"
 
 ERR5X	LDY	#8
 	LDA	(10),Y
