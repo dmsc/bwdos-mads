@@ -100,15 +100,15 @@ $(O_ATR): $(OUT) | $(BUILD)
 
 # Build DOS
 $(O_XDOS):dos/bwdos.asm | $(DISK)/dos $(LST)
-	$(MADS) -o:$@ -l:$(LST)/$(notdir $(@:%.dos=%.lst)) $<
+	$(MADS) -o:$@ -l:$(LST)/$(notdir $(@:%.dos=%.lst)) -t:$(LST)/$(notdir $(@:%.dos=%.lab)) $<
 
 # Simple assembly for the main tools:
 $(O_TOOLS):$(DISK)/dos/%.com:utils/%.src | $(DISK)/dos $(LST)
-	$(MADS) -o:$@ -l:$(LST)/$(notdir $(@:%.com=%.lst)) $<
+	$(MADS) -o:$@ -l:$(LST)/$(notdir $(@:%.com=%.lst)) -t:$(LST)/$(notdir $(@:%.com=%.lab)) $<
 
 # Assembly from multiple files:
 $(O_TOOLS_MULTI):$(DISK)/dos/%.com:utils/%.asm | $(DISK)/dos $(LST)
-	$(MADS) -o:$@ -l:$(LST)/$(notdir $(@:%.com=%.lst)) $<
+	$(MADS) -o:$@ -l:$(LST)/$(notdir $(@:%.com=%.lst)) -t:$(LST)/$(notdir $(@:%.com=%.lab)) $<
 
 # Extra files
 $(O_EXTRA):$(DISK)/%:extra/%
