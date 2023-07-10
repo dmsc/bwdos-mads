@@ -1,6 +1,3 @@
-	ORG	$6000
-	JMP	START
-
 *************************************
 *				*
 *     " P A U S E "   PRO BW-DOS	*
@@ -9,13 +6,7 @@
 
 * VOLNO: 128
 
-***
-	ICL	"print.inc"
-	ICL	"print1.inc"
-***
-
-XDIVIO	JMP	($FFFF)
-
+	ORG	$3000
 ***
 	ICL	"chkdos.inc"
 ***
@@ -36,31 +27,26 @@ XDIVIO	JMP	($FFFF)
 
 START3	JSR	CLOSE
 
-	LDX	#$10
-	LDA	#3
-	STA	$342,X
-
 	LDA	#<KNAM
-	STA	$344,X
+	STA	$344+$10
 	LDA	#>KNAM
-	STA	$345,X
+	STA	$345+$10
 
 	LDA	#4
-	STA	$34A,X
+	STA	$34A+$10
 	LDA	#0
-	STA	$34B,X
+	STA	$34B+$10
 
-	JSR	$E456
+	LDA	#3
+	JSR	CIOC
 	BMI	START3
 
-	LDX	#$10
-	LDA	#7
-	STA	$342,X
 	LDA	#0
-	STA	$348,X
-	STA	$349,X
+	STA	$348+$10
+	STA	$349+$10
 
-	JSR	$E456
+	LDA	#7
+	JSR	CIOC
 	BMI	START3
 
 	PHA
@@ -87,13 +73,19 @@ STRET	JSR	PRINT
 	JMP	(10)
 ***
 
-CLOSE	LDX	#$10
-	LDA	#12
+CLOSE	LDA	#12
+CIOC	LDX	#$10
 	STA	$342,X
-
 	JMP	$E456
 ***
 
 KNAM	DTA C"K:"
 	DTA 155
 ****
+	ICL	"print.inc"
+	ICL	"print1.inc"
+***
+
+XDIVIO	JMP	($FFFF)
+
+***
