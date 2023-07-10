@@ -1,6 +1,3 @@
-	ORG	$6000
-	JMP	START
-
 *************************************
 *				*
 *     " E L S E "   PRO BW-DOS	*
@@ -9,19 +6,10 @@
 
 * VOLNO: 128
 
-BUFFER	EQU	$6800
+BUFFER	EQU	$3800
 
 ***
-	ICL	"print.inc"
-	ICL	"print1.inc"
-***
-
-XDIVIO	JMP	($FFFF)
-
-BATFLG	LDA	$FFFF
-	RTS
-
-***
+	ORG	$3000
 	ICL	"chkdos.inc"
 ***
 	LDA	10
@@ -41,7 +29,25 @@ BATFLG	LDA	$FFFF
 	STA	BATFLG+2
 ***
 
-NO2	JSR	GETLINE
+NO2
+BATFLG	LDA	$FFFF
+	BMI	GETLNX
+
+	LDA	#5
+	STA	$342
+
+	LDA	#<BUFFER
+	STA	$344
+	LDA	#>BUFFER
+	STA	$345
+
+	LDA	#64
+	STA	$348
+	LDX	#0
+	STX	$349
+
+	JSR	$E456
+	BMI	GETLNX
 
 	LDX	#0
 
@@ -74,28 +80,12 @@ GETLNX	LDY	#1
 	DTA 155,0
 
 	JMP	(10)
-**
 
-GETLINE	JSR	BATFLG
-	BMI	GETLNX
-
-	LDX	#0
-	LDA	#5
-	STA	$342,X
-
-	LDA	#<BUFFER
-	STA	$344,X
-	LDA	#>BUFFER
-	STA	$345,X
-
-	LDA	#64
-	STA	$348,X
-	LDA	#0
-	STA	$349,X
-
-	JSR	$E456
-	BMI	GETLNX
-
-	RTS
+***
+	ICL	"print.inc"
+	ICL	"print1.inc"
 ***
 
+XDIVIO	JMP	($FFFF)
+
+***

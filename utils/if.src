@@ -1,6 +1,3 @@
-	ORG	$6000
-	JMP	START
-
 *************************************
 *				*
 *	" I F "   PRO BW-DOS	*
@@ -9,23 +6,10 @@
 
 * VOLNO: 128
 
-BUFFER	EQU	$6800
+BUFFER	EQU	$3800
 
 ***
-	ICL	"print.inc"
-***
-
-EOL	LDA	#$9B
-
-	ICL	"print1.inc"
-***
-
-XDIVIO	JMP	($FFFF)
-
-BATFLG	LDA	$FFFF
-	RTS
-
-***
+	ORG	$3000
 	ICL	"chkdos.inc"
 ***
 	LDA	10
@@ -55,31 +39,26 @@ BATFLG	LDA	$FFFF
 
 START3	JSR	CLOSE
 
-	LDX	#$10
-	LDA	#3
-	STA	$342,X
-
 	LDA	#<KNAM
-	STA	$344,X
+	STA	$344+$10
 	LDA	#>KNAM
-	STA	$345,X
+	STA	$345+$10
 
 	LDA	#4
-	STA	$34A,X
+	STA	$34A+$10
 	LDA	#0
-	STA	$34B,X
+	STA	$34B+$10
 
-	JSR	$E456
+	LDA	#3
+	JSR	CIO10
 	BMI	START3
 
-	LDX	#$10
-	LDA	#7
-	STA	$342,X
 	LDA	#0
-	STA	$348,X
-	STA	$349,X
+	STA	$348+$10
+	STA	$349+$10
 
-	JSR	$E456
+	LDA	#7
+	JSR	CIO10
 	BMI	START3
 
 	PHA
@@ -127,12 +106,10 @@ NO2	JSR	GETLINE
 
 	LDX	#0
 	JSR	TEST
-	BEQ	NO3
 
 	LDX	#VZ2-VZOR
 	JSR	TEST
 	BNE	NO2
-	BEQ	NO3
 
 ***
 
@@ -154,16 +131,13 @@ TEST2	LDA	BUFFER,Y
 
 	CMP	#$9B
 	BNE	TEST2
-
-	LDA	#0
-TESTX	RTS
+	BEQ	NO3
 
 ***
 
-CLOSE	LDX	#$10
-	LDA	#12
+CLOSE	LDA	#12
+CIO10	LDX	#$10
 	STA	$342,X
-
 	JMP	$E456
 ***
 
@@ -183,26 +157,37 @@ GETLNX	LDY	#1
 	JMP	(10)
 **
 
-GETLINE	JSR	BATFLG
+GETLINE
+BATFLG	LDA	$FFFF
 	BMI	GETLNX
 
-	LDX	#0
 	LDA	#5
-	STA	$342,X
+	STA	$342
 
 	LDA	#<BUFFER
-	STA	$344,X
+	STA	$344
 	LDA	#>BUFFER
-	STA	$345,X
+	STA	$345
 
 	LDA	#64
-	STA	$348,X
-	LDA	#0
-	STA	$349,X
+	STA	$348
+	LDX	#0
+	STX	$349
 
 	JSR	$E456
 	BMI	GETLNX
 
-	RTS
+TESTX	RTS
+
+***
+	ICL	"print.inc"
 ***
 
+EOL	LDA	#$9B
+
+	ICL	"print1.inc"
+***
+
+XDIVIO	JMP	($FFFF)
+
+***
