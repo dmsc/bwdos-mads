@@ -1,33 +1,18 @@
-	ORG	$6000
-	JMP	START
-
 *************************************
 *				*
 *	'DATE' PRO BW-DOS 1.00	*
 *				*
 *************************************
 
-DECOUT	EQU	128
 INDEX	EQU	130
-TMP	EQU	131
 
-***
-	ICL	"print.inc"
-***
-
-PRTNM	LDA	(DECOUT),Y
-	ORA	#$30
-***
-	ICL	"print1.inc"
-***
+	ORG	$3000
 	ICL	"chkbw.inc"
 ***
 
 CLOSES	LDA	#0
 	STA	752
 
-	LDX	#$10
-	JSR	CLOSE
 	LDX	#$20
 
 CLOSE	LDA	#12
@@ -38,107 +23,43 @@ CLOSE	LDA	#12
 
 GETTD	JMP	($706)
 SETTD	JMP	($708)
-CONVDC	JMP	($70A)
-
-VZOR	DTA	C"  -  -   "
-
-MYTD	DTA	0,0,0
-
-KNAME	DTA	C"K:"
-	DTA	155
 
 ETAB	DTA	0,1,3,4,6,7,8
 
 ***
 
-START2	LDA	10
-	SEC
-	SBC	#19
-	STA	DECOUT
-	LDA	11
-	SBC	#0
-	STA	DECOUT+1
-
-	JSR	GETTD
+START2	JSR	GETTD
 
 	JSR	PRINT
 	DTA	155
 	DTA	C"Current date is "
 	DTA	0
 
+	LDA	#'-'
 	LDY	#13
-
-STL1	TYA
-	PHA
-
-	LDA	(10),Y
-	LDY	#13
-	STA	(DECOUT),Y
-
-	LDA	#0
-	INY
-	STA	(DECOUT),Y
-	INY
-	STA	(DECOUT),Y
-
-	JSR	CONVDC
-
-	LDY	#6
-	JSR	PRTNM
-	LDY	#7
-	JSR	PRTNM
-
-	PLA
-	PHA
-	CMP	#15
-	BEQ	STL2
+	JSR	PRTDEC
 
 	LDA	#'-'
-	JSR	PRT1
+	LDY	#14
+	JSR	PRTDEC
 
-STL2	PLA
-	TAY
+	LDA	#155
+	LDY	#15
+	JSR	PRTDEC
 
-	INY
-	CPY	#16
-	BCC	STL1
 ***
-
-	JSR	PRINT
-	DTA	155,0
-
-	LDX	#8
-	LDA	#32
-
-STL3	LDA	VZOR,X
-	STA	TEXT,X
-
-	DEX
-	BPL	STL3
-
-	LDA	#0
-	STA	INDEX
+* X=0 after PRT1
+	STX	INDEX
 ***
 
 	JSR	CLOSES
 
-	LDX	#$10
-	LDA	#<KNAME
-	STA	$344,X
-	LDA	#>KNAME
-	STA	$345,X
-	LDA	#4
-	STA	$34A,X
-	LDA	#0
-	STA	$34B,X
-	LDA	#3
-	STA	$342,X
-
-	STA	752
-
-	JSR	$E456
-
+*Hide cursor
 	LDX	#15
+	STX	752
+
+*Copy IOCB#0 to #2, to call EDITOR
+*without redirection.
 STL4	LDA	$340,X
 	STA	$360,X
 	DEX
@@ -168,15 +89,7 @@ EDLOOP	LDX	INDEX
 
 **
 
-EDL2	LDX	#$10
-	LDA	#0
-	STA	$348,X
-	STA	$349,X
-	LDA	#7
-	STA	$342,X
-
-	JSR	$E456
-	BMI	EDL2
+EDL2	JSR	GETKEY
 
 	CMP	#27
 	BEQ	EDESC
@@ -215,7 +128,7 @@ EDDEL	LDX	INDEX
 EDESC	JSR	CLOSES
 
 	JSR	PRINT
-	DTA	155
+	DTA	156
 	DTA	C"Aborted."
 	DTA	155,0
 
@@ -237,27 +150,19 @@ EDRET	JSR	CLOSES
 	JSR	EDGET
 	CPY	#31
 	BCS	INVALID
-	STA	MYTD
+	LDY	#13
+	STA	(10),Y
 
 	JSR	EDGET
 	CPY	#12
 	BCS	INVALID
-	STA	MYTD+1
-
-	JSR	EDGET
-	STA	MYTD+2
-*
-	JSR	GETTD
-
-	LDY	#13
-
-EDRET2	LDA	MYTD-13,Y
+	LDY	#14
 	STA	(10),Y
 
-	INY
-	CPY	#16
-	BCC	EDRET2
-
+	JSR	EDGET
+	LDY	#15
+	STA	(10),Y
+*
 	JSR	SETTD
 
 	JSR	PRINT
@@ -270,8 +175,8 @@ TEXT	DTA	C"  -  -   "
 ***
 
 NOTCHG	JSR	PRINT
+	DTA	156
 	DTA	C"(Date not changed)"
-	DTA	C"         "
 	DTA	155,0
 	JMP	(10)
 ***
@@ -284,28 +189,53 @@ INVALID	JSR	PRINT
 	JMP	(10)
 ***
 
-EDGET	JSR	EDGT2
-	STA	TMP
+EDGET	LDA	TEXT,X
 	ASL
 	ASL
-	ADC	TMP
+	ADC	TEXT,X
 	ASL
-	STA	TMP
+	CLC
+	ADC	TEXT+1,X
+	SEC
+	SBC	#16
 
-	JSR	EDGT2
-	ADC	TMP
-
+	INX
+	INX
 	INX
 
 	TAY
 	DEY
 	RTS
 ***
+	ICL	"print.inc"
+***
+	ICL	"print1.inc"
+***
+PRTDEC	PHA
+	LDA	(10),Y
 
-EDGT2	LDA	TEXT,X
-	INX
-	AND	#15
+	LDY	#$2F
+PDEC1	INY
+	SEC
+	SBC	#10
+	BCS	PDEC1
+	PHA
+	TYA
+	JSR	PRT1
+	PLA
+	CLC
+	ADC	#58
+	JSR	PRT1
 
+	PLA
+	JMP	PRT1
+
+*Call K: get handler
+GETKEY	LDA	$E420+5
+	PHA
+	LDA	$E420+4
+	PHA
+	LDX	#0
+	STX	$2A	;Clears ICAX1Z
 	RTS
 ***
-
