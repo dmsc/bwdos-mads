@@ -1,6 +1,3 @@
-	ORG	$6000
-	JMP	START
-
 *************************************
 *				*
 *     " N E W E D "  PRO BW-DOS	*
@@ -9,12 +6,10 @@
 
 * VOLNO: 128
 
-NAME	EQU	$6800
+NAME	EQU	$3800
 
-***
+	ORG	$3000
 
-COMNAM	DTA 155
-	DTA C"MOC."
 ***
 
 START	LDA	$700
@@ -33,10 +28,10 @@ START	LDA	$700
 	BCS	START2
 
 ST0ER	JSR	PRINT
-	DTA 155
-	DTA C"Error: Not BW-DOS "
-	DTA C"ver.1.20 or later !"
-	DTA 155,0
+	DTA	155
+	DTA	C"Error: Not BW-DOS "
+	DTA	C"1.20 or later!"
+	DTA	155,0
 
 	JMP	(10)
 ***
@@ -80,9 +75,7 @@ ST5	LDA	COMNAM,X
 
 	LDA	#3
 	JSR	DOIT
-	BPL	ST6
-
-	JMP	ERROR
+	BMI	ERROR
 *
 
 ST6	JSR	TESTFF
@@ -105,10 +98,9 @@ RED1	LDA	$31A,Y
 	BCC	RED1
 *
 	JSR	PRINT
-	DTA 155
-	DTA C"Error: Handler 'E:'"
-	DTA C" not present !"
-	DTA 155,0
+	DTA	155
+	DTA	C"Error: No 'E:' handler!"
+	DTA	155,0
 
 	JMP	ERR5
 **
@@ -139,20 +131,15 @@ DOIT	LDX	#$10
 
 **CLOSE
 
-CLOSE	LDX	#$10
-	LDA	#12
-	STA	$342,X
-	JMP	$E456
+CLOSE	LDA	#12
+	BNE	DOIT
 ***
 
-TESTFF	LDX	#$10
-	LDA	#0
-	STA	$348,X
-	STA	$349,X
+TESTFF	LDA	#0
+	STA	$348+$10
+	STA	$349+$10
 	LDA	#7
-	STA	$342,X
-
-	JSR	$E456
+	JSR	DOIT
 	BMI	TFFER
 
 	CMP	#$FF
@@ -186,9 +173,13 @@ ERR5J	JSR	XDOS
 XDOS	JMP	(10)
 **
 
-ERRTAB	DTA 1,10,100
+ERRTAB	DTA	1,10,100
 
 ***
 	ICL	"print.inc"
 	ICL	"print1.inc"
 ***
+COMNAM	DTA 155
+	DTA C"MOC."
+***
+
