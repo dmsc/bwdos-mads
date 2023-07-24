@@ -1,6 +1,6 @@
 *************************************
 *				*
-*	RAM-DISK PRO BW-DOS	*
+*	RAM-DISK FOR BW-DOS	*
 *				*
 *************************************
 
@@ -24,16 +24,12 @@ MIX	EQU	141
 MKONEC	EQU	142
 
 TEMP1	EQU	144
-TEMP2	EQU	145
-
-*** VOLNO: 146
 
 BUFF	EQU	$500
 
 SWTAB	EQU	$480
 
 ***
-
 	ORG	$3700
 ***
 	ICL	"chkdos.inc"
@@ -120,8 +116,7 @@ STRT4C	CMP	#'E'
 	STA	XFLAG
 	BEQ	STRT4B
 
-STRT4D	SEC
-	SBC	#'0'
+STRT4D	EOR	#'0'
 	BEQ	STRTHLP
 	CMP	#10
 	BCS	STRTHLP
@@ -255,11 +250,8 @@ CONFIG2	LDA	#0
 
 	LDA	#7
 	JSR	CIO1
-	BPL	CONF2B
+	BMI	CONFIG3
 
-	CPY	#136
-	BNE	CONFERR
-	BEQ	CONFIG3
 *
 
 CONF2B	INC	LDFLG
@@ -281,7 +273,10 @@ CONFBAD	JSR	CLOSE1
 	JMP	CFGE2
 **
 
-CONFIG3	JSR	CLOSE1
+CONFIG3	CPY	#136
+	BNE	CONFERR
+
+	JSR	CLOSE1
 
 	LDA	LDFLG
 	BEQ	CONFBAD
@@ -295,8 +290,7 @@ CONFIG3	JSR	CLOSE1
 *Memory test OK.
 *NBANKS and RBTAB hold extended RAM info.
 START6	JSR	SRCHRUT
-	BCC	STRT6B
-	JMP	START7
+	BCS	START7
 
 *Install resident
 STRT6B	LDA	743
@@ -328,7 +322,7 @@ STRT6B	LDA	743
 	ADC	SRCHADR+1
 	STA	(SIOADR),Y
 
-*COPY
+*Copy low-memory handler
 	LDY	#RESLEN
 
 STRT6C	DEY
@@ -337,7 +331,8 @@ STRT6C	DEY
 
 	TYA
 	BNE	STRT6C
-*RESET
+
+*Setup RESET handler
 	LDY	#2
 
 STRT6D	LDA	11,Y
@@ -348,12 +343,11 @@ STRT6D	LDA	11,Y
 	DEY
 	BNE	STRT6D
 
-*REZIDENT EXISTUJE
-
+*Resident handler already installed
 START7	LDA	DNUMB
 	STA	RR1+1
 
-*MAXSECT
+*Setup MAXSECT
 	LDA	NBANKS
 	LSR
 	STA	MAXSECT+1
@@ -370,13 +364,11 @@ START7	LDA	DNUMB
 	STA	RR6+1
 
 	JSR	DECMAXS
-*BANK0
-	JSR	DISINT
-
-	LDA	$D301
-	PHA
 
 *Setup code bank
+	JSR	DISINT
+	PHA
+
 	LDA	RBTAB
 	LDY	#(R03-RESID)+1
 	STA	(SRCHADR),Y
@@ -400,8 +392,6 @@ STRT7C	DEY
 	BPL	STRT7C
 *
 	PLA
-	STA	$D301
-
 	JSR	ENINT
 
 * FORMATOVANI
@@ -587,11 +577,9 @@ FORMEND	JSR	PRINT
 
 	LDA	#0
 	STA	MAXSECT+1
-	STA	TEMP2
 
 	LDA	NBANKS
 	LDX	#3
-	STX	TEMP1
 
 PRTSZ1	ASL
 	ROL	MAXSECT+1
@@ -600,22 +588,22 @@ PRTSZ1	ASL
 
 	STA	MAXSECT
 
-
+*Divide by 10
 	LDX	#3
 DIV0	STX	DIVI+1
 
 	LDX	#16
 	LDA	#0
-	CLV		; V flag will be set if any quotient bit is 1
+	CLV
 
-DIV1	CMP	#5	; is accumulator >= 5 ?
+DIV1	CMP	#5
 	BCC	DIV2
-	SBC	#$85	; if so, subtract 5, toggle bit 7 and set V flag
-	SEC		; set C (=next quotient bit)
+	SBC	#$85
+	SEC
 
-DIV2	ROL	MAXSECT	; shift quotient
+DIV2	ROL	MAXSECT
 	ROL	MAXSECT+1
-	ROL		; shift dividend into A
+	ROL
 	DEX
 	BNE	DIV1
 
@@ -761,9 +749,8 @@ REMOV2	LDA	743
 	BNE	REM2LST
 
 *Enable code bank to get old SIO
-	LDA	$D301
-	PHA
 	JSR	DISINT
+	PHA
 	LDY	#(R03-RESID)+1
 	LDA	(SRCHADR),Y
 	STA	$D301
@@ -784,10 +771,8 @@ REM3	INY
 	DEY
 	BPL	REM3
 
-
 *Re-enable original bank and exir
 	PLA
-	STA	$D301
 	JSR	ENINT
 ***
 
@@ -841,8 +826,6 @@ RT0A	STA	RBTAB,X
 	BPL	RT0A
 *
 	JSR	DISINT
-
-	LDA	$D301
 	PHA
 
 *SAVE OLD
@@ -896,8 +879,7 @@ RT3	DEX
 
 	STY	NBANKS
 
-*OBNOV OLD
-
+*RESTORE OLD
 	LDX	#64
 
 RT4	JSR	RSWITCH
@@ -912,13 +894,11 @@ RT4	JSR	RSWITCH
 	DEX
 	BPL	RT4
 
-*KONEC
-
+*END
 	PLA
-	STA	$D301
 ***
-
-ENINT	LDA	#$40
+ENINT	STA	$D301
+	LDA	#$40
 	STA	54286
 	CLI
 
@@ -928,7 +908,7 @@ ENINT	LDA	#$40
 DISINT	LDA	#0
 	STA	54286
 	SEI
-
+	LDA	$D301
 	RTS
 ***
 
@@ -978,7 +958,7 @@ RR1	CMP	#0
 	BEQ	RDS2
 
 *Exit trough stub to standard SIO
-STDSIO	LDX	#SIOST-RES2
+STDSIO	LDY	#SIOST+10-RES2
 	JMP	CSTUB+RESO
 
 *Setup read/write address and stub
@@ -1005,37 +985,7 @@ RDS3A	LDA	COPYST+RESO,X
 	BNE	R2NAK
 
 	CMP	#'S'
-	BNE	R2RW
-
-*STATUS - read from pre-defined area
-	LDA	#<(RDSTAT+RESO)
-	STA	RADR
-	LDA	#>(RDSTAT+RESO)
-	STA	RADR+1
-
-	CPY	#4
-	BNE	R2NAK
-R05	LDX	#$FF
-	DEY
-	BNE	SREAD
-
-*SIO error
-R2NAK	LDY	#139
-R2XIT	STY	$303
-	LDX	#EXTST-RES2
-	; Fall through
-
-*Copy STUB to low memory and jump
-CSTUB	STX	CST1+1+RESO
-	LDX	#10
-CST1	LDA	$4000,X
-	STA	$30,X
-	DEX
-	BPL	CST1
-	PLA
-	LDX	#$40
-	JMP	$0030
-
+	BEQ	SSTAT
 
 *Read/Write
 R2RW	CPY	#128
@@ -1077,7 +1027,11 @@ RR6B	TAY
 	CMP	#'W'
 	BEQ	SWRITE
 	CMP	#'P'
-	BNE	R2NAK
+	BEQ	SWRITE
+
+*SIO error
+R2NAK	LDY	#139
+	BNE	R2XIT
 
 *Write operation, should swap buffers
 SWRITE	LDA	WBNK+1+RESO
@@ -1095,20 +1049,47 @@ SWRITE	LDA	WBNK+1+RESO
 	LDA	#$80
 	BNE	R2CPY
 
+*STATUS - read from pre-defined area
+SSTAT	LDA	#<(RDSTAT+RESO)
+	STA	RADR
+	LDA	#>(RDSTAT+RESO)
+	STA	RADR+1
+
+	CPY	#4
+	BNE	R2NAK
+
+R05	LDX	#$FF
+	DEY
+	BEQ	R2NAK
+
 SREAD	STX	RBNK
 	LDA	#$40
 R2CPY	CMP	$303
 	BNE	R2NAK
 WBNK	LDX	#$FF
 	JSR	$30
+	LDY	#1
+
+R2XIT	STY	$303
 *Restore ZP
 	LDX	#$100-(COPYLEN-$11)
 RZP	PLA
 	STA	$30+COPYLEN,X
 	INX
 	BNE	RZP
-	LDY	#1
-	JMP	R2XIT+RESO
+	LDY	#EXTST+10-RES2
+	; Fall through
+
+*Copy STUB to low memory and jump
+CSTUB	LDX	#10
+CST1	LDA	$4000,Y
+	STA	$30,X
+	DEY
+	DEX
+	BPL	CST1
+	PLA
+	LDX	#$40
+	JMP	$0030
 
 *Exit jumping to standard SIO
 SIOST	STA	$D301
