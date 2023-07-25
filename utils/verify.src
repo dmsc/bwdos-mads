@@ -1,6 +1,3 @@
-	ORG	$6000
-	JMP	START
-
 *************************************
 *				*
 *    " V E R I F Y "  PRO BW-DOS	*
@@ -9,15 +6,7 @@
 
 WRTADR	EQU	128
 
-* VOLNO: 130
-
-***
-	ICL	"print.inc"
-	ICL	"print1.inc"
-***
-
-GETNAME	JMP	PRTEX
-
+	ORG	$3000
 ***
 	ICL	"chkdos.inc"
 ***
@@ -30,15 +19,13 @@ GETNAME	JMP	PRTEX
 	STA	GETNAME+2
 
 	LDA	10
-	SEC
-	SBC	#2
 	STA	WRTADR
-	LDA	11
-	SBC	#0
-	STA	WRTADR+1
+	LDX	11
+	DEX
+	STX	WRTADR+1
 **
 
-	JSR	GETNAME
+GETNAME	JSR	GETNAME
 
 	LDY	#36
 	LDA	(10),Y
@@ -49,6 +36,8 @@ GETNAME	JMP	PRTEX
 	LDA	(10),Y
 	INY
 
+	LDX	#'W'	;VERIFY ON
+
 	CMP	#'N'
 	BEQ	ON1
 	CMP	#'F'
@@ -56,32 +45,26 @@ GETNAME	JMP	PRTEX
 * OFF?
 	CMP	(10),Y
 	BNE	BADPAR
-
 	INY
-	LDA	(10),Y
-	CMP	#$9B
-	BNE	BADPAR
-* OFF!
-	LDA	#'P'
-	BNE	ONOF2
-* ON?
+
+	LDX	#'P'	;VERIFY OFF
 
 ON1	LDA	(10),Y
 	CMP	#$9B
 	BNE	BADPAR
-* ON!
-	LDA	#'W'
 
-ONOF2	LDY	#0
+	TXA
+
+	LDY	#256-2
 	STA	(WRTADR),Y
 
 	JMP	(10)
 **
 
 BADPAR	JSR	PRINT
-	DTA 155
-	DTA C"Bad parameter!"
-	DTA 155,0
+	DTA	155
+	DTA	C"Bad parameter!"
+	DTA	155,0
 
 ERR5X	LDY	#8
 	LDA	(10),Y
@@ -95,4 +78,6 @@ ERR5Y	JSR	$E474
 	JMP	(10)
 
 ***
-
+	ICL	"print.inc"
+	ICL	"print1.inc"
+***
