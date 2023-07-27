@@ -35,6 +35,7 @@ TOOLS=\
       dos/newed.com\
       dos/offload.com\
       dos/pause.com\
+      dos/pwd.com\
       dos/save.com\
       dos/time.com\
       dos/unerase.com\

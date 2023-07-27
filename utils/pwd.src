@@ -1,0 +1,201 @@
+*************************************
+*				*
+*	 "PWD" for BW-DOS		*
+*				*
+*************************************
+
+DIRLEN	EQU	128
+PATHLEN	EQU	129
+
+DIRBUF	EQU	130
+NAME	EQU	130+23
+
+PATH	EQU	$3F00
+
+	ORG	$3000
+***
+	ICL	"chkdos.inc"
+***
+	LDA	10
+	CLC
+	ADC	#3
+	STA	GETNAME+1
+	LDA	11
+	ADC	#0
+	STA	GETNAME+2
+
+	LDA	#1
+	STA	PATHLEN
+	LDA	#4
+	STA	DIRLEN
+
+*Get parameter, D*:
+GETNAME	JSR	GETNAME
+
+	LDY	#33
+	LDA	(10),Y
+	CMP	#'D'
+	BNE	ERR146
+	INY
+	LDA	(10),Y
+	STA	DIR+1
+	LDY	#36
+	LDA	(10),Y
+	CMP	#$9B
+	BEQ	DIRNAME
+
+ERR146	LDY	#146
+	JMP	ERROR
+
+*Open directory data
+DIRNAME	LDX	PATHLEN
+	LDA	#'>'
+	STA	PATH-1,X
+
+	JSR	CLOSE
+
+	LDA	#$1C
+	STA	$34A+$10
+	LDA	#0
+	STA	$34B+$10
+
+	LDX	#<DIR
+	LDY	#>DIR
+	LDA	#3
+	JSR	CIOXY	;OPEN DIR
+
+	LDA	#0
+	STA	$34C+$10
+	STA	$34D+$10
+	STA	$34E+$10
+	LDA	#37
+	JSR	CIO10	;POINT
+
+	LDX	#23
+	STX	$348+$10
+	LDY	#0
+	STY	$349+$10
+	;LDY	#>DIRBUF
+	LDX	#<DIRBUF
+	LDA	#7
+	JSR	CIOXY	;READ
+
+	JSR	CLOSE
+***
+	LDA	DIRBUF+1
+	ORA	DIRBUF+2
+	BEQ	OK	;Main DIR
+
+*Convert name to DOS format
+	LDX	#6
+	LDY	#0
+CVNAM	LDA	DIRBUF,X
+	CMP	#' '
+	BEQ	CVNAM1
+	STA	NAME,Y
+	INY
+	INX
+	CPX	#14
+	BNE	CVNAM
+
+CVNAM1	LDA	#'.'
+	STA	NAME,Y
+	INY
+	LDX	#14
+
+CVEXT	LDA	DIRBUF,X
+	CMP	#' '
+	BEQ	CVEXT1
+	STA	NAME,Y
+	INY
+	INX
+	CPX	#17
+	BNE	CVEXT
+
+CVEXT1	CPX	#14
+	BNE	CVEXT2
+	DEY
+*And prepend the new directory name to the full path
+CVEXT2
+	LDX	PATHLEN
+MPATH	LDA	NAME-1,Y
+	STA	PATH,X
+	INX
+	BEQ	ERRLONG
+	DEY
+	BPL	MPATH
+	LDA	#'>'
+	STA	PATH-1,X
+	STX	PATHLEN
+
+*Now, go to parent directory
+	LDX	DIRLEN
+	LDA	#'<'
+	STA	DIR-1,X
+	LDA	#$9B
+	STA	DIR,X
+
+	INC	DIRLEN
+	BEQ	ERRLONG
+
+*And repeat!
+	JMP	DIRNAME
+
+OK
+PRTD1	LDA	DIR
+	JSR	PRT1
+	INC	PRTD1+1
+	LDA	PRTD1+1
+	CMP	#<(DIR+3)
+	BNE	PRTD1
+PRTPATH	LDX	PATHLEN
+	LDA	PATH-1,X
+	JSR	PRT1
+	DEC	PATHLEN
+	BNE	PRTPATH
+	JMP	(10)
+***
+
+ERRLONG	JSR	PRINT
+	DTA	155
+	DTA	C"Path too long!"
+	DTA	155,0
+
+	JMP	ERR5X
+***
+	ICL	"error.inc"
+
+ERR5X	LDY	#8
+	LDA	(10),Y
+	STA	ERR5Y+1
+	INY
+	LDA	(10),Y
+	STA	ERR5Y+2
+	LDY	#1
+ERR5Y	JSR	$E474	;XDIVIO
+
+ERR5	JSR	CLOSE
+
+	JMP	(10)
+***
+
+CLOSE	LDA	#12
+
+CIOXY	STX	$344+$10
+	STY	$345+$10
+
+CIO10	LDX	#$10
+	STA	$342+$10
+	JSR	$E456
+	BMI	ERROR
+	RTS
+
+***
+	ICL	"print.inc"
+	ICL	"print1.inc"
+***
+ERRTAB	DTA 1,10,100
+
+DIR	DTA	C"D1:*"
+	DTA	$9B
+
