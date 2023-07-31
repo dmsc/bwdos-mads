@@ -290,7 +290,24 @@ CONFIG3	CPY	#136
 *Memory test OK.
 *NBANKS and RBTAB hold extended RAM info.
 START6	JSR	SRCHRUT
-	BCS	START7
+	BCC	STRT6B
+
+*Resident already installed, we need to get old SIO address
+*using original code bank
+	JSR	DISINT
+	PHA
+	LDY	#(R03-RESID)+1	;Get code bank from low memory handler
+	LDA	(SRCHADR),Y
+	STA	$D301
+
+	LDY	#1
+STRT6A	LDA	JSIO+1+RESO,Y
+	STA	JSIO+1,Y
+	DEY
+	BPL	STRT6A
+	PLA
+	JSR	ENINT
+	BNE	START7
 
 *Install resident
 STRT6B	LDA	743
