@@ -292,8 +292,8 @@ CONFIG3	CPY	#136
 START6	JSR	SRCHRUT
 	BCC	STRT6B
 
-*Resident already installed, we need to get old SIO address
-*using original code bank
+*Resident handler already installed, we need to get old SIO
+*address using original code bank, in case banks need to change.
 	JSR	DISINT
 	PHA
 	LDY	#(R03-RESID)+1	;Get code bank from low memory handler
@@ -322,20 +322,25 @@ STRT6B	LDA	743
 	ADC	#0
 	STA	744
 	STA	R02+1
-*SIO
-	LDY	#1
-	LDA	(SIOADR),Y
-	STA	JSIO+2
-	DEY
-	LDA	(SIOADR),Y
-	STA	JSIO+1
 
+*Setup SIO and RESET handler
+	LDY	#1
+STRT6D	LDA	(SIOADR),Y
+	STA	JSIO+1,Y
+	LDA	12,Y
+	STA	RESID+1,Y
+	LDX	SRCHADR,Y
+	STX	12,Y
+	DEY
+	BPL	STRT6D
+
+	INY
 	LDA	#(RDSIO-RESID)
 	CLC
 	ADC	SRCHADR
 	STA	(SIOADR),Y
+	TYA
 	INY
-	LDA	#0
 	ADC	SRCHADR+1
 	STA	(SIOADR),Y
 
@@ -349,18 +354,7 @@ STRT6C	DEY
 	TYA
 	BNE	STRT6C
 
-*Setup RESET handler
-	LDY	#2
-
-STRT6D	LDA	11,Y
-	STA	(SRCHADR),Y
-	LDA	SRCHADR-1,Y
-	STA	11,Y
-
-	DEY
-	BNE	STRT6D
-
-*Resident handler already installed
+*Resident handler installed, configure and install code in extended RAM
 START7	LDA	DNUMB
 	STA	RR1+1
 
@@ -788,7 +782,7 @@ REM3	INY
 	DEY
 	BPL	REM3
 
-*Re-enable original bank and exir
+*Re-enable original bank and exit
 	PLA
 	JSR	ENINT
 ***
