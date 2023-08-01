@@ -1,26 +1,12 @@
-	ORG	$6000
-	JMP	START
-
 *************************************
 *				*
-*     " M E M "	PRO BW-DOS	*
+*     " M E M "	FOR BW-DOS	*
 *				*
 *************************************
 
-* VOLNO: 128
+HVAL	EQU	128
 
-***
-	ICL	"print.inc"
-***
-
-POML	LDA	#'-'
-
-	ICL	"print1.inc"
-***
-
-GETNAME	JMP	PRTEX
-
-***
+	ORG	$3000
 
 START	LDA	$700
 	CMP	#'S'
@@ -34,7 +20,7 @@ START2	LDA	10
 	ADC	#0
 	STA	GETNAME+2
 
-	JSR	GETNAME
+GETNAME	JSR	GETNAME
 
 	LDY	#36
 	LDA	(10),Y
@@ -50,155 +36,144 @@ START2	LDA	10
 ***
 
 START3	JSR	PRINT
-	DTA 155
-	DTA C"MEMLO = "
-	DTA 0
+	DTA	155
+	DTA	C"MEMLO = $"
+	DTA	0
 
-	LDY	743
 	LDX	744
+	LDA	743
 	JSR	PRTHEX
+	DTA	155
+	DTA	C"MEMHI = $"
+	DTA	0
 
-	JSR	PRINT
-	DTA 155
-	DTA C"MEMHI = "
-	DTA 0
-
-	LDY	741
 	LDX	742
+	LDA	741
 	JSR	PRTHEX
-
-	LDA	#155
-	JSR	PRT1
+	DTA	155,0
 
 	JMP	(10)
 ***
 
 LONG	JSR	PRINT
-	DTA 155
-	DTA C"Current Memory-map :"
-	DTA 155,155
+	DTA	155
+	DTA	C"Current Memory-map:"
+	DTA	155,0
 
-	DTA C"$0000-$007F "
-	DTA C"System area"
-	DTA 155
-	DTA C"$0080-$00FF "
-	DTA C"User area"
-	DTA 155
-	DTA C"$0100-$047F "
-	DTA C"System area"
-	DTA 155
-	DTA C"$0480-$06FF "
-	DTA C"User area"
-	DTA 155
-	DTA C"$0700-"
-	DTA 0
+	TAX
+	STX	HVAL
+	STX	HVAL+1
+	LDA	#$80
+	JSR	PRTLINE
+	DTA	C"System area"
+	DTA	0
+	LDX	#1
+	JSR	PRTLINE
+	DTA	C"User area"
+	DTA	0
+	LDA	#$80
+	LDX	#$04
+	JSR	PRTLINE
+	DTA	C"System area"
+	DTA	0
+	LDX	#$07
+	JSR	PRTLINE
+	DTA	C"User area"
+	DTA	0
 
 	LDY	#31
 	LDA	(10),Y
-	PHA
 	TAX
 	DEY
 	LDA	(10),Y
-	PHA
-	TAY
+	JSR	PRTLINE
+	DTA	C"DOS"
+	DTA	0
 
-	JSR	PRTHEXM
-
-	JSR	PRINT
-	DTA C" DOS"
-	DTA 155,0
-
-	PLA
-	TAY
-	PLA
-	TAX
-
-	CPY	743
+	LDA	743
+	LDX	744
+	CMP	HVAL
 	BNE	LONG2
-	CPX	744
+	CPX	HVAL+1
 	BEQ	LONG3
 
-LONG2	JSR	PRTHEX
-	JSR	POML
+LONG2	JSR	PRTLINE
+	DTA	C"Resident handlers"
+	DTA	0
 
-	LDY	743
-	LDX	744
-	JSR	PRTHEXM
-
-	JSR	PRINT
-	DTA C" Resident handlers"
-	DTA 155,0
-
-LONG3	LDY	743
-	LDX	744
-	JSR	PRTHEX
-	JSR	POML
-
-	LDY	741
+LONG3	LDA	741
 	LDX	742
-	JSR	PRTHEXM
+	JSR	PRTLINE
+	DTA	C"User area"
+	DTA	0
 
-	JSR	PRINT
-	DTA C" User area"
-	DTA 155,0
-
-	LDY	741
-	LDX	742
-	JSR	PRTHEX
-	JSR	POML
-
-	LDY	#0
 	LDX	106
-	JSR	PRTHEXM
+	JSR	PRTLINE
+	DTA	C"Screen memory"
+	DTA	0
 
-	JSR	PRINT
-	DTA C" Screen memory"
-	DTA 155,0
+	LDX	#$C0
 
-	LDY	#0
-	LDX	106
-
-	CPX	#$C0
+	CPX	106
 	BCS	LONG4
 **
-	JSR	PRTHEX
+	JSR	PRTLINE
+	DTA	C"Cartridge or Reserved"
+	DTA	0
 
-	JSR	PRINT
-	DTA C"-$BFFF Cartridge or "
-	DTA C"Reserved"
-	DTA 155,0
-
-LONG4	JSR	PRINT
-	DTA C"$C000-$CFFF Operating"
-	DTA C" System"
-	DTA 155
-	DTA C"$D000-$D7FF Input"
-	DTA C"/Output area"
-	DTA 155
-	DTA C"$D800-$FFFF Operating"
-	DTA C" System"
-	DTA 155,0
+LONG4	LDX	#$D0
+	JSR	PRTLINE
+	DTA	C"Operating System"
+	DTA	0
+	LDX	#$D8
+	JSR	PRTLINE
+	DTA	C"Input/Output area"
+	DTA	0
+	LDX	#$0
+	JSR	PRTLINE
+	DTA	C"Operating System"
+	DTA	155,0
 
 	JMP	(10)
 ****
 
-PRTHEXM	TYA
+PRTLINE	TAY
 	BNE	PHXM2
 	DEX
 PHXM2	DEY
 
-PRTHEX	TYA
+	TYA
 	PHA
 	TXA
 	PHA
+	JSR	PRINT
+	DTA	155,'$',0
 
-	LDA	#'$'
+	JSR	PRTVAL
+	JSR	PRINT
+	DTA	C"-$"
+	DTA	0
+	PLA
+PRTHX1	STA	HVAL+1
+	PLA
+	STA	HVAL
+	JSR	PRTVAL
+	INC	HVAL
+	BNE	PRTHX4
+	INC	HVAL+1
+PRTHX4	LDA	#' '
 	JSR	PRT1
 
-	PLA
-	JSR	PRTHX2
+	ICL	"print.inc"
 
-	PLA
+PRTHEX	PHA
+	TXA
+	JMP	PRTHX1
+
+PRTVAL	LDA	HVAL+1
+	JSR	PRTHX2
+	LDA	HVAL
+
 **
 
 PRTHX2	PHA
@@ -211,15 +186,12 @@ PRTHX2	PHA
 **
 
 PRTHX3	AND	#15
-	CLC
-	ADC	#$30
+	ORA	#$30
 	CMP	#$3A
-	BCC	PRTHX4
+	BCC	PRT1
 
-	CLC
-	ADC	#7
+	ADC	#6
 
-PRTHX4	JMP	PRT1
+	ICL	"print1.inc"
 
-****
 
