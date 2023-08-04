@@ -15,5 +15,6 @@ PRINT3	LDA	$FF00,Y
 	JSR	PRT1
 	BPL	PRINT
 **
+*Returns with A=0
 PRTEX	RTS
 ***
