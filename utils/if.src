@@ -1,103 +1,91 @@
 *************************************
 *				*
-*	" I F "   PRO BW-DOS	*
+*	" I F "  FOR BW-DOS	*
 *				*
 *************************************
 
-* VOLNO: 128
-
-BUFFER	EQU	$3800
+DPTR	EQU	$80
+BUFFER	EQU	$82
 
 ***
 	ORG	$3000
 	ICL	"chkdos.inc"
 ***
-	LDA	10
-	CLC
-	ADC	#8
+	LDY	#8
+	LDA	(10),Y
 	STA	XDIVIO+1
-	LDA	11
-	ADC	#0
+	INY
+	LDA	(10),Y
 	STA	XDIVIO+2
 
 	LDA	10
-	SEC
-	SBC	#7
-	STA	BATFLG+1
-	LDA	11
-	SBC	#0
-	STA	BATFLG+2
+	STA	DPTR
+	LDY	11
+	DEY
+	STY	DPTR+1
+
 ***
 	JSR	EOL
 
 	JSR	GETLINE
 
 	JSR	PRINT
-	DTA C"<Y>...Yes  <N>...No  "
-	DTA 0
+	DTA	C"<Y>...Yes  <N>...No  "
+	DTA	0
 ***
 
 START3	JSR	GETKEY
 
 	CMP	#27
-	BEQ	ESCAPE
-
-	AND	#$5F
-	CMP	#'Y'
-	BNE	NONO
-*
-
-YES0	JSR	PRINT
-	DTA C"Yes!"
-	DTA 155,0
-
-	JMP	(10)
-***
-
-NONO	CMP	#'N'
-	BEQ	NO
-	BNE	START3
+	BNE	YESNO
 
 * ESC
-
-ESCAPE	LDY	#1
-	JSR	XDIVIO
-
 	JSR	PRINT
-	DTA 155
-	DTA C"(Batch file aborted)"
-	DTA 155,0
+	DTA	155
+	DTA	C"(Batch file aborted)"
+	DTA	155,0
+	BEQ	ERREND
 
-NO3	JMP	(10)
+YESNO	AND	#$5F
+	CMP	#'Y'
+	BNE	NONO
+
+*
+YES0	JSR	PRINT
+	DTA	C"Yes!"
+	DTA	155,0
+	BEQ	NO3
 
 ***
+NONO	CMP	#'N'
+	BNE	START3
 
-NO	JSR	PRINT
-	DTA C"No!"
-	DTA 155,155,0
+	JSR	PRINT
+	DTA	C"No!"
+	DTA	155,155,0
 
 NO2	JSR	GETLINE
 
-	LDX	#0
+	LDY	#0
 	JSR	TEST
 
-	LDX	#VZ2-VZOR
+	LDY	#VZ2-VZOR
 	JSR	TEST
 	BNE	NO2
 
 ***
 
-VZOR	DTA C"ENDIF"
-	DTA 155
-VZ2	DTA C"ELSE"
-	DTA 155
+VZOR	DTA	C"ENDIF"
+	DTA	155
+VZ2	DTA	C"ELSE"
+	DTA	155
 
 ***
 
-TEST	LDY	#0
+TEST	LDX	#0
 
-TEST2	LDA	BUFFER,Y
-	CMP	VZOR,X
+TEST2	LDA	BUFFER,X
+	CMP	VZOR,Y
 	BNE	TESTX
 
 	INY
@@ -118,36 +106,32 @@ GETKEY	LDA	$E420+5
 	RTS
 ****
 
-GETLNX	LDY	#1
-	JSR	XDIVIO
+GETLNX	JSR	PRINT
+	DTA	155
+	DTA	C"Error: End of batch file!"
+	DTA	155,0
 
-	JSR	PRINT
-	DTA 155
-	DTA C"Error: End of batch "
-	DTA C"file!"
-	DTA 155,0
+ERREND	LDY	#1
+XDIVIO	JSR	XDIVIO
+NO3	JMP	(10)
 
-	JMP	(10)
 **
 
-GETLINE
-BATFLG	LDA	$FFFF
+GETLINE	LDY	#256-7	;BATFLG
+	LDA	(DPTR),Y
 	BMI	GETLNX
 
-	LDA	#5
-	STA	$342
+	LDY	#5
+	LDA	#64
+	STA	$348
 
 	LDA	#<BUFFER
 	STA	$344
-	LDA	#>BUFFER
-	STA	$345
-
-	LDA	#64
-	STA	$348
-	LDX	#0
-	STX	$349
-
-	JSR	$E456
+	LDX	#>BUFFER
+	STX	$345
+*>BUFFER = 0
+;	LDX	#0
+	JSR	CIOXY0
 	BMI	GETLNX
 
 TESTX	RTS
@@ -161,6 +145,3 @@ EOL	LDA	#$9B
 	ICL	"print1.inc"
 ***
 
-XDIVIO	JMP	($FFFF)
-
-***

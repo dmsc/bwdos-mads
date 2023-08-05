@@ -1,83 +1,73 @@
 *************************************
 *				*
-*     " E L S E "   PRO BW-DOS	*
+*     " E L S E "  FOR BW-DOS	*
 *				*
 *************************************
 
-* VOLNO: 128
-
-BUFFER	EQU	$3800
+DPTR	EQU	128
+BUFFER	EQU	130
 
 ***
 	ORG	$3000
 	ICL	"chkdos.inc"
 ***
-	LDA	10
-	CLC
-	ADC	#8
+	LDY	#8
+	LDA	(10),Y
 	STA	XDIVIO+1
-	LDA	11
-	ADC	#0
+	INY
+	LDA	(10),Y
 	STA	XDIVIO+2
 
 	LDA	10
-	SEC
-	SBC	#7
-	STA	BATFLG+1
-	LDA	11
-	SBC	#0
-	STA	BATFLG+2
+	STA	DPTR
+	LDY	11
+	DEY
+	STY	DPTR+1
+
 ***
 
-NO2
-BATFLG	LDA	$FFFF
+NO2	LDY	#256-7	;BATFLG
+	LDA	(DPTR),Y
 	BMI	GETLNX
 
-	LDA	#5
-	STA	$342
+	LDY	#5
+	LDA	#64
+	STA	$348
 
 	LDA	#<BUFFER
 	STA	$344
-	LDA	#>BUFFER
-	STA	$345
-
-	LDA	#64
-	STA	$348
-	LDX	#0
-	STX	$349
-
-	JSR	$E456
+	LDX	#>BUFFER
+	STX	$345
+;>BUFFER = 0
+;	LDX	#0
+	JSR	CIOXY0
 	BMI	GETLNX
 
-	LDX	#0
+	LDX	#EPATRN-PATRN
 
 NO3	LDA	BUFFER,X
-	CMP	VZOR,X
+	CMP	PATRN,X
 	BNE	NO2
 
-	INX
-
-	CMP	#155
-	BNE	NO3
+	DEX
+	BPL	NO3
 ***
-
 	JMP	(10)
 
 ***
 
-VZOR	DTA C"ENDIF"
-	DTA 155
+PATRN	DTA	C"ENDIF"
+EPATRN	DTA	155
 
 ****
 
 GETLNX	LDY	#1
-	JSR	XDIVIO
+XDIVIO	JSR	XDIVIO
 
 	JSR	PRINT
-	DTA 155
-	DTA C"Error: End of batch "
-	DTA C"file!"
-	DTA 155,0
+	DTA	155
+	DTA	C"Error: End of batch file!"
+	DTA	155,0
 
 	JMP	(10)
 
@@ -86,6 +76,3 @@ GETLNX	LDY	#1
 	ICL	"print1.inc"
 ***
 
-XDIVIO	JMP	($FFFF)
-
-***
