@@ -123,8 +123,7 @@ CLOSE	LDX	#$10
 
 	JSR	PRINT
 	DTA	155
-	DTA	C"BLOAD fname adr. "
-	DTA	C"[len.]"
+	DTA	C"BLOAD fname adr. [len.]"
 	DTA	155,0
 	JMP	ERR2
 ***
@@ -143,8 +142,7 @@ START3	LDA	(10),Y
 **
 	JSR	PRINT
 	DTA	155
-	DTA	C"No address"
-	DTA	C" specified !"
+	DTA	C"No address specified!"
 	DTA	155,0
 	JMP	ERR2X
 **
@@ -193,7 +191,7 @@ START5	TXA
 ***
 	JSR	PRINT
 	DTA	155
-	DTA	C"Can't open !"
+	DTA	C"Can't open!"
 	DTA	155,0
 	JMP	ERR2X
 ***
@@ -220,7 +218,7 @@ START6	LDX	#$10
 
 	JSR	PRINT
 	DTA	155
-	DTA	C"I/O Error !"
+	DTA	C"I/O Error!"
 	DTA	155,0
 	JMP	ERR2X
 **
@@ -233,7 +231,7 @@ LENFLG	EQU	ST6EOF+1
 
 	JSR	PRINT
 	DTA	155
-	DTA	C"EOF found !"
+	DTA	C"EOF found!"
 	DTA	155,0
 
 START7	JMP	ERR2
