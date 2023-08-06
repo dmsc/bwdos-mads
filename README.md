@@ -63,7 +63,7 @@ Changes from BW-DOS 1.3
 
 Many of the external commands are reduced in size, both in disk and in the
 resident size after installation, for example, `RAMDISK` now only uses 31 bytes
-of low RAM and `XFSIO` only 105.
+of low RAM and `XFSIO` only 103.
 
 | Command   | Original Size / Resident | New Size / Resident |
 | --------- | ------------------------ | ------------------- |
@@ -73,7 +73,7 @@ of low RAM and `XFSIO` only 105.
 | CLOCK     |        1069   /  210     |    821   /   151    |
 | DOSDRIVE  |         986   /  108     |    876   /    70    |
 | KEYBUFF   |        1066   /  278     |    825   /   183    |
-| RAMBOX    |        1746   /   34     |   1712   /    34    |
+| RAMBOX    |        1746   /   34     |   1658   /    34    |
 | RAMDISK   |        2165   /   73     |   2028   /    31    |
 | RTIME8    |        1316   /  213     |   1274   /   213    |
 | XFSIO     |        1074   /  115     |    925   /   103    |
