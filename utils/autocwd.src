@@ -1,6 +1,6 @@
 *************************************
 *				*
-*   " A U T O C W D "  PRO BW-DOS	*
+*   " A U T O C W D "  FOR BW-DOS	*
 *				*
 *************************************
 
@@ -10,17 +10,8 @@ ALINST	EQU	130
 
 ***
 
-	ORG	$6000
-	JMP	START
+	ORG	$3000
 
-***
-	ICL	"print.inc"
-	ICL	"print1.inc"
-***
-
-GETNAME	JMP	PRTEX
-
-***
 	ICL	"chkdos.inc"
 ***
 	LDA	10
@@ -31,7 +22,7 @@ GETNAME	JMP	PRTEX
 	ADC	#0
 	STA	GETNAME+2
 ***
-	JSR	GETNAME
+GETNAME	JSR	GETNAME
 
 	LDY	#36
 	LDA	(10),Y
@@ -59,27 +50,19 @@ GETNAME	JMP	PRTEX
 
 SYNTAX	JSR	PRINT
 	DTA	155
-	DTA	C"Syntax: "
-	DTA	C"AUTOCWD [Dn:]path"
+	DTA	C"Syntax: AUTOCWD [Dn:]path"
 	DTA	155
 	DTA	C"        AUTOCWD OFF"
 	DTA	155,0
 
 	JMP	(10)
 
-*** NENI UZ ?
+*Already installed?
+START3	JSR	SRCHRUT
+	ROR	ALINST
+	BMI	START5	;Yes!
 
-START3	LDA	#0
-	STA	ALINST
-
-	JSR	SRCHRUT
-	BCC	START4
-*JE!
-	DEC	ALINST
-	JMP	START5
-
-***INSTALL
-
+*Install
 START4	LDA	743
 	STA	SRCHADR
 	CLC
@@ -92,7 +75,7 @@ START4	LDA	743
 	ADC	#0
 	STA	744
 	STA	R02+1
-*RELOK
+*Relocate
 	LDA	SRCHADR
 	CLC
 	ADC	#RESNAM-RESID
@@ -139,43 +122,37 @@ ST5B	LDA	(10),Y
 	CPY	#61
 	BCC	ST5B
 *
-	LDY	#RESNAM-RESID
-	LDX	#0
+	LDY	#RESNAM-RESID+27
+	LDX	#27
 
 ST5C	LDA	RESNAM,X
 	STA	(SRCHADR),Y
 
-	INY
-	INX
-	CPX	#28
-	BCC	ST5C
+	DEY
+	DEX
+	BPL	ST5C
 ****
 	LDA	ALINST
 	BMI	START6
 *
 	JSR	PRINT
-	DTA	155
-	DTA	C"AutoCWD "
-	DTA	C"Installed."
+	DTA	C" Installed."
 	DTA	155,0
 
-	JMP	(10)
+	BEQ	JDOS
 **
 
 START6	JSR	PRINT
-	DTA	155
-	DTA	C"AutoCWD: Path changed."
+	DTA	C": Path changed."
 	DTA	155,0
 
-	JMP	(10)
+	BEQ	JDOS
 ***
 
 DISABLE	JSR	SRCHRUT
 	BCS	DISABLE2
 
 	JSR	PRINT
-	DTA	155
-	DTA	C"AutoCWD"
 	DTA	C" not Installed!"
 	DTA	155,0
 
@@ -183,18 +160,16 @@ DISABLE	JSR	SRCHRUT
 ***
 
 DISCANT	JSR	PRINT
+	DTA	C" is not the last handler"
 	DTA	155
-	DTA	C"AutoCWD is not the"
-	DTA	C" last installed"
-	DTA	155
-	DTA	C" handler!"
+	DTA	C"installed!"
 	DTA	155,0
 
 DISERR2	JSR	PRINT
 	DTA	C"Can't remove."
 	DTA	155,0
 
-	JMP	(10)
+JDOS	JMP	(10)
 ***
 
 DISABLE2	LDA	743
@@ -221,15 +196,23 @@ DISBL2	LDA	(SRCHADR),Y
 	BNE	DISBL2
 **
 	JSR	PRINT
-	DTA	155
-	DTA	C"AutoCWD"
 	DTA	C" Removed."
 	DTA	155,0
 
-	JMP	(10)
+	BEQ	JDOS
 ****
 
-SRCHRUT	LDA	743
+	ICL	"print.inc"
+	ICL	"print1.inc"
+***
+
+*Print name and search
+SRCHRUT	JSR	PRINT
+	DTA	155
+	DTA	C"AutoCWD"
+	DTA	0
+
+	LDA	743
 	SEC
 	SBC	#RESLEN
 	STA	SRCHADR
@@ -267,7 +250,7 @@ SRCHNXT	LDA	SRCHADR
 SNXT2	DEC	SRCHADR
 
 	LDA	SRCHADR+1
-	CMP	#$10
+	CMP	#$1A
 	BCS	SRCHR1
 
 	RTS
