@@ -81,22 +81,19 @@ START3	LDY	#37
 	STA	(SRCHADR),Y
 
 	JSR	PRINT
-	DTA	155
-	DTA	C"DOSDRIVE: Drive number changed."
+	DTA	C": Drive number changed."
 	DTA	155,0
 
 	JMP	(10)
 
 *Install error
 STRT4ER	JSR	PRINT
-	DTA	155
-	DTA	C"Handler 'D:' not present!"
+	DTA	C": 'D' handler not present!"
 	DTA	0
 	BEQ	STRT4E2
 
 STRT4RM	JSR	PRINT
-	DTA	155
-	DTA	C"DOS is in ROM!"
+	DTA	C": DOS is in ROM!"
 	DTA	0
 STRT4E2	JSR	PRINT
 	DTA	155
@@ -214,8 +211,7 @@ INSTL3	LDA	11,Y
 
 *Done
 	JSR	PRINT
-	DTA	155
-	DTA	C"DOSDRIVE installed."
+	DTA	C" installed."
 	DTA	155,0
 
 	JMP	(10)
@@ -240,15 +236,13 @@ DISABLE	JSR	SRCHRUT
 	BCS	DISABLE2
 
 	JSR	PRINT
-	DTA	155
-	DTA	C"DOSDRIVE not Installed!"
+	DTA	C" not Installed!"
 	DTA	0
 	BEQ	DISERR2
 ***
 
 DISCANT	JSR	PRINT
-	DTA	155
-	DTA	C"DOSDRIVE is not the last handler"
+	DTA	C" is not the last handler"
 	DTA	155
 	DTA	C"installed! "
 	DTA	0
@@ -319,14 +313,19 @@ DISBL2	LDA	(SRCHADR),Y
 	BNE	DISBL2
 **
 	JSR	PRINT
-	DTA	155
-	DTA	C"DOSDRIVE Removed."
+	DTA	C" Removed."
 	DTA	155,0
 
 	JMP	(10)
 ****
 
-SRCHRUT	LDA	743
+*Print name and search
+SRCHRUT	JSR	PRINT
+	DTA	155
+	DTA	C"DOSDRIVE"
+	DTA	0
+
+	LDA	743
 	SEC
 	SBC	#RESLEN
 	STA	SRCHADR
@@ -374,7 +373,7 @@ SRCHNXT	LDA	SRCHADR
 SNXT2	DEC	SRCHADR
 
 	LDA	SRCHADR+1
-	CMP	#$10
+	CMP	#$19
 	BCS	SRCHR1
 
 	RTS
