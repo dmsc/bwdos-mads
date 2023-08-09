@@ -76,7 +76,7 @@ of low RAM and `XFSIO` only 103.
 | RAMBOX    |        1746   /   34     |   1658   /    34    |
 | RAMDISK   |        2165   /   73     |   2028   /    31    |
 | RTIME8    |        1316   / 94 (213) |   1120   / 91 (199) |
-| XFSIO     |        1074   /  115     |    925   /   103    |
+| XFSIO     |        1074   /  115     |    925   /   101    |
 | XLRDISK   |        1341   /   73     |   1274   /    31    |
 
 ### Optimization to the external commands
