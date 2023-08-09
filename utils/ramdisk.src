@@ -54,9 +54,11 @@ SWTAB	EQU	$480
 	DTA	155
 	DTA	C"BW-DOS RAMDISK 1.4D"
 	DTA	155,0
-**
+
+* first parameter
 	JSR	GETNAME
 
+* check for OFF
 	LDY	#36
 	LDA	(10),Y
 
@@ -77,8 +79,8 @@ SWTAB	EQU	$480
 	BNE	STRTHLP
 
 	JMP	REMOVE
-*HELP
 
+*HELP
 STRTHLP	JSR	PRINT
 	DTA	155
 	DTA	C"  Syntax:"
@@ -123,7 +125,6 @@ STRT4D	EOR	#'0'
 	BCC	STRT4A
 
 ***
-
 START5	LDA	DNUMB
 	BEQ	STRTHLP
 
@@ -155,7 +156,8 @@ ST5B	STA	SWTAB+1,X
 	BNE	ST5B
 
 ST5C	STX	SWTAB
-**
+
+*Check for extended memory
 	JSR	RAMTEST
 
 	LDA	NBANKS
@@ -164,12 +166,12 @@ ST5C	STX	SWTAB
 	LDX	XFLAG
 	BEQ	START6J
 
+*Option 'E', subtract 4 banks
 	SEC
 	SBC	#4
 	STA	NBANKS
 	BEQ	ST5MALO
 	BCS	START6J
-*
 
 ST5MALO	JSR	PRINT
 	DTA	155
@@ -197,8 +199,8 @@ CLOSE1	LDA	#12
 CIO1	LDX	#$10
 	STA	$342,X
 	JMP	$E456
-***
 
+*Load config file
 CONFIG1	LDA	#$FF
 	LDX	#64
 
@@ -228,7 +230,6 @@ CONF1B	STA	SWTAB,X
 	LDA	#3
 	JSR	CIO1
 	BPL	CONFIG2
-**
 
 CONFERR	JSR	CLOSE1
 
@@ -242,8 +243,8 @@ CFGE2	JSR	PRINT
 	DTA	155,0
 
 	JMP	ST5AB
-**
 
+*Read config file
 CONFIG2	LDA	#0
 	STA	$348+$10
 	STA	$349+$10
@@ -252,8 +253,7 @@ CONFIG2	LDA	#0
 	JSR	CIO1
 	BMI	CONFIG3
 
-*
-
+*Check config file too long
 CONF2B	INC	LDFLG
 	LDX	LDFLG
 	CPX	#65
@@ -271,18 +271,19 @@ CONFBAD	JSR	CLOSE1
 	DTA	0
 
 	JMP	CFGE2
-**
 
 CONFIG3	CPY	#136
 	BNE	CONFERR
 
 	JSR	CLOSE1
 
+*Check empty config file
 	LDA	LDFLG
 	BEQ	CONFBAD
 
 	JSR	RAMTEST
 
+*And check if all banks tested ok
 	LDA	LDFLG
 	CMP	NBANKS
 	BNE	CONFBAD
@@ -354,7 +355,8 @@ STRT6C	DEY
 	TYA
 	BNE	STRT6C
 
-*Resident handler installed, configure and install code in extended RAM
+*Resident handler installed,
+*configure and install code in extended RAM
 START7	LDA	DNUMB
 	STA	RR1+1
 
@@ -401,11 +403,11 @@ STRT7C	DEY
 	DEC	STRT7C+6
 	DEX
 	BPL	STRT7C
-*
+
 	PLA
 	JSR	ENINT
 
-* FORMATOVANI
+*Format RAM-disk
 
 	LDA	FFLAG
 	BNE	FORM1
@@ -513,7 +515,6 @@ FORM1CB	INX
 
 	LDX	#0
 	BEQ	FORM1C
-*
 
 FORM1D	CPX	MKONEC
 	BNE	FORM1CB
@@ -586,12 +587,14 @@ FORMEND	JSR	PRINT
 
 * PRINT SIZE
 
+*Print size
 	LDA	#0
 	STA	MAXSECT+1
 
 	LDA	NBANKS
 	LDX	#3
 
+*Get size = NBANKS*8 (kB)
 PRTSZ1	ASL
 	ROL	MAXSECT+1
 	DEX
@@ -599,7 +602,7 @@ PRTSZ1	ASL
 
 	STA	MAXSECT
 
-*Divide by 10
+*Convert to ASCII
 	LDX	#3
 DIV0	STX	DIVI+1
 
@@ -625,7 +628,6 @@ DIVI	LDX	#0
 	BVS	DIV0
 
 ***
-
 	JSR	PRINT
 PRNUM	DTA	C"    "
 	DTA	C" kB)"
@@ -803,7 +805,6 @@ SRCHRUT	LDA	743
 	LDA	744
 	SBC	#0
 	STA	SRCHADR+1
-*
 
 SRCHR1	LDY	#R03-RESID
 
@@ -814,7 +815,6 @@ SRCHR2	LDA	(SRCHADR),Y
 	DEY
 	CPY	#TST1-RESID
 	BNE	SRCHR2
-*
 	RTS
 **
 
@@ -828,8 +828,8 @@ SNXT2	DEC	SRCHADR
 	BCS	SRCHR1
 
 	RTS
-*****
 
+*Check extended memory
 RAMTEST	LDX	#63
 	LDA	#$FF
 RT0A	STA	RBTAB,X
