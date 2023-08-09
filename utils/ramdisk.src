@@ -830,46 +830,49 @@ RT0A	STA	RBTAB,X
 	JSR	DISINT
 	PHA
 
-*SAVE OLD
+*To avoid problems with ICD RAMBO XL 256k expansion,
+*we don't touch memory that could be aliased
+*to $3700 - $3F00, as this is our own code.
 
+*Save old memory
 	LDX	#64
 
 RT0	JSR	RSWITCH
 
-	LDA	$4080
+	LDA	$7000
 	STA	BUFF,X
-	LDA	$5032
+	LDA	$7100
 	STA	BUFF+65,X
-	LDA	$7FFE
-	STA	BUFF+130,X
-
 	DEX
 	BPL	RT0
 
-*SET NEW
-
+*Set memory with bank number
 	LDX	#64
 
 RT1	JSR	RSWITCH
 
-	STX	$4080
-	STX	$5032
-	STX	$7FFE
-
+	STX	$7000
+	STX	$7100
 	DEX
 	BPL	RT1
 
-*TEST
+*And set "alias" locations to avoid detecting those,
+*fixing detection of RAMBO XL 256k
+	DEX
+	STX	$D301
+	STX	$3000
+	STX	$B000
+	STX	$F000
 
+*Check if the number in RAM correspond to the expected
+*bank number
 	LDY	#0
 	LDX	#64
 
 RT2	JSR	RSWITCH
-	CPX	$4080
+	CPX	$7000
 	BNE	RT3
-	CPX	$5032
-	BNE	RT3
-	CPX	$7FFE
+	CPX	$7100
 	BNE	RT3
 
 	LDA	SWTAB,X
@@ -881,18 +884,15 @@ RT3	DEX
 
 	STY	NBANKS
 
-*RESTORE OLD
+*Restore old ram contents
 	LDX	#64
 
 RT4	JSR	RSWITCH
 
 	LDA	BUFF,X
-	STA	$4080
+	STA	$7000
 	LDA	BUFF+65,X
-	STA	$5032
-	LDA	BUFF+130,X
-	STA	$7FFE
-
+	STA	$7100
 	DEX
 	BPL	RT4
 

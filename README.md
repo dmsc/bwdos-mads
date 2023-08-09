@@ -58,6 +58,7 @@ Changes from BW-DOS 1.3
   * Improve performance of sector allocation for overwrite cases.
   * Don´t accept `@` as `9` when parsing hexadecimal numbers.
   * Avoid screen corruption when enabling BASIC.
+  * Fixes detection of RAMBO XL 256k expansion in RAMDISK handler.
 
 ### Optimization to the resident commands
 
@@ -74,7 +75,7 @@ of low RAM and `XFSIO` only 103.
 | DOSDRIVE  |         986   /  108     |    876   /    70    |
 | KEYBUFF   |        1066   /  278     |    825   /   183    |
 | RAMBOX    |        1746   /   34     |   1658   /    34    |
-| RAMDISK   |        2165   /   73     |   2021   /    31    |
+| RAMDISK   |        2165   /   73     |   2014   /    31    |
 | RTIME8    |        1316   / 94 (213) |   1120   / 91 (199) |
 | XFSIO     |        1074   /  115     |    925   /   101    |
 | XLRDISK   |        1341   /   73     |   1274   /    31    |
