@@ -833,6 +833,10 @@ RT0A	STA	RBTAB,X
 *To avoid problems with ICD RAMBO XL 256k expansion,
 *we don't touch memory that could be aliased
 *to $3700 - $3F00, as this is our own code.
+*
+*To avoid mis-detection with an 8kB cartridge inserted,
+*we test $4020 (aliased to $20, $8020 and $C020) and
+*$7000 (aliased to $3000, $B000 and $F000).
 
 *Save old memory
 	LDX	#64
@@ -841,7 +845,7 @@ RT0	JSR	RSWITCH
 
 	LDA	$7000
 	STA	BUFF,X
-	LDA	$7100
+	LDA	$4020
 	STA	BUFF+65,X
 	DEX
 	BPL	RT0
@@ -852,17 +856,19 @@ RT0	JSR	RSWITCH
 RT1	JSR	RSWITCH
 
 	STX	$7000
-	STX	$7100
+	STX	$4020
 	DEX
 	BPL	RT1
 
 *And set "alias" locations to avoid detecting those,
 *fixing detection of RAMBO XL 256k
 	DEX
+
 	STX	$D301
-	STX	$3000
+	STX	$20
 	STX	$B000
-	STX	$F000
+	STX	$F000	;NOTE: this could destroy programs using RAM under ROM!!
+	STX	$8020
 
 *Check if the number in RAM correspond to the expected
 *bank number
@@ -872,7 +878,7 @@ RT1	JSR	RSWITCH
 RT2	JSR	RSWITCH
 	CPX	$7000
 	BNE	RT3
-	CPX	$7100
+	CPX	$4020
 	BNE	RT3
 
 	LDA	SWTAB,X
@@ -892,7 +898,7 @@ RT4	JSR	RSWITCH
 	LDA	BUFF,X
 	STA	$7000
 	LDA	BUFF+65,X
-	STA	$7100
+	STA	$4020
 	DEX
 	BPL	RT4
 
