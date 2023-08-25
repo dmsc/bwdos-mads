@@ -92,7 +92,7 @@ Many of the external commands are reduced in size:
 | CHKDSK    |      470      |    434   |
 | CHVOL     |      344      |    310   |
 | COPY      |     1306      |   1151   |
-| CUT       |      702      |    698   |
+| CUT       |      702      |    628   |
 | DATE      |      661      |    509   |
 | DIRMAST   |     2682      |   2682   |
 | DISASS    |     1603      |   1599   |
