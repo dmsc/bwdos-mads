@@ -110,7 +110,7 @@ Many of the external commands are reduced in size:
 | MSDOS     |     2310      |   2292   |
 | MSINI     |     1916      |   1565   |
 | NEWED     |      422      |    373   |
-| OFFLOAD   |      935      |    934   |
+| OFFLOAD   |      935      |    829   |
 | PAUSE     |      273      |    250   |
 | SAVE      |      466      |    381   |
 | TIME      |      659      |    511   |

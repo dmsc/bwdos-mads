@@ -1,83 +1,11 @@
-	ORG	$6000
-	JMP	START
-
 *************************************
 *				*
-*  " O F F L O A D "    PRO BW-DOS	*
+*  " O F F L O A D "   FOR BW-DOS	*
 *				*
 *************************************
 
-***
+	ORG	$3000
 
-GETNAME	JMP	PRTEX
-
-***
-
-GHXRTS	LDY	#0
-	LDX	#0
-**
-HEXL	EQU	GHXRTS+1
-HEXH	EQU	GHXRTS+3
-**
-	LDA	#1
-
-GHXRTS2	RTS
-
-**
-
-GETHEX	JSR	GETNAME
-
-	LDA	#0
-	STA	HEXL
-	STA	HEXH
-
-	LDY	#36
-	LDA	(10),Y
-	CMP	#155
-	BEQ	GHXRTS2
-	CMP	#'/'
-	BEQ	GHXRTS2
-
-GETHX2	CPY	#41
-	BCS	GHXERR
-
-	LDA	(10),Y
-	INY
-
-	CMP	#$9B
-	BEQ	GHXRTS
-
-	SEC
-	SBC	#$30
-	CMP	#$0A
-	BCC	GETHX3
-
-	SBC	#7
-	CMP	#$0A
-	BCC	GHXERR
-	CMP	#$10
-	BCS	GHXERR
-
-GETHX3	PHA
-
-	LDX	#4
-GETHX4	ASL	HEXL
-	ROL	HEXH
-	DEX
-	BNE	GETHX4
-
-	PLA
-	ORA	HEXL
-	STA	HEXL
-
-	JMP	GETHX2
-***
-
-GHXERR	JSR	PRINT
-	DTA 155
-	DTA C"Bad parameter !"
-	DTA 155,0
-	JMP	ERR2X
 ***
 	ICL	"chkdos.inc"
 ***
@@ -88,8 +16,8 @@ GHXERR	JSR	PRINT
 	LDA	11
 	ADC	#0
 	STA	GETNAME+2
-**NAME
 
+*File name
 	JSR	GETNAME
 
 	LDY	#36
@@ -97,15 +25,13 @@ GHXERR	JSR	PRINT
 	CMP	#$9B
 	BNE	START3A
 
-**SYNTAX
-
+*Show syntax
 	JSR	PRINT
-	DTA 155
-	DTA C"Syntax:"
-	DTA 155
-	DTA C"OFFLOAD fname [offs.] "
-	DTA C"[/QL]"
-	DTA 155,0
+	DTA	155
+	DTA	C"Syntax:"
+	DTA	155
+	DTA	C"OFFLOAD fname [offs.] [/QL]"
+	DTA	155,0
 	JMP	ERR2
 ***
 
@@ -122,23 +48,18 @@ START3	LDA	(10),Y
 	LDA	NAME+1
 	STA	DNAM+1
 
-**OFFS
-	LDA	#0
-	STA	OFFSL
-	STA	OFFSH
-	STA	LDIT
-	STA	NOQUE
+*Already initialized inside code
+;	LDA	#0
+;	STA	LDIT
+;	STA	NOQUE
+;	STA	OFFSL
+;	STA	OFFSH
 
-	JSR	GETHEX
-	BNE	STRT3B
+*Get load offset
+	JSR	GETOFF
 
 	CMP	#'/'
 	BEQ	STRT3D
-	BNE	STRT3C
-**
-
-STRT3B	STY	OFFSL
-	STX	OFFSH
 
 **/QL
 
@@ -160,9 +81,11 @@ STRT3E	INY
 	CMP	#'L'
 	BNE	STRT3ER
 	STA	NOQUE
+	LDA	#'!'
+	STA	ASKS
 
 STRT3F	STA	LDIT
-	BEQ	STRT3E
+	BCS	STRT3E
 **
 
 STRT3ER	JMP	GHXERR
@@ -171,28 +94,25 @@ STRT3ER	JMP	GHXERR
 
 STRT4	JSR	CLOSE
 
-	LDX	#$10
-	LDA	#3
-	STA	$342,X
-
 	LDA	#<NAME
-	STA	$344,X
+	STA	$344+$10
 	LDA	#>NAME
-	STA	$345,X
+	STA	$345+$10
 
 	LDA	#4
-	STA	$34A,X
+	STA	$34A+$10
 	LDA	#0
-	STA	$34B,X
+	STA	$34B+$10
 
-	JSR	$E456
+	LDA	#3
+	JSR	CIO10
 	BPL	STRT5
 **
 
 	JSR	PRINT
-	DTA 155
-	DTA C"Can't open file !"
-	DTA 155,0
+	DTA	155
+	DTA	C"Can't open file!"
+	DTA	155,0
 	JMP	ERR2X
 ***
 
@@ -207,17 +127,71 @@ STRT5B	AND	#0
 **
 
 STRT5ER	JSR	PRINT
-	DTA 155
-	DTA C"Not binary load file !"
-	DTA 155,0
+	DTA	155
+	DTA	C"Not binary load file!"
+	DTA	155,0
 	JMP	ERR2X
-*
+***
+
+GETNAME	JMP	GETNAME
+
+***
+
+GHXRTS2	RTS
+
+**
+
+GETOFF	JSR	GETNAME
+
+	LDY	#36
+	LDA	(10),Y
+	CMP	#155
+	BEQ	GHXRTS2
+	CMP	#'/'
+	BEQ	GHXRTS2
+
+GETHX2	CPY	#41
+	BCS	GHXERR
+
+	LDA	(10),Y
+	INY
+
+	CMP	#$9B
+	BEQ	GHXRTS2
+
+	EOR	#'0'
+	CMP	#$0A
+	BCC	GETHX3
+
+	SBC	#$77
+	CMP	#$FA
+	BCC	GHXERR
+
+GETHX3	ASL
+	ASL
+	ASL
+	ASL
+
+	LDX	#4
+GETHX4	ASL
+	ROL	OFFSL
+	ROL	OFFSH
+	DEX
+	BNE	GETHX4
+
+	BEQ	GETHX2
+***
+
+GHXERR	JSR	PRINT
+	DTA	155
+	DTA	C"Bad parameter!"
+	DTA	155,0
+	JMP	ERR2X
+
 **********
-*
-* KONEC PRVNI CASTI
-*
+* End of part 1
 **********
-*
+
 NAME	EQU	*
 
 O1 EQU *
@@ -225,21 +199,19 @@ END1 EQU *
 O2 EQU *
 *
 **********
-*
-* DRUHA CAST
-*
+* Second part: low-memory loader
 **********
-*
-        OPT     H-
-        ORG     0
-        DTA     255,255
-        OPT     H+
+
+*Force inclusion of a FFFF header between sections
+	OPT	H-
+	ORG	0
+	DTA	255,255
+	OPT	H+
 	ORG	$500
 
 ***
 	ICL	"print.inc"
 ***
-
 GET1	LDX	#$10
 	LDA	#7
 	JSR	GEPU1
@@ -249,13 +221,16 @@ GET1	LDX	#$10
 	BNE	ERROR
 
 	JSR	PRINT
-	DTA 155
-	DTA C"<EOF>"
-	DTA 155,0
+	DTA	155
+	DTA	C"<EOF>"
+	DTA	155,0
+	BEQ	ERR2
 
-ERR2	JSR	CLOSE
-	JMP	(10)
 **
+ERROR	JSR	PRINT
+	DTA	155
+	DTA	C"I/O Error!"
+	DTA	155,0
 
 ERR2X	LDY	#8
 	LDA	(10),Y
@@ -265,33 +240,30 @@ ERR2X	LDY	#8
 	STA	ERR5Y+2
 	LDY	#1
 ERR5Y	JSR	$E474
-	JMP	ERR2
+
+ERR2	JSR	CLOSE
+	JMP	(10)
 ***
 
-ERROR	JSR	PRINT
-	DTA 155
-	DTA C"I/O Error !"
-	DTA 155,0
-	JMP	ERR2X
-***
+NOTPOI	LDX	#<DNAM
+	STX	$344+$10
+	LDX	#>DNAM
+	STX	$345+$10
 
-NOTPOI	STA	$342,X
-
-	LDA	#<DNAM
-	STA	$344,X
-	LDA	#>DNAM
-	STA	$345,X
-
-	JSR	$E456
+	JSR	CIO10
 	BMI	ERROR
 
 	RTS
 *
 
-DNAM	DTA C"D1:"
-	DTA 155
+DNAM	DTA	C"D1:"
+	DTA	155
 
 ***
+PRTAX	PHA
+	TXA
+	JSR	PRTHEX
+	PLA
 
 PRTHEX	PHA
 	LSR
@@ -302,8 +274,7 @@ PRTHEX	PHA
 	PLA
 
 PRTHX2	AND	#15
-	CLC
-	ADC	#$30
+	ORA	#$30
 	CMP	#$3A
 	BCC	PRT1
 
@@ -325,69 +296,64 @@ GEPU1	STA	$342,X
 
 ***
 
-CLOSE	LDX	#$10
-	LDA	#12
-	STA	$342,X
+CLOSE	LDA	#12
+CIO10	LDX	#$10
+CIOX	STA	$342,X
 	JMP	$E456
 
 *****
 
 LOAD1	JSR	PRINT
-	DTA 155,0
+	DTA	155,0
 
 LOAD1A	JSR	GET1
 	STA	ADRL
 	JSR	GET1
 	STA	ADRH
+	TAX
 
 	AND	ADRL
 	CMP	#$FF
 	BEQ	LOAD1A
 
-	JSR	GET1
-	STA	ENDL
-	JSR	GET1
-	STA	ENDH
-
-**PRT ADRESY
-
-	LDA	ADRH
-	JSR	PRTHEX
+*Print start address
 	LDA	ADRL
-	JSR	PRTHEX
+	JSR	PRTAX
 
 	LDA	#'-'
 	JSR	PRT1
 
-	LDA	ENDH
-	JSR	PRTHEX
-	LDA	ENDL
-	JSR	PRTHEX
+	JSR	GET1
+	STA	ENDL
+	PHA
+	JSR	GET1
+	STA	ENDH
 
-**POZICE
+*Print end address
+	TAX
+	PLA
+	JSR	PRTAX
 
+*Print position
 	JSR	PRINT
-	DTA C" Pos."
-	DTA 0
+	DTA	C" at "
+	DTA	0
 *NOTE
-	LDX	#$10
 	LDA	#38
 	JSR	NOTPOI
 
-	LDX	#$10
-	LDA	$34C,X
-	STA	POSL
-	LDA	$34D,X
+	LDA	$34D+$10
 	STA	POSM
-	LDA	$34E,X
-	STA	POSH
+	LDX	$34E+$10
+	STX	POSH
 
+	JSR	PRTAX
+
+	LDA	$34C+$10
+	STA	POSL
 	JSR	PRTHEX
-	LDA	POSM
-	JSR	PRTHEX
-	LDA	POSL
-	JSR	PRTHEX
-**LEN
+
+*Get length
 
 LN0	LDA	#0
 **
@@ -418,9 +384,9 @@ LN3	LDA	#0
 LDIT	EQU	LN3+1
 **
 	BNE	LOAD2
-*NE
 
-LOADNE	LDX	#$10
+*Don't load (skip)
+LOADNE
 LN4	LDA	#0
 **
 POSL	EQU	LN4+1
@@ -430,7 +396,7 @@ LN5	ADC	#0
 **
 LENL	EQU	LN5+1
 **
-	STA	$34C,X
+	STA	$34C+$10
 
 LN6	LDA	#0
 **
@@ -440,61 +406,55 @@ LN7	ADC	#0
 **
 LENH	EQU	LN7+1
 **
-	STA	$34D,X
+	STA	$34D+$10
 
 LN8	LDA	#0
 **
 POSH	EQU	LN8+1
 **
 	ADC	#0
-	STA	$34E,X
+	STA	$34E+$10
 
 	LDA	#37
 	JSR	NOTPOI
 
-	JMP	LOAD1
-**LOAD!
+JLOAD1	JMP	LOAD1
 
+*Show new load address
 LOAD2	JSR	PRINT
-	DTA C" Load at "
-	DTA 0
+	DTA	C". Load at "
+	DTA	0
 
 	LDA	ADRL
 	CLC
-LD21	ADC	#0
 **
-OFFSL	EQU	LD21+1
+	ADC	#0
+OFFSL	EQU	*-1
 **
 	STA	ADRL
+	PHA
 
 	LDA	ADRH
-LD22	ADC	#0
 **
-OFFSH	EQU	LD22+1
+	ADC	#0
+OFFSH	EQU	*-1
 **
 	STA	ADRH
 
-	JSR	PRTHEX
-	LDA	ADRL
-	JSR	PRTHEX
-**QUE?
-
-LD23	LDA	#0
-**
-NOQUE	EQU	LD23+1
-**
-	BEQ	LD24
+	TAX
+	PLA
+	JSR	PRTAX
 
 	JSR	PRINT
-	DTA C" ! "
-	DTA 0
-	JMP	LOAD3
-**
+ASKS	DTA	C"?"
+	DTA	0
 
-LD24	JSR	PRINT
-	DTA C" ? "
-	DTA 0
-***
+*Ask?
+	LDA	#0
+NOQUE	EQU	*-1
+**
+	BNE	LOAD3
+**
 
 LD25	LDX	764
 	INX
@@ -515,42 +475,34 @@ LD25	LDX	764
 	JMP	LOADNE
 **
 
-LD25ESC	JSR	PRINT
-	DTA 155
-	DTA C"<Aborted>"
-	DTA 155,0
-	JMP	ERR2X
-**
-
 LD25Y	LDA	#'Y'
 	JSR	PRT1
 ***
 
-LOAD3	LDX	#$10
-	LDA	#7
-	STA	$342,X
-
-LD31	LDA	#0
+LOAD3	LDA	#0
+ADRL	EQU	*-1
 **
-ADRL	EQU	LD31+1
+	STA	$344+$10
+	LDA	#0
+ADRH	EQU	*-1
 **
-	STA	$344,X
-LD32	LDA	#0
-**
-ADRH	EQU	LD32+1
-**
-	STA	$345,X
+	STA	$345+$10
 
 	LDA	LENL
-	STA	$348,X
+	STA	$348+$10
 	LDA	LENH
-	STA	$349,X
+	STA	$349+$10
 
-	JSR	$E456
-	BPL	LOAD4
+	LDA	#7
+	JSR	CIO10
+	BPL	JLOAD1
 	JMP	ERROR
 **
-
-LOAD4	JMP	LOAD1
-
 ***
+LD25ESC	JSR	PRINT
+	DTA	155
+	DTA	C"<Aborted>"
+	DTA	155,0
+	JMP	ERR2X
+**
+
