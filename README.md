@@ -116,7 +116,7 @@ Many of the external commands are reduced in size:
 | TIME      |      659      |    511   |
 | UNERASE   |     1524      |   1498   |
 | VERIFY    |      227      |    197   |
-| XBAT      |      315      |    289   |
+| XBAT      |      315      |    238   |
 
 ### Extra external commands
 
