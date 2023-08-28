@@ -188,7 +188,7 @@ CIO10	LDX	#$10
 	ICL	"print.inc"
 	ICL	"print1.inc"
 ***
-ERRTAB	DTA 1,10,100
+ERRTAB	DTA	100,10,1
 
 DIR	DTA	C"D1:*"
 	DTA	$9B

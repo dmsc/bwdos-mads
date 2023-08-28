@@ -87,11 +87,11 @@ Many of the external commands are reduced in size:
 | Command   | Original Size | New Size |
 | --------- | ------------- | -------- |
 | BACKUP    |     4617      |   4611   |
-| BLOAD     |      487      |    489   |
-| BOOT      |      605      |    588   |
+| BLOAD     |      487      |    485   |
+| BOOT      |      605      |    579   |
 | CHKDSK    |      470      |    434   |
-| CHVOL     |      344      |    310   |
-| COPY      |     1306      |   1151   |
+| CHVOL     |      344      |    301   |
+| COPY      |     1306      |   1142   |
 | CUT       |      702      |    628   |
 | DATE      |      661      |    509   |
 | DIRMAST   |     2682      |   2682   |
@@ -99,24 +99,24 @@ Many of the external commands are reduced in size:
 | DUMP      |      783      |    722   |
 | ELSE      |      243      |    199   |
 | ENDIF     |        9      |      9   |
-| FORMAT    |     2784      |   2767   |
+| FORMAT    |     2784      |   2758   |
 | HEXEDIT   |      728      |    724   |
 | IF        |      442      |    333   |
 | MDUMP     |      554      |    496   |
 | MEM       |      620      |    503   |
 | MEMEDIT   |      502      |    499   |
 | MENU      |     9883      |   9695   |
-| MOVE      |     1736      |   1719   |
+| MOVE      |     1736      |   1710   |
 | MSDOS     |     2310      |   2292   |
 | MSINI     |     1916      |   1565   |
-| NEWED     |      422      |    373   |
+| NEWED     |      422      |    364   |
 | OFFLOAD   |      935      |    829   |
 | PAUSE     |      273      |    250   |
 | SAVE      |      466      |    381   |
 | TIME      |      659      |    511   |
-| UNERASE   |     1524      |   1442   |
+| UNERASE   |     1524      |   1498   |
 | VERIFY    |      227      |    197   |
-| XBAT      |      315      |    298   |
+| XBAT      |      315      |    289   |
 
 ### Extra external commands
 

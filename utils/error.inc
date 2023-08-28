@@ -1,39 +1,22 @@
 *Show ERROR and number
 
 ERROR	TYA
-	PHA
+	LDX	#$FD
 
-	JSR	PRINT
-	DTA 155
-	DTA C"Error "
-	DTA 0
+ERR2	SEC
 
-	LDX	#2
-
-ERR2	LDY	#$2F
-	PLA
-
-ERR4	PHA
-	SEC
-	SBC	ERRTAB,X
-	INY
+ERR4	SBC	ERRTAB-$FD,X
+	INC	ERR4N-$FD,X
 	BCS	ERR4
 **
-	TXA
-	PHA
+	ADC	ERRTAB-$FD,X
 
-	TYA
-	JSR	PRT1
+	INX
+	BNE	ERR2
 
-	PLA
-	TAX
+	JSR	PRINT
+	DTA	155
+	DTA	C"Error "
+ERR4N	DTA	C"///"
+	DTA	155,0
 
-	DEX
-	BPL	ERR2
-
-*NOTE: we miss a PLA here, but the code will just jump to DOS
-*      after this, so we will skip that byte.
-
-**
-	LDA	#$9B
-	JSR	PRT1
