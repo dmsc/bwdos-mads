@@ -1,91 +1,72 @@
 *************************************
 *				*
-*     " P A U S E "   PRO BW-DOS	*
+*     " P A U S E "   FOR BW-DOS	*
 *				*
 *************************************
 
-* VOLNO: 128
-
 	ORG	$3000
 ***
-	ICL	"chkdos.inc"
-***
-	LDA	10
-	CLC
-	ADC	#8
+	LDY	#8
+	LDA	(10),Y
 	STA	XDIVIO+1
-	LDA	11
-	ADC	#0
+	INY
+	LDA	(10),Y
 	STA	XDIVIO+2
 ***
-	JSR	PRINT
-	DTA 155
-	DTA C"Press <RETURN> "
-	DTA C"to continue..."
-	DTA 0
+	LDY	#<MPRESS
+	LDA	#MEND-MPRESS
+	JSR	PUTS
 ***
 
-START3	JSR	CLOSE
-
-	LDA	#<KNAM
-	STA	$344+$10
-	LDA	#>KNAM
-	STA	$345+$10
-
-	LDA	#4
-	STA	$34A+$10
-	LDA	#0
-	STA	$34B+$10
-
-	LDA	#3
-	JSR	CIOC
-	BMI	START3
-
-	LDA	#0
-	STA	$348+$10
-	STA	$349+$10
-
-	LDA	#7
-	JSR	CIOC
-	BMI	START3
-
-	PHA
-	JSR	CLOSE
-	PLA
-
+START3	JSR	GETKEY
 	CMP	#155
 	BEQ	STRET
 	CMP	#27
 	BNE	START3
-* ESC
+
+*ESC, on older DOS, same as RETURN.
+	LDA	$700
+	CMP	#'S'
+	BNE	STRET
+
 	LDY	#1
-	JSR	XDIVIO
+XDIVIO	JSR	XDIVIO
 
-	JSR	PRINT
-	DTA 155
-	DTA C"(Batch file aborted)"
-	DTA 0
+	LDA	#MPRESS-MABORT+1
+	DTA	$2C	;Skip
+
 * RETURN
-
-STRET	JSR	PRINT
-	DTA 155,0
+STRET	LDA	#1
+	JSR	PABORT
 
 	JMP	(10)
-***
 
-CLOSE	LDA	#12
-CIOC	LDX	#$10
-	STA	$342,X
+*Call K: get handler
+GETKEY	LDA	$E420+5
+	PHA
+	LDA	$E420+4
+	PHA
+	LDX	#0
+	STX	$2A	;Clears ICAX1Z
+	RTS
+
+****
+PABORT	LDY	#<MABORT
+PUTS	STY	$344
+	LDY	#>MABORT
+	STY	$345
+
+	LDX	#0
+	STA	$348
+	STX	$349
+
+	LDY	#11
+	STY	$342
 	JMP	$E456
 ***
-
-KNAM	DTA C"K:"
-	DTA 155
-****
-	ICL	"print.inc"
-	ICL	"print1.inc"
-***
-
-XDIVIO	JMP	($FFFF)
-
-***
+*Note: all those must be on the same memory page:
+MABORT	DTA	155
+	DTA	C"(Batch file aborted)"
+MPRESS	DTA	155
+	DTA	C"Press <RETURN> to continue..."
+MEND

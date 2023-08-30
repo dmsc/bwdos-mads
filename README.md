@@ -111,7 +111,7 @@ Many of the external commands are reduced in size:
 | MSINI     |     1916      |   1565   |
 | NEWED     |      422      |    364   |
 | OFFLOAD   |      935      |    829   |
-| PAUSE     |      273      |    250   |
+| PAUSE     |      273      |    150   |
 | SAVE      |      466      |    381   |
 | TIME      |      659      |    511   |
 | UNERASE   |     1524      |   1498   |
