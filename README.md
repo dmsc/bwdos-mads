@@ -104,7 +104,7 @@ Many of the external commands are reduced in size:
 | IF        |      442      |    333   |
 | MDUMP     |      554      |    496   |
 | MEM       |      620      |    503   |
-| MEMEDIT   |      502      |    499   |
+| MEMEDIT   |      502      |    366   |
 | MENU      |     9883      |   9695   |
 | MOVE      |     1736      |   1710   |
 | MSDOS     |     2310      |   2292   |
