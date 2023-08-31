@@ -102,7 +102,7 @@ Many of the external commands are reduced in size:
 | FORMAT    |     2784      |   2758   |
 | HEXEDIT   |      728      |    724   |
 | IF        |      442      |    333   |
-| MDUMP     |      554      |    496   |
+| MDUMP     |      554      |    382   |
 | MEM       |      620      |    503   |
 | MEMEDIT   |      502      |    366   |
 | MENU      |     9883      |   9695   |
