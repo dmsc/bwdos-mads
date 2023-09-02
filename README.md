@@ -96,7 +96,7 @@ Many of the external commands are reduced in size:
 | DATE      |      661      |    509   |
 | DIRMAST   |     2682      |   2682   |
 | DISASS    |     1603      |   1599   |
-| DUMP      |      783      |    722   |
+| DUMP      |      783      |    600   |
 | ELSE      |      243      |    199   |
 | ENDIF     |        9      |      9   |
 | FORMAT    |     2784      |   2758   |
