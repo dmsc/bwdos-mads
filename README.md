@@ -87,7 +87,7 @@ Many of the external commands are reduced in size:
 | Command   | Original Size | New Size |
 | --------- | ------------- | -------- |
 | BACKUP    |     4617      |   4611   |
-| BLOAD     |      487      |    485   |
+| BLOAD     |      487      |    377   |
 | BOOT      |      605      |    579   |
 | CHKDSK    |      470      |    434   |
 | CHVOL     |      344      |    301   |
