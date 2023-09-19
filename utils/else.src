@@ -4,12 +4,18 @@
 *				*
 *************************************
 
-DPTR	EQU	128
-BUFFER	EQU	130
-
+DPTR	EQU	$80
 ***
 	ORG	$3000
-	ICL	"chkdos.inc"
+
+*Bad DOS version
+START	LDA	#<PBADVER
+	LDX	#PEBAT-PBADVER+1
+
+	LDY	$700
+	CPY	#'S'
+	BNE	ERROR
+
 ***
 	LDY	#8
 	LDA	(10),Y
@@ -23,56 +29,56 @@ BUFFER	EQU	130
 	LDY	11
 	DEY
 	STY	DPTR+1
-
 ***
 
-NO2	LDY	#256-7	;BATFLG
+GETLINE	LDY	#256-7	;BATFLG
 	LDA	(DPTR),Y
 	BMI	GETLNX
 
 	LDY	#5
-	LDA	#64
-	STA	$348
-
 	LDA	#<BUFFER
-	STA	$344
-	LDX	#>BUFFER
-	STX	$345
-;>BUFFER = 0
-;	LDX	#0
+	LDX	#64
 	JSR	CIOXY0
 	BMI	GETLNX
 
-	LDX	#EPATRN-PATRN
+	LDX	#PBADVER-PATRN
 
 NO3	LDA	BUFFER,X
 	CMP	PATRN,X
-	BNE	NO2
+	BNE	GETLINE
 
 	DEX
 	BPL	NO3
-***
-	JMP	(10)
-
+	BMI	EXIT
 ***
 
+*Get line error, end of batch file
+GETLNX	LDA	#<PEBAT
+	LDX	#PEND-PEBAT+1
+
+*Print error and exit
+ERROR	LDY	#11
+	JSR	CIOXY0
+	LDY	#1
+XDIVIO	JSR	XRTS
+EXIT	JMP	(10)
+
+CIOXY0	STX	$348
+	STA	$344
+	STY	$342
+	LDX	#>BUFFER
+	STX	$345
+	LDX	#0
+	STX	$349
+	JMP	$E456
+
+***
+XRTS	RTS
+*Messages
 PATRN	DTA	C"ENDIF"
-EPATRN	DTA	155
-
-****
-
-GETLNX	LDY	#1
-XDIVIO	JSR	XDIVIO
-
-	JSR	PRINT
-	DTA	155
+PBADVER	DTA	155,253
+	DTA	C"Incorrect DOS version"
+PEBAT	DTA	155
 	DTA	C"Error: End of batch file!"
-	DTA	155,0
-
-	JMP	(10)
-
-***
-	ICL	"print.inc"
-	ICL	"print1.inc"
-***
-
+PEND	DTA	155
+BUFFER

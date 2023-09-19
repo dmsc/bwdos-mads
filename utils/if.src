@@ -5,11 +5,16 @@
 *************************************
 
 DPTR	EQU	$80
-BUFFER	EQU	$82
-
 ***
-	ORG	$3000
-	ICL	"chkdos.inc"
+	ORG	$3080
+
+START	LDA	#<PBADVER
+	LDX	#PABORT-PBADVER+1
+
+	LDY	$700
+	CPY	#'S'
+	BNE	ERREND
+
 ***
 	LDY	#8
 	LDA	(10),Y
@@ -24,68 +29,57 @@ BUFFER	EQU	$82
 	DEY
 	STY	DPTR+1
 
-***
+*Print next line of batch file
 	JSR	EOL
-
 	JSR	GETLINE
 
+*Ask Y/N question
+	LDA	#<PYESNO
+	LDX	#PBADVER-PYESNO
 	JSR	PRINT
-	DTA	C"<Y>...Yes  <N>...No  "
-	DTA	0
 ***
-
 START3	JSR	GETKEY
 
 	CMP	#27
 	BNE	YESNO
+*ESC
+	LDA	#<PABORT
+	LDX	#PYES-PABORT
+	BNE	ERREND
 
-* ESC
-	JSR	PRINT
-	DTA	155
-	DTA	C"(Batch file aborted)"
-	DTA	155,0
-	BEQ	ERREND
-
-YESNO	AND	#$5F
+YESNO	LDX	#5
+	AND	#$5F
 	CMP	#'Y'
 	BNE	NONO
 
 *
-YES0	JSR	PRINT
-	DTA	C"Yes!"
-	DTA	155,0
-	BEQ	NO3
+YES0	LDA	#<PYES
+	JSR	PRINT
+	BPL	EXIT	;Jump always
 
 ***
 NONO	CMP	#'N'
 	BNE	START3
 
+	LDA	#<PNO
 	JSR	PRINT
-	DTA	C"No!"
-	DTA	155,155,0
 
-NO2	JSR	GETLINE
+*Read lines from batch until ELSE/ENDIF
+NXTLINE	JSR	GETLINE
 
 	LDY	#0
 	JSR	TEST
 
-	LDY	#VZ2-VZOR
+	LDY	#TELSE-TENDIF
 	JSR	TEST
-	BNE	NO2
+
+	BNE	NXTLINE
 
 ***
-
-VZOR	DTA	C"ENDIF"
-	DTA	155
-VZ2	DTA	C"ELSE"
-	DTA	155
-
-***
-
 TEST	LDX	#0
 
 TEST2	LDA	BUFFER,X
-	CMP	VZOR,Y
+	CMP	TENDIF,Y
 	BNE	TESTX
 
 	INY
@@ -93,9 +87,44 @@ TEST2	LDA	BUFFER,X
 
 	CMP	#$9B
 	BNE	TEST2
-	BEQ	NO3
+	BEQ	EXIT
 
 ***
+*Read a line into buffer
+GETLINE	LDY	#256-7	;BATFLG
+	LDA	(DPTR),Y
+	BMI	GETLNX
+
+	LDY	#5
+	LDA	#<BUFFER
+	LDX	#64
+	JSR	CIOXY0
+	BPL	TESTX
+
+*Get line error, end of batch file
+GETLNX	LDA	#<PEBAT
+	LDX	#PEND-PEBAT+1
+
+*Print error and exit
+ERREND	JSR	PRINT
+	LDY	#1
+XDIVIO	JSR	TESTX
+EXIT	JMP	(10)
+
+***
+EOL	LDA	#$9B
+PRT1	LDX	#0
+
+PRINT	LDY	#11
+CIOXY0	STX	$348
+	STA	$344
+	STY	$342
+	LDX	#>PYESNO
+	STX	$345
+	LDX	#0
+	STX	$349
+	JMP	$E456
+
 *Call K: get handler
 GETKEY	LDA	$E420+5
 	PHA
@@ -103,45 +132,27 @@ GETKEY	LDA	$E420+5
 	PHA
 	LDA	#0
 	STA	$2A	;Clears ICAX1Z
-	RTS
-****
-
-GETLNX	JSR	PRINT
-	DTA	155
-	DTA	C"Error: End of batch file!"
-	DTA	155,0
-
-ERREND	LDY	#1
-XDIVIO	JSR	XDIVIO
-NO3	JMP	(10)
-
-**
-
-GETLINE	LDY	#256-7	;BATFLG
-	LDA	(DPTR),Y
-	BMI	GETLNX
-
-	LDY	#5
-	LDA	#64
-	STA	$348
-
-	LDA	#<BUFFER
-	STA	$344
-	LDX	#>BUFFER
-	STX	$345
-*>BUFFER = 0
-;	LDX	#0
-	JSR	CIOXY0
-	BMI	GETLNX
-
 TESTX	RTS
-
 ***
-	ICL	"print.inc"
+*Commands
+TENDIF	DTA	C"ENDIF"
+	DTA	155
+TELSE	DTA	C"ELSE"
+	DTA	155
 ***
-
-EOL	LDA	#$9B
-
-	ICL	"print1.inc"
-***
+*Messages
+PYESNO	DTA	C"<Y>...Yes  <N>...No  "
+PBADVER	DTA	155,253
+	DTA	C"Incorrect DOS version"
+PABORT	DTA	155
+	DTA	C"(Batch file aborted)"
+	DTA	155
+PYES	DTA	C"Yes!"
+	DTA	155
+PNO	DTA	C"No!"
+	DTA	155
+PEBAT	DTA	155
+	DTA	C"Error: End of batch file!"
+PEND	DTA	155
+BUFFER
 

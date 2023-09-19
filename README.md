@@ -97,11 +97,11 @@ Many of the external commands are reduced in size:
 | DIRMAST   |     2682      |   2682   |
 | DISASS    |     1603      |   1599   |
 | DUMP      |      783      |    600   |
-| ELSE      |      243      |    199   |
+| ELSE      |      243      |    166   |
 | ENDIF     |        9      |      9   |
 | FORMAT    |     2784      |   2758   |
 | HEXEDIT   |      728      |    558   |
-| IF        |      442      |    333   |
+| IF        |      442      |    308   |
 | MDUMP     |      554      |    382   |
 | MEM       |      620      |    503   |
 | MEMEDIT   |      502      |    366   |
