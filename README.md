@@ -100,7 +100,7 @@ Many of the external commands are reduced in size:
 | ELSE      |      243      |    199   |
 | ENDIF     |        9      |      9   |
 | FORMAT    |     2784      |   2758   |
-| HEXEDIT   |      728      |    724   |
+| HEXEDIT   |      728      |    558   |
 | IF        |      442      |    333   |
 | MDUMP     |      554      |    382   |
 | MEM       |      620      |    503   |
