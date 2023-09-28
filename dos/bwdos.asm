@@ -8,7 +8,7 @@ DEFMIN	EQU	14
 DEFSEC	EQU	06
 
 * Load address
-LOADAD	EQU	$3000
+LOADAD	EQU	$1C00
 
 	ICL	"equates.inc"
 	ICL	"bwmac.src"
