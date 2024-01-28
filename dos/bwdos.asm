@@ -7,8 +7,8 @@ DEFHOU	EQU	22
 DEFMIN	EQU	14
 DEFSEC	EQU	06
 
-* Load address
-LOADAD	EQU	$1C00
+* Load address offset from $700
+LOADAD	EQU	$2700-$700
 
 	ICL	"equates.inc"
 	ICL	"bwmac.src"

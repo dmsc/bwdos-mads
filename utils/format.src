@@ -20,11 +20,11 @@ BUFF	EQU	$400
 NAMBUFF	EQU	$500
 
 ; Actual BOOT code load address
-BTORG	EQU	$3E00
+BTORG	EQU	$2200
 ; BOOT code data buffer
-BTDAT	EQU	$3C00
+BTDAT	EQU	$2000
 ; BOOT code map buffer
-BTMAP	EQU	$3D00
+BTMAP	EQU	$2100
 
 ******* BOOT CODE *******
 BOOTER	DTA	0,3
