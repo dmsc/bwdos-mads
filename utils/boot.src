@@ -1,46 +1,63 @@
-	ORG	$6000
-	JMP	START
-
 *************************************
 *				*
-*     " B O O T "  PRO BW-DOS	*
+*     " B O O T "  FOR BW-DOS	*
 *				*
 *************************************
 
 NAMOFFS	EQU	128
 TMP	EQU	129
-SIOADR	EQU	130
+ZPG	EQU	130	; COMTAB-256
 
-**VOLNO: 132
+DIRBUF	EQU	$88	; 23 bytes, binary directory entry
+MASK	EQU	$A0	; 11 bytes, mask for filename to search
+DIRNAM	EQU	$B0	; 64 bytes, name of directory to open
 
-SRC	EQU	$500
-MSK	EQU	$540
-DIRBUF	EQU	$5C0
+SECBUF	EQU	$2F00	; $80 bytes
 
+* Both DIRBUF and DIRNAM must be in the same page
+	ERT	>DIRBUF	<>	>DIRNAM
+
+	ORG	$3000
+
+	ICL	"chkdos.inc"
 ***
-	ICL	"print.inc"
-	ICL	"print1.inc"
+	LDA	10
+	STA	ZPG
+	CLC
+	ADC	#3
+	STA	GETNAME+1
+	LDA	11
+	STA	ZPG+1
+	ADC	#0
+	STA	GETNAME+2
+
+	DEC	ZPG+1
+
+	LDY	#256-10
+	LDA	(ZPG),Y
+	STA	SPSIO+1
+	INY
+	LDA	(ZPG),Y
+	STA	SPSIO+2
 ***
+	JSR	CLOSE
 
-GETNAME	JMP	PRTEX
+* Get command line
+GETNAME	JSR	GETNAME
 
-***
-
-GETPAR	JSR	GETNAME
-
-	LDX	#0
-*
+* Store drive number
 	LDY	#34
 	LDA	(10),Y
 	AND	#15
 	STA	RWSDRIV
 
+* Copy full path into DIRNAM, and store offset of filename in NAMOFFS
+	LDX	#0
 	DEY
-
 GTPAR0	STX	NAMOFFS
 
 GTPAR1	LDA	(10),Y
-	STA	SRC,X
+	STA	DIRNAM,X
 
 	INX
 	INY
@@ -55,8 +72,116 @@ GTPAR1	LDA	(10),Y
 	CMP	#$9B
 	BNE	GTPAR1
 
-	RTS
 ***
+
+	JSR	GETFLTR
+* OPEN binary directory
+	LDA	#$14
+	STA	$35A
+
+	LDA	#3
+	LDX	#<DIRNAM
+	JSR	CIOCMD1
+	BMI	ERROR
+
+* SEARCH file
+MAIN2	LDA	#23
+	STA	$358
+
+	LDA	#7
+	LDX	#<DIRBUF
+	JSR	CIOCMD1
+	BPL	MAIN2B
+*
+	CPY	#136
+	BNE	ERROR
+
+	JSR	PRINT
+	DTA	155
+	DTA	C"File not found!"
+	DTA	155,0
+	BEQ	ERR5X
+***
+
+MAIN2B	LDX	#10
+
+MAIN2C	LDA	MASK,X
+	CMP	#'?'
+	BEQ	MAIN2D
+
+	CMP	DIRBUF+6,X
+	BNE	MAIN2
+
+MAIN2D	DEX
+	BPL	MAIN2C
+*STAT
+	LDA	DIRBUF
+	AND	#$28
+	CMP	#8
+	BNE	MAIN2
+
+* Ok, found file, read boot sector
+	JSR	RDSEC1
+* Patch sector map of new boot file
+	LDA	DIRBUF+1
+	STA	SECBUF+40
+	LDA	DIRBUF+2
+	STA	SECBUF+41
+* Write boot sector
+	JSR	WRSEC1
+**
+	JSR	PRINT
+	DTA	155
+	DTA	C"BOOT-file installed."
+	DTA	155,0
+* Close and exit to DOS
+	BEQ	ERR5
+****
+	ICL	"error.inc"
+
+ERR5X	LDY	#8
+	LDA	(10),Y
+	STA	ERR5Y+1
+	INY
+	LDA	(10),Y
+	STA	ERR5Y+2
+	LDY	#1
+ERR5Y	JSR	$E474	;XDIVIO
+
+ERR5	JSR	CLOSE
+
+	JMP	(10)
+**
+
+ERRTAB	DTA	100,10,1
+
+***
+RDSEC1	LDA	#'R'
+	LDY	#64
+	BNE	RWS1
+*
+
+WRSEC1	LDY	#256-2	;WRTCMD
+	LDA	(ZPG),Y
+	LDY	#128
+*
+
+RWS1	STA	RWSIOT+2
+	STY	RWSIOT+3
+
+	LDX	#11
+RWS2	LDA	RWSIOT,X
+	STA	$300,X
+	DEX
+	BPL	RWS2
+
+SPSIO	JSR	SPSIO
+
+	TYA
+	BMI	ERROR
+
+	RTS
+**
 
 GETFLTR	LDX	NAMOFFS
 	LDY	#0
@@ -68,7 +193,7 @@ GETFLTR	LDX	NAMOFFS
 
 DC1B1	INX
 
-	LDA	SRC,X
+	LDA	DIRNAM,X
 	CMP	#'*'
 	BEQ	DC1BHVE
 
@@ -78,7 +203,16 @@ DC1B1	INX
 	CMP	#'?'
 	BEQ	DC1BZN
 
-	JSR	JELIPL
+	CMP	#'_'
+	BEQ	DC1BZN
+
+	CMP	#'0'
+	BCC	DC1BNEP
+	CMP	#'9'+1
+	BCC	DC1BZN
+	CMP	#'A'
+	BCC	DC1BNEP
+	CMP	#'Z'+1
 	BCS	DC1BNEP
 *
 
@@ -99,7 +233,7 @@ DC1BP1	RTS
 
 *
 
-DC1BP2	STA	MSK,Y
+DC1BP2	STA	MASK,Y
 	INY
 	RTS
 
@@ -123,209 +257,34 @@ DC1BTEC	LDA	#$20
 
 	RTS
 
-****
-	ICL	"error.inc"
-
-ERR5X	LDY	#8
-	LDA	(10),Y
-	STA	ERR5Y+1
-	INY
-	LDA	(10),Y
-	STA	ERR5Y+2
-	LDY	#1
-ERR5Y	JSR	$E474
-
-ERR5	JSR	CLOSE
-
-	JMP	(10)
-**
-
-ERRTAB	DTA	100,10,1
-
 ***
+	ICL	"print.inc"
 
-CLOSE	LDX	#$10
-
-	LDA	#12
-	STA	$342,X
-
+*PRINT 1 CHARACTER IN A
+PRT1	TAY
+	LDA	#11
+	LDX	#0
+	STX	$348
+	BEQ	CIOCMD
+***
+CLOSE	LDA	#12
+CIOCMD1	STX	$354
+	LDX	#>DIRNAM
+	STX	$355
+	LDX	#$10
+CIOCMD	STA	$342,X
+	LDA	#0
+	STA	$349,X
+	STA	$34B,X
+	TYA
 	JMP	$E456
 ***
 
-JELIPL	CMP	#'_'
-	BEQ	JLPP
-
-	CMP	#$30
-	BCC	JLPM
-	CMP	#$3A
-	BCC	JLPP
-	CMP	#$41
-	BCC	JLPM
-	CMP	#$5B
-	BCS	JLPM
-
-JLPP	CLC
-	RTS
-*
-
-JLPM	SEC
-	RTS
-***
-	ICL	"chkdos.inc"
-***
-	LDA	10
-	CLC
-	ADC	#3
-	STA	GETNAME+1
-	LDA	11
-	ADC	#0
-	STA	GETNAME+2
-
-	LDA	10
-	SEC
-	SBC	#10
-	STA	SIOADR
-	STA	SPSIO+1
-	LDA	11
-	SBC	#0
-	STA	SIOADR+1
-	STA	SPSIO+2
-***
-
-	JSR	CLOSE
-	JSR	GETPAR
-	JSR	GETFLTR
-*OPEN
-	LDX	#$10
-	LDA	#3
-	STA	$342,X
-
-	LDA	#<SRC
-	STA	$344,X
-	LDA	#>SRC
-	STA	$345,X
-
-	LDA	#$14
-	STA	$349,X
-	STA	$34A,X
-	LDA	#0
-	STA	$34B,X
-
-	JSR	$E456
-	BPL	MAIN2
-
-ERRJP	JMP	ERROR
-
-* SEARCH
-
-MAIN2	LDX	#$10
-	LDA	#7
-	STA	$342,X
-
-	LDA	#<DIRBUF
-	STA	$344,X
-	LDA	#>DIRBUF
-	STA	$345,X
-
-	LDA	#23
-	STA	$348,X
-	LDA	#0
-	STA	$349,X
-
-	JSR	$E456
-	BPL	MAIN2B
-*
-	CPY	#136
-	BNE	ERRJP
-
-	JSR	PRINT
-	DTA	155
-	DTA	C"File not found!"
-	DTA	155,0
-
-	JMP	ERR5X
-***
-
-MAIN2B	LDX	#10
-
-MAIN2C	LDA	MSK,X
-	CMP	#'?'
-	BEQ	MAIN2D
-
-	CMP	DIRBUF+6,X
-	BNE	MAIN2
-
-MAIN2D	DEX
-	BPL	MAIN2C
-*STAT
-	LDA	DIRBUF
-	AND	#$28
-	CMP	#8
-	BNE	MAIN2
-
-* NASEL!
-
-	JSR	CLOSE
-
-	JSR	RDSEC1
-
-	LDA	DIRBUF+1
-	STA	SRC+40
-	LDA	DIRBUF+2
-	STA	SRC+41
-
-	JSR	WRSEC1
-**
-
-	JSR	PRINT
-	DTA	155
-	DTA	C"BOOT-file installed."
-	DTA	155,0
-
-	JMP	(10)
-***
-
-RDSEC1	LDA	#'R'
-	LDY	#64
-	BNE	RWS1
-*
-
-WRSEC1	LDY	#8	;WRTCMD
-	LDA	(SIOADR),Y
-	LDY	#128
-*
-
-RWS1	STA	RWSIOT+2
-	STY	RWSIOT+3
-
-	LDX	#11
-RWS2	LDA	RWSIOT,X
-	STA	$300,X
-	DEX
-	BPL	RWS2
-
-	JSR	SPSIO
-
-	TYA
-	BMI	ERJP2
-
-	RTS
-**
-
-ERJP2	JMP	ERROR
-
-**
-
 RWSIOT	DTA	$31
 RWSDRIV	DTA	0,0,0
-	DTA	A(SRC)
+	DTA	A(SECBUF)
 	DTA	7,0
 	DTA	A(128)
 	DTA	A(1)
 
 ***
-
-SPSIO	JMP	($FFFF)
-
-***
-
