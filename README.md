@@ -99,7 +99,7 @@ Many of the external commands are reduced in size:
 | DUMP      |      783      |    600   |
 | ELSE      |      243      |    166   |
 | ENDIF     |        9      |      9   |
-| FORMAT    |     2784      |   2758   |
+| FORMAT    |     2784      |   2652   |
 | HEXEDIT   |      728      |    558   |
 | IF        |      442      |    308   |
 | MDUMP     |      554      |    382   |
