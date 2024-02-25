@@ -85,9 +85,9 @@ EDIT3	STA	EDBUF,X	;Store final EOL
 
 ***
 EDIT3B	INC	POS
-	BEQ	EDIT1
+	BNE	EDIT1
 	INC	POS+1
-	BEQ	EDIT1
+	BNE	EDIT1
 	INC	POS+2
 
 *Start byte edit loop
