@@ -1,8 +1,6 @@
-	ORG	$3800
-	JMP	START
 *************************************
 *				*
-*   " D I R M A S T "  PRO BW-DOS	*
+*   " D I R M A S T "  FOR BW-DOS	*
 *				*
 *************************************
 
@@ -29,21 +27,8 @@ CONVPR	EQU	156
 
 *** VOLNO: 159
 
-L0ODS	LDX	#27
-
-L0OD2	LDA	FNAME-1,X
-	STA	FNAME,X
-
-	DEX
-	BNE	L0OD2
-
-	RTS
 ***
-
-STERR	DTA C"Incorrect DOS "
-	DTA C"version !"
-	DTA 253,155
-***
+	ORG	$3800
 
 START	LDA	$700
 	CMP	#'S'
@@ -54,8 +39,10 @@ START	LDA	$700
 	LDX	#>STERR
 	LDY	#<STERR
 	JSR	PRINT
-
 	JMP	(10)
+***
+STERR	DTA	C"Incorrect DOS version !"
+	DTA	253,155
 ***
 
 INI00	LDX	#39
@@ -140,13 +127,11 @@ SYNTER	LDX	#>SYNTTX
 	JMP	DOSPRT
 **
 
-SYNTTX	DTA C"Syntax: DIRMAST [Dn:]"
-	DTA C"[path] [/Q]"
-	DTA 253,155
+SYNTTX	DTA	C"Syntax: DIRMAST [Dn:][path] [/Q]"
+	DTA	253,155
 
-QTEXT	DTA C"Insert disk, and press"
-	DTA C" any key..."
-	DTA 155
+QTEXT	DTA	C"Insert disk, and press any key..."
+	DTA	155
 ****
 
 GETNM	JMP	INSER7
@@ -1136,7 +1121,7 @@ TIME2Z	TYA
 	JSR	OBNKU
 
 	LDA	#160
-	DTA $2C
+	DTA	$2C
 TIME3	LDA	ODDEL
 
 	JSR	PRT1
@@ -1253,18 +1238,17 @@ FPOR2	ORA	(FLAGZ),Y
 	BNE	FTXN
 
 	LDA	#34	;"
-	DTA $2C
+	DTA	$2C
 FTXN	LDA	#'*'
 
 FEND	RTS
 
 **
 
-FTB1	DTA 0,$28,$29,$18,$19
-	DTA $38,$39,$10,9,8
+FTB1	DTA	0,$28,$29,$18,$19
+	DTA	$38,$39,$10,9,8
 
-FTB2	DTA C"?>>=="
-	DTA C"===* "
+FTB2	DTA	C"?>>=====* "
 
 ***
 
@@ -1403,31 +1387,21 @@ EOLT	DTA	$9B
 ***
 
 TOOLONG	DTA	125,253
-	DTA	C"Directory too "
-	DTA	C"long !"
+	DTA	C"Directory too long !"
 	DTA	$9B
 
 ***
 
-BWLN	DTA	C"BW-DOS Dir"
-	DTA	C". Master V"
-	DTA	C"1.2    BEW"
-	DTA	C"ESOFT 1995"
+BWLN	DTA	C"BW-DOS Dir. Master V1.2    BEWESOFT 1995"
 
 ***
 
 OL1	DTA	160,156,157,158,159
-	DTA	C"=Move"*
-	DTA	C"  C=Commen"*
-	DTA	C"t line  Q="*
-	DTA	C"Quit+Save "*
+	DTA	C"=Move  C=Comment line  Q=Quit+Save "*
 
 ***
 
-OL2	DTA	C" E=Erase  "*
-	DTA	C"ESC=Abort "*
-	DTA	C" T,D=New t"*
-	DTA	C"ime, date "*
+OL2	DTA	C" E=Erase  ESC=Abort  T,D=New time, date "*
 
 ***
 GETK	LDX	#$20
@@ -1472,31 +1446,24 @@ HORREP	LDA	88
 
 **
 
-ESCLIN	DTA	C" Exit to D"*
-	DTA	C"OS  - Are "*
-	DTA	C"you sure ("*
-	DTA	C"Y or N) ? "*
+ESCLIN	DTA	C" Exit to DOS  - Are you sure (Y or N) ? "*
 
 **
 
-DATLIN	DTA	C"  Enter ne"*
-	DTA	C"w date (dd"*
-	DTA	C"-mm-yy) : "*
+DATLIN	DTA	C"  Enter new date (dd-mm-yy) : "*
 	DTA	C"        "
 	DTA	C"  "*
 
 **
 
-TIMLIN	DTA	C"  Enter ne"*
-	DTA	C"w time (hh"*
-	DTA	C"-mm-ss) : "*
+TIMLIN	DTA	C"  Enter new time (hh-mm-ss) : "*
 	DTA	C"        "
 	DTA	C"  "*
 
 ***
 
 CLS	LDA	#125
-	DTA $2C
+	DTA	$2C
 EOL	LDA	#155
 
 PRT1	PHA
@@ -1540,7 +1507,7 @@ PRINT	TXA
 	STA	$349,X
 
 	LDA	#9
-	DTA $2C
+	DTA	$2C
 CLOSE	LDA	#12
 
 	STA	$342,X
@@ -1574,11 +1541,8 @@ POSKUE	RTS
 
 ***
 
-TEXTT	DTA	C"      Comm"*
-	DTA	C"ent line :"*
-	DTA	C" "*
-TBU	DTA	C"          "
-	DTA	C"   "
+TEXTT	DTA	C"      Comment line : "*
+TBU	DTA	C"             "
 	DTA	C"        "*
 
 ***
@@ -1590,17 +1554,11 @@ COMLIN	DTA	9,0,0,0,0,0
 
 ***
 
-QTX	DTA	C" Save chan"*
-	DTA	C"ges - are "*
-	DTA	C"you sure ("*
-	DTA	C"Y or N) ? "*
+QTX	DTA	C" Save changes - are you sure (Y or N) ? "*
 
 ***
 
-QTX2	DTA	C"       Wri"*
-	DTA	C"tting new "*
-	DTA	C"directory "*
-	DTA	C"...       "*
+QTX2	DTA	C"        Writing new directory ...       "*
 
 ***
 
@@ -1657,7 +1615,7 @@ ZEXI	RTS
 
 **
 
-CONT	DTA 1,10,100
+CONT	DTA	1,10,100
 
 ****
 
