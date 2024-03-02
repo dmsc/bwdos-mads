@@ -106,7 +106,7 @@ Many of the external commands are reduced in size:
 | MEM       |      620      |    503   |
 | MEMEDIT   |      502      |    366   |
 | MENU      |     9883      |   9695   |
-| MOVE      |     1736      |   1710   |
+| MOVE      |     1736      |   1520   |
 | MSDOS     |     2310      |   2292   |
 | MSINI     |     1916      |   1565   |
 | NEWED     |      422      |    364   |
