@@ -1,0 +1,154 @@
+' FastBasic program to compress DISASM tables
+' -------------------------------------------
+
+' Tables to encode:
+' Addressing mode text, 4 bytes per mode
+'  1 byte:  text before operand
+'  3 bytes: text after operand
+'	      IMP  ABS   ZP  IMM  A,X  Z,X  A,Y IIDX  REL IDXI  IND  Z,Y
+DATA X()B. =   0,   0,   0,  35,   0,   0,   0,  40,  42,  40,  40,   0,
+DATA	B. =   0,   0,   0,   0,  44,  44,  44,  41,   0,  44,  41,  44,
+DATA	B. =   0,   0,   0,   0,  88,  88,  89,  44,   0,  88,   0,  89,
+DATA	B. =   0,   0,   0,   0,   0,   0,   0,  89,   0,  41,   0,   0,
+
+' Length of each addressing mode
+DATA	B. =   0,   2,   1,   1,   2,   1,   2,   1,   1,   1,   2,   1,
+
+' Instruction OPCODE (name) table
+DATA	B. =	29,6,0,0,0,6,9,0,
+DATA	B. =	43,6,9,0,0,6,9,0,
+DATA	B. =	28,6,0,0,0,6,9,0,
+DATA	B. =	32,6,0,0,0,6,9,0,
+DATA	B. =	40,2,0,0,21,2,13,0,
+DATA	B. =	45,2,13,0,21,2,13,0,
+DATA	B. =	26,2,0,0,0,2,13,0,
+DATA	B. =	48,2,0,0,0,2,13,0,
+DATA	B. =	46,4,0,0,0,4,12,0,
+DATA	B. =	42,4,12,0,22,4,12,0,
+DATA	B. =	30,4,0,0,0,4,12,0,
+DATA	B. =	34,4,0,0,0,4,12,0,
+DATA	B. =	47,1,0,0,0,1,14,0,
+DATA	B. =	44,1,14,0,22,1,14,0,
+DATA	B. =	31,1,0,0,0,1,14,0,
+DATA	B. =	50,1,0,0,0,1,14,0,
+DATA	B. =	0,8,0,0,20,8,19,0,
+DATA	B. =	37,0,54,0,20,8,19,0,
+DATA	B. =	23,8,0,0,20,8,19,0,
+DATA	B. =	56,8,55,0,0,8,0,0,
+DATA	B. =	11,5,10,0,11,5,10,0,
+DATA	B. =	52,5,51,0,11,5,10,0,
+DATA	B. =	24,5,0,0,11,5,10,0,
+DATA	B. =	35,5,53,0,11,5,10,0,
+DATA	B. =	18,3,0,0,18,3,15,0,
+DATA	B. =	39,3,36,0,18,3,15,0,
+DATA	B. =	27,3,0,0,0,3,15,0,
+DATA	B. =	33,3,0,0,0,3,15,0,
+DATA	B. =	17,7,0,0,17,7,16,0,
+DATA	B. =	38,7,41,0,17,7,16,0,
+DATA	B. =	25,7,0,0,0,7,16,0,
+DATA	B. =	49,7,0,0,0,7,16,0,
+
+' Addressing mode table of each opcode
+DATA	B. =	0,9,0,0,0,2,2,0,0,3,0,0,0,1,1,0,
+DATA	B. =	8,7,0,0,0,5,5,0,0,6,0,0,0,4,4,0,
+DATA	B. =	1,9,0,0,2,2,2,0,0,3,0,0,1,1,1,0,
+DATA	B. =	8,7,0,0,0,5,5,0,0,6,0,0,0,4,4,0,
+DATA	B. =	0,9,0,0,0,2,2,0,0,3,0,0,1,1,1,0,
+DATA	B. =	8,7,0,0,0,5,5,0,0,6,0,0,0,4,4,0,
+DATA	B. =	0,9,0,0,0,2,2,0,0,3,0,0,10,1,1,0,
+DATA	B. =	8,7,0,0,0,5,5,0,0,6,0,0,0,4,4,0,
+DATA	B. =	0,9,0,0,2,2,2,0,0,0,0,0,1,1,1,0,
+DATA	B. =	8,7,0,0,5,5,11,0,0,6,0,0,0,4,0,0,
+DATA	B. =	3,9,3,0,2,2,2,0,0,3,0,0,1,1,1,0,
+DATA	B. =	8,7,0,0,5,5,11,0,0,6,0,0,4,4,6,0,
+DATA	B. =	3,9,0,0,2,2,2,0,0,3,0,0,1,1,1,0,
+DATA	B. =	8,7,0,0,0,5,5,0,0,6,0,0,0,4,4,0,
+DATA	B. =	3,9,0,0,2,2,2,0,0,3,0,0,1,1,1,0,
+DATA	B. =	8,7,0,0,0,5,5,0,0,6,0,0,0,4,4,0,
+
+' END OF TABLE
+DATA	B. =	255
+
+DIM PROBS(256)
+DIM COMP(512)
+
+' Encode all the tables, reporting the bytes/bits used for each one
+B=0
+N=0
+I=0
+REPEAT
+  IF I=48 THEN ? " TABLE 1:";N;" . "; B
+  IF I=60 THEN ? " TABLE 2:";N;" . "; B
+  IF I=60+256 THEN ? " TABLE 3:";N;" . "; B
+  IF I=60+512 THEN ? " TABLE 4:";N;" . "; B 
+
+  P = X(I)
+  INC I
+  ' Encode P
+  INC PROBS(P)
+
+  @elias P+1
+UNTIL P = 255
+
+' Pad with zeros
+WHILE B : @encode 0 : WEND
+
+? "Total encoded bytes:";N
+
+' Report statistics
+INPUT "Statistics report(Y/N)?",YN$
+IF YN$="Y" OR YN$="y"
+
+  TOT=0
+  ? "Sym    Count    Bits    Total Bits"
+  FOR I=0 TO 255
+    BITS = 1
+    IF I>0 THEN BITS = BITS + 2
+    IF I>2 THEN BITS = BITS + 2
+    IF I>6 THEN BITS = BITS + 2
+    IF I>14 THEN BITS = BITS + 2
+    IF I>30 THEN BITS = BITS + 2
+    IF I>62 THEN BITS = BITS + 2
+    IF I>126 THEN BITS = BITS + 2
+
+    IF PROBS(I)
+      ? I,PROBS(I),BITS,PROBS(I)*BITS
+      TOT = TOT + PROBS(I)*BITS
+    ENDIF
+  NEXT
+  ? "TOTAL BITS=";TOT,"BYTES=";(TOT+7)/8
+ENDIF
+
+FOR I=0 TO N-1
+   IF I & 15
+     ? ",";COMP(I);
+   ELSE
+     ? : ? "	DTA	";COMP(I);
+   ENDIF
+NEXT
+?
+
+PROC elias ev
+  max=1
+  WHILE max+max <= ev : max=max+max : WEND
+
+  WHILE max>1
+    max = max / 2
+    @encode 0
+    @encode ev & max <> 0
+  WEND
+  @encode 1
+ENDPROC
+
+PROC encode bit
+  BYTE=BYTE/2
+  IF bit THEN BYTE=BYTE+128
+  INC B
+  IF B = 8
+    COMP(N)=BYTE
+    BYTE=0
+    B = 0
+    INC N
+  ENDIF
+ENDPROC
+
